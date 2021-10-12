@@ -1,14 +1,9 @@
-* {
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
-  font-family: Roboto;
-}
 body {
   height: 100vh;
 }
 /* Container  */
 .container.login {
+  padding: 3rem;
   display: flex;
   justify-content: center;
   height: 100%;
@@ -48,7 +43,20 @@ body {
   display: flex;
   align-items: center;
   padding: 2rem 0;
-  border: 1px solid black;
+}
+#right .panel p{
+  color: var(--panel-text-color);
+  padding: 0 1.5rem;
+}
+#right .panel button{
+  font-size: 16px;
+  font-weight: bold;
+  outline: none;
+  padding: .5rem 1.5rem;
+  border-radius: 15px;
+  background: none;
+  border: 1px solid var(--light-grey);
+  box-shadow: 0 0 2px rgba(0,0,0,.2);
 }
 #right .panel.content-right {
   top: 0;
@@ -59,23 +67,19 @@ body {
 }
 /* #right -> .form-container  */
 #right .form-container {
-  border: 1px solid black;
-  margin: 2rem 0;
   flex: 1 0 auto;
   width: 100%;
 }
 /* .form-container -> .form-header, .form */
 .form-container .form-header {
-  padding: 1.5rem;
-  border: 1px solid black;
+  padding: 1rem 0;
   width: 100%;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 .form .form-section{
-  padding: 1.5rem;
-  border: 1px solid black;
+  padding: 1rem;
   width: 100%;  
-  margin-bottom: 2rem;
+  margin-bottom: .5rem;
 }
 /* .form-section -> label, input */
 .form-section label{
@@ -89,5 +93,22 @@ body {
   padding: 15px 10px;
   border-radius: 10px;
   outline: none;
-  border: 2px solid ;
+  font-size: 16px;
+  padding: 1rem;
+  border: 2px solid var(--input-color);
 }
+.form-section input:focus{
+  border: 2px solid var(--input-hover-color);
+}
+.form-section input[type=submit]{
+  background: var(--input-hover-color);
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+  width: 30%;
+  outline: none;
+  border: none;
+  border-radius: 1rem;
+  box-shadow: 0 0 10px rgba(0,0,0,.5);
+}
+
