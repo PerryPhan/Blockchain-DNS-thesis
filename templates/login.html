@@ -2,7 +2,11 @@
 {% block body %}
 <div class="container login">
   <div class="section" id="left">
-    <div class="imgbox hero-imgbox">
+    <div class="absolute branding animation popup">
+      <img src="{{url_for('static',filename='img/dnschain-logo-last.png')}}" alt="Branding">
+      <span>DNSChain</span>
+    </div>
+    <div class="imgbox hero-imgbox animation slidetoRight">
       <img
         src="{{url_for('static',filename='img/hero-image.png')}}"
         alt="Hero"
@@ -10,39 +14,39 @@
     </div>
   </div>
   <div class="section" id="right">
-    <div class="panel content-right">
+    <div class="panel content-right animation popup">
       <p>Haven't had an account?</p>
-      <button class="btn btn-link" id="signup">Sign up</button>
+      <a href="/register" class="btn btn-link" id="signup">Sign up</a>
     </div>
     <div class="form-container">
-      <div class="form-header">
+      <div class="form-header animation popup">
         <h1>Hello DNSChain user !</h1>
         <h4>Login your account</h4>
       </div>
       <!-- TODO : Loop FormItems here -->
       <form class="form" method="POST">
-        <div class="form-section">
+        <div class="form-section animation slidetoLeft">
           <label for="email">Email</label>
           <input
             type="email"
             name="email"
             id="input-email"
-            placeholder="At least 2 words seperate with space"
+            placeholder="daiphan@gmail.com"
             required
           />
         </div>
-        <div class="form-section">
+        <div class="form-section animation slidetoLeft">
           <label for="password">Password</label>
           <input
             type="password"
             name="password"
             id="input-password"
-            placeholder="At least 2 words seperate with space"
+            placeholder="8+ characters"
             pattern=".{8,}"
             required
           />
         </div>
-        <div class="form-section submit">
+        <div class="form-section submit animation popup">
           <input type="submit" value="Sign In" />
         </div>
       </form>

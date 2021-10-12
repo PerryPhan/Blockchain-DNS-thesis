@@ -5,7 +5,8 @@
     box-sizing: border-box;
     font-family: Roboto;
     --input-color: #BABABA ;
-    --input-hover-color: #8165FF ;   
+    --input-hover-color: #8165FF ; 
+  
     --light-grey: #CECECE;
     --panel-text-color: rgba(0,0,0,.5);
 }

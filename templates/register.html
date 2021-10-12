@@ -3,22 +3,30 @@
 {% block body %}
 <div class="container login">
   <div class="section" id="left">
-    <div class="imgbox hero-imgbox">
-      <img src="#" alt="Hero" />
+    <div class="absolute branding animation popup">
+      <img src="{{url_for('static',filename='img/dnschain-logo-last.png')}}" alt="Branding">
+      <span>DNSChain</span>
+    </div>
+    <div class="imgbox hero-imgbox animation slidetoRight">
+      <img
+        src="{{url_for('static',filename='img/hero-image3.png')}}"
+        alt="Hero"
+      />
     </div>
   </div>
   <div class="section" id="right">
-    <div class="panel content-on-the-left">
+    <div class="panel content-right animation popup">
       <p>Already have an account?</p>
-      <button class="btn btn-link" id="signin">Sign in</button>
+      <a href="/login" class="btn btn-link" id="signup">Sign in</a>
     </div>
-    <div class="form-header">
+    <div class="form-container">
+    <div class="form-header animation popup">
       <h1>Welcome to DNSChain !</h1>
       <h4>Register your account</h4>
     </div>
     <!-- TODO : Loop FormItems here -->
     <form class="form" method="POST">
-      <div class="form-section">
+      <div class="form-section animation slidetoLeft">
         <label for="name">Name</label>
         <input
           type="text"
@@ -29,28 +37,28 @@
           required
         />
       </div>
-      <div class="form-section">
+      <div class="form-section animation slidetoLeft">
         <label for="email">Email</label>
         <input
           type="email"
           name="email"
           id="input-email"
-          placeholder="At least 2 words seperate with space"
+          placeholder="daiphan308@gmail.com"
           required
         />
       </div>
-      <div class="form-section">
+      <div class="form-section animation slidetoLeft">
         <label for="password">Password</label>
         <input
           type="password"
           name="password"
           id="input-password"
-          placeholder="At least 2 words seperate with space"
+          placeholder="8+ characters"
           pattern=".{8,}"
           required
         />
       </div>
-      <div class="form-section">
+      <div class="form-section animation slidetoLeft">
         <label for="password">RePassword</label>
         <input
           type="password"
@@ -61,10 +69,11 @@
           required
         />
       </div>
-      <div class="form-section submit">
+      <div class="form-section submit animation popup longer">
         <input type="submit" value="Sign Up" />
       </div>
     </form>
+    </div>
     <div class="panel content-on-the-left">
       <p>This project is made by Phan Dai</p>
     </div>
