@@ -1,0 +1,60 @@
+{% extends 'base.html' %} {% block title %} Sign in DNSChain {% endblock %} {%
+block head %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/login.css')}}"
+/>
+{% endblock %} {% block body %}
+<div class="container login">
+  <div class="section" id="left">
+    <div class="imgbox hero-imgbox">
+      <img
+        src="{{url_for('static',filename='img/hero-image.png')}}"
+        alt="Hero"
+      />
+    </div>
+  </div>
+  <div class="section" id="right">
+    <div class="panel content-right">
+      <p>Haven't had an account?</p>
+      <button class="btn btn-link" id="signup">Sign up</button>
+    </div>
+    <div class="form-container">
+      <div class="form-header">
+        <h1>Hello DNSChain user !</h1>
+        <h4>Login your account</h4>
+      </div>
+      <!-- TODO : Loop FormItems here -->
+      <form class="form" method="POST">
+        <div class="form-section">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            name="email"
+            id="input-email"
+            placeholder="At least 2 words seperate with space"
+            required
+          />
+        </div>
+        <div class="form-section">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            name="password"
+            id="input-password"
+            placeholder="At least 2 words seperate with space"
+            pattern=".{8,}"
+            required
+          />
+        </div>
+        <div class="form-section submit">
+          <input type="submit" value="Sign In" />
+        </div>
+      </form>
+    </div>
+    <div class="panel content-left">
+      <p>This project is made by Phan Dai</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

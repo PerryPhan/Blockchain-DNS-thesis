@@ -1,0 +1,76 @@
+{% extends 'base.html' %} 
+{% block title %} Sign up your account with DNSChain {% endblock %} 
+{% block head %}   
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css')}}">
+{% endblock %}
+{% block body %}
+<div class="container login">
+  <div class="section" id="left">
+    <div class="imgbox hero-imgbox">
+      <img src="#" alt="Hero" />
+    </div>
+  </div>
+  <div class="section" id="right">
+    <div class="panel content-on-the-left">
+      <p>Already have an account?</p>
+      <button class="btn btn-link" id="signin">Sign in</button>
+    </div>
+    <div class="form-header">
+      <h1>Welcome to DNSChain !</h1>
+      <h4>Register your account</h4>
+    </div>
+    <!-- TODO : Loop FormItems here -->
+    <form class="form" method="POST">
+      <div class="form-section">
+        <label for="name">Name</label>
+        <input
+          type="text"
+          name="name"
+          id="input-name"
+          placeholder="At least 2 words seperate with space"
+          pattern="^[a-zA-Z]+[ a-zA-Z]*$"
+          required
+        />
+      </div>
+      <div class="form-section">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          name="email"
+          id="input-email"
+          placeholder="At least 2 words seperate with space"
+          required
+        />
+      </div>
+      <div class="form-section">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          name="password"
+          id="input-password"
+          placeholder="At least 2 words seperate with space"
+          pattern=".{8,}"
+          required
+        />
+      </div>
+      <div class="form-section">
+        <label for="password">RePassword</label>
+        <input
+          type="password"
+          name="repassword"
+          id="input-repassword"
+          placeholder="Must be same as password"
+          pattern=".{8,}"
+          required
+        />
+      </div>
+      <div class="form-section submit">
+        <input type="submit" value="Sign Up" />
+      </div>
+    </form>
+    <div class="panel content-on-the-left">
+      <p>This project is made by Phan Dai</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

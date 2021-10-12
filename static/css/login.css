@@ -1,0 +1,93 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: Roboto;
+}
+body {
+  height: 100vh;
+}
+/* Container  */
+.container.login {
+  display: flex;
+  justify-content: center;
+  height: 100%;
+}
+
+/* Login -> section */
+.login .section {
+  width: 50%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Section #left img */
+#left .imgbox {
+  width: 100%;
+  height: 100%;
+  text-align: center;
+}
+#left .imgbox img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Section #right form */
+#right {
+  height: 100%;
+  padding: 0 5rem;
+}
+/* #right -> panel ( Top, bottom ) */
+#right .panel {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 2rem 0;
+  border: 1px solid black;
+}
+#right .panel.content-right {
+  top: 0;
+  justify-content: flex-end;
+}
+#right .panel.content-left {
+  justify-content: flex-start;
+}
+/* #right -> .form-container  */
+#right .form-container {
+  border: 1px solid black;
+  margin: 2rem 0;
+  flex: 1 0 auto;
+  width: 100%;
+}
+/* .form-container -> .form-header, .form */
+.form-container .form-header {
+  padding: 1.5rem;
+  border: 1px solid black;
+  width: 100%;
+  margin-bottom: 2rem;
+}
+.form .form-section{
+  padding: 1.5rem;
+  border: 1px solid black;
+  width: 100%;  
+  margin-bottom: 2rem;
+}
+/* .form-section -> label, input */
+.form-section label{
+  display: block;
+  font-size: 16px;
+  font-weight: bold;
+  margin: .5rem 0;
+}
+.form-section input{
+  width: 100%;
+  padding: 15px 10px;
+  border-radius: 10px;
+  outline: none;
+  border: 2px solid ;
+}
