@@ -99,7 +99,7 @@ body {
 /* .form-container -> .form-header, .form */
 .form-container .form-header {
   padding: 1rem 0;
-  margin-bottom: 1rem;
+  margin-bottom: 0;
   display: flex;
 }
 .form-header > div {
@@ -111,6 +111,7 @@ body {
   justify-content: center;
 }
 .form-header .text-box h4 {
+  display: block;
   color: rgba(0, 0, 0, 0.5);
   font-weight: 500;
   margin-top: 0.5rem;
