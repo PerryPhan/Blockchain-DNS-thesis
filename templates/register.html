@@ -1,10 +1,12 @@
-{% extends 'base.html' %} 
-{% block title %} Sign up your account with DNSChain {% endblock %} 
-{% block body %}
+{% extends 'base.html' %} {% block title %} Sign up your account with DNSChain
+{% endblock %} {% block body %}
 <div class="container login">
   <div class="section" id="left">
     <div class="absolute branding animation popup">
-      <img src="{{url_for('static',filename='img/dnschain-logo-last.png')}}" alt="Branding">
+      <img
+        src="{{url_for('static',filename='img/dnschain-logo-last.png')}}"
+        alt="Branding"
+      />
       <span>DNSChain</span>
     </div>
     <div class="imgbox hero-imgbox animation slidetoRight">
@@ -20,59 +22,71 @@
       <a href="/login" class="btn btn-link" id="signup">Sign in</a>
     </div>
     <div class="form-container">
-    <div class="form-header animation popup">
-      <h1>Welcome to DNSChain !</h1>
-      <h4>Register your account</h4>
-    </div>
-    <!-- TODO : Loop FormItems here -->
-    <form class="form" method="POST">
-      <div class="form-section animation slidetoLeft">
-        <label for="name">Name</label>
-        <input
-          type="text"
-          name="name"
-          id="input-name"
-          placeholder="At least 2 words seperate with space"
-          pattern="^[a-zA-Z]+[ a-zA-Z]*$"
-          required
-        />
+      <div class="form-header animation popup">
+        <div class="text-box">
+          <h1>Welcome to DNSChain !</h1>
+          <h4>Register your account</h4>
+        </div>
+        <div class="type-img-box animation popup ">
+          <div class="img-box ">
+            <img src="{{url_for('static',filename='img/client-type.jpg')}}" alt="Client" />
+            <p>Client</p>
+          </div>
+          <div class="img-box">
+            <img src="{{url_for('static',filename='img/hoster-type.jpg')}}" alt="Hoster" />
+            <p>Hoster</p>
+          </div>          
+        </div>
       </div>
-      <div class="form-section animation slidetoLeft">
-        <label for="email">Email</label>
-        <input
-          type="email"
-          name="email"
-          id="input-email"
-          placeholder="daiphan308@gmail.com"
-          required
-        />
-      </div>
-      <div class="form-section animation slidetoLeft">
-        <label for="password">Password</label>
-        <input
-          type="password"
-          name="password"
-          id="input-password"
-          placeholder="8+ characters"
-          pattern=".{8,}"
-          required
-        />
-      </div>
-      <div class="form-section animation slidetoLeft">
-        <label for="password">RePassword</label>
-        <input
-          type="password"
-          name="repassword"
-          id="input-repassword"
-          placeholder="Must be same as password"
-          pattern=".{8,}"
-          required
-        />
-      </div>
-      <div class="form-section submit animation popup longer">
-        <input type="submit" value="Sign Up" />
-      </div>
-    </form>
+      <!-- TODO : Loop FormItems here -->
+      <form class="form" method="POST">
+        <div class="form-section animation slidetoLeft">
+          <label for="name">Name</label>
+          <input
+            type="text"
+            name="name"
+            id="input-name"
+            placeholder="At least 2 words seperate with space"
+            pattern="^[a-zA-Z]+[ a-zA-Z]*$"
+            required
+          />
+        </div>
+        <div class="form-section animation slidetoLeft">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            name="email"
+            id="input-email"
+            placeholder="daiphan308@gmail.com"
+            required
+          />
+        </div>
+        <div class="form-section animation slidetoLeft">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            name="password"
+            id="input-password"
+            placeholder="8+ characters"
+            pattern=".{8,}"
+            required
+          />
+        </div>
+        <div class="form-section animation slidetoLeft">
+          <label for="password">RePassword</label>
+          <input
+            type="password"
+            name="repassword"
+            id="input-repassword"
+            placeholder="Must be same as password"
+            pattern=".{8,}"
+            required
+          />
+        </div>
+        <div class="form-section submit animation popup longer">
+          <input type="submit" value="Sign Up" />
+        </div>
+      </form>
     </div>
     <div class="panel content-on-the-left">
       <p>This project is made by Phan Dai</p>

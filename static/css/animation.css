@@ -33,7 +33,10 @@
 .longer.submit.animation.popup:last-child{
     animation-delay: 1.3s;
 }
-
+.type-img-box.animation.popup{
+    animation-duration: 1.25s;
+    animation-delay: 2s;
+}
 
 @keyframes slidetoRight { 
     0%{

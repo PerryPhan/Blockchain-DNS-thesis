@@ -20,19 +20,19 @@ body {
   align-items: center;
   position: relative;
 }
-.absolute.branding{
+.absolute.branding {
   top: 0;
   left: 10%;
   position: absolute;
   display: flex;
   align-items: center;
 }
-.absolute.branding img{
+.absolute.branding img {
   width: 80px;
   height: 80px;
   object-fit: contain;
 }
-.absolute.branding span{
+.absolute.branding span {
   font-size: 24px;
   font-weight: bold;
   color: rgba(103, 10, 165, 0.781);
@@ -62,26 +62,26 @@ body {
   align-items: center;
   padding: 2rem 0;
 }
-#right .panel p{
+#right .panel p {
   color: var(--panel-text-color);
   padding: 0 1.5rem;
 }
-#right .panel a{
+#right .panel a {
   font-size: 16px;
   font-weight: bold;
   outline: none;
-  padding: .5rem 1.5rem;
+  padding: 0.5rem 1.5rem;
   border-radius: 15px;
   background: none;
   border: 1px solid var(--light-grey);
-  box-shadow: 0 0 2px rgba(0,0,0,.2);
-  transition: .3s;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+  transition: 0.3s;
   cursor: pointer;
   color: unset;
   text-decoration: none;
 }
-#right .panel a:hover{
-  background-color: rgba(0,0,0,.04);
+#right .panel a:hover {
+  background-color: rgba(0, 0, 0, 0.04);
   transform: scale(1.1);
 }
 #right .panel.content-right {
@@ -99,29 +99,78 @@ body {
 /* .form-container -> .form-header, .form */
 .form-container .form-header {
   padding: 1rem 0;
-  width: 100%;
   margin-bottom: 1rem;
+  display: flex;
 }
-
-.form-header h4{
-  color: rgba(0,0,0,.5);
+.form-header > div {
+  display: flex;
+  width: 50%;
+}
+.form-header .text-box{
+  flex-direction: column;
+  justify-content: center;
+}
+.form-header .text-box h4 {
+  color: rgba(0, 0, 0, 0.5);
   font-weight: 500;
-  margin-top: .5rem;
+  margin-top: 0.5rem;
+}
+.form-header .type-img-box {
+  width: 50%;
+  align-items: center;
+  justify-content: center;
+  transition: 1s;
+}
+.type-img-box .img-box {
+  width: 120px;
+  overflow: hidden;
+  text-align: center;
+  margin-right: 20px;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: 0.3s;
+  padding: 0.8rem 1rem 0rem;
 }
 
-.form .form-section{
-  padding: 1rem 0 ;
-  width: 100%;  
-  margin-bottom: .5rem;
+.type-img-box .img-box:hover {
+  transform: scale(1.1);
+  background-color: var(--input-hover-color);
+}
+.img-box p {
+  transition: 0.3s;
+  transform: translateY(100%);
+  letter-spacing: 0.5px;
+  vertical-align: middle;
+  font-weight: bold;
+  font-size: 12px;
+  line-height: 12px;
+  padding: 0.3rem;
+  margin: 0.1rem;
+}
+.img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+.type-img-box .img-box:hover p {
+  color: white;
+  transform: translateY(0%);
+}
+
+.form .form-section {
+  padding: 1rem 0;
+  width: 100%;
+  margin-bottom: 0.5rem;
 }
 /* .form-section -> label, input */
-.form-section label{
+.form-section label {
   display: block;
   font-size: 16px;
   font-weight: bold;
-  margin-bottom: .5rem;
+  margin-bottom: 0.5rem;
 }
-.form-section input{
+.form-section input {
   width: 100%;
   padding: 15px 10px;
   border-radius: 10px;
@@ -129,10 +178,10 @@ body {
   font-size: 16px;
   border: 2px solid var(--input-color);
 }
-.form-section input:focus{
+.form-section input:focus {
   border: 2px solid var(--input-hover-color);
 }
-.form-section input[type=submit]{
+.form-section input[type="submit"] {
   background: var(--input-hover-color);
   font-size: 18px;
   font-weight: bold;
@@ -141,12 +190,11 @@ body {
   outline: none;
   border: none;
   border-radius: 1rem;
-  box-shadow: 0 0 10px rgba(0,0,0,.5);
-  transition: .3s;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  transition: 0.3s;
   cursor: pointer;
 }
-.form-section input[type=submit]:hover{
+.form-section input[type="submit"]:hover {
   background-color: rgba(157, 23, 246, 0.781);
   transform: scale(1.1);
 }
-
