@@ -3,28 +3,29 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_session import Session
 from werkzeug.utils import redirect
 from business.model.account import AccountSchema
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # --------- SETTINGS --------------------------------------
 app = Flask(__name__)
 
 # Setting SESSION
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:1234@localhost/dnschain2'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:1234@localhost/dnschain'
 app.config['SESSION_PERMANENT'] = False
 app.config['SESSION_TYPE'] = 'filesystem'
 app.secret_key = 'super secret key'
 Session(app)
-
 # Setting DB
 db = SQLAlchemy(app)
 
-
 # --------- MODELS --------------------------------------
+
+
 class Account(db.Model):
     __tablename__ = 'accounts'
     id = db.Column(db.Integer, primary_key=True)
     fullname = db.Column(db.String(40), nullable=False)
     email = db.Column(db.String(40), nullable=False)
-    password = db.Column(db.String(), nullable=False)
+    password = db.Column(db.String(255), nullable=False)
     type_cd = db.Column(db.Integer, nullable=False)
     is_deleted = db.Column(db.Boolean, nullable=False)
 
@@ -36,6 +37,8 @@ class Account(db.Model):
         self.is_deleted = is_deleted
 
 # --------- BUSINESS -----------------------------------
+
+
 class AccountBusiness:
     def __init__(self):
         pass
@@ -48,7 +51,7 @@ class AccountBusiness:
         password = request.form.get(AccountSchema.PASSWORD)
         account = Account.query.filter(Account.email == email).all()
         # print("Account: ", account[0].password)
-        if(account[0].password == password):
+        if check_password_hash(account[0].password, password):
             return True
         return False
 
@@ -63,60 +66,68 @@ class AccountBusiness:
         # print("Password : ",password)
         # print("RePassword : ",repassword)
         # print("Type code : ",type_cd)
-        isPassed = False
-        isPassed = type_cd != None
-        isPassed = password == repassword 
+        if password != repassword:
+            return False
+        if type_cd == 0:
+            return False
         # print('Validating register: ', isPassed)
-        return isPassed
+        return True
 
-    def onReturn(self, data ) :
-        if data != None : data.password = None
+    def onReturn(self, data):
         response = {
-            'isSuccess' : True,
-            'data' : data,
-            'error' : None 
+            'isSuccess': True,
+            'data': data,
+            'message': AccountSchema.message['RE01XXXX']
         }
         # print('Success: ', response['isSuccess'])
         # print('Data : ', data.email)
         return response
 
-    def onError(self ,data ,error_message ):
-        if data != None : data.password = None
+    def onError(self, data, message_cd):
         response = {
-            'isSuccess' : False,
-            'data' : data,
-            'error' : error_message 
+            'isSuccess': False,
+            'data': data,
+            'message': AccountSchema.message[message_cd]
         }
         # print('Success: ', response['isSuccess'])
         # print('Error Message : ', error_message)
         return response
 
+    def encodingPassword(self, password):
+        return generate_password_hash(password)
+
+    def checkDuplicatingAccount(self, email):
+        accounts = Account.query.filter(
+            Account.email == email, Account.is_deleted == False).all()
+        return len(accounts) if len(accounts) > 0 else True
+
     def insert(self, request, resolve, reject):
-        # TODO : set error message in Dist
-        insertErrorMessage = '[E0100001] Error in inserting account' 
-        insertEmptyErrorMessage = '[E0100002] Data not match' 
-        if  resolve == None or reject == None or request == None : 
-            return reject( None , insertEmptyErrorMessage )
+        if resolve == None or reject == None or request == None:
+            return reject(None, 'RE010002')
         newAccount = Account(
             fullname=request.form.get(AccountSchema.FULLNAME),
             email=request.form.get(AccountSchema.EMAIL),
-            password=request.form.get(AccountSchema.PASSWORD),
-            type_cd= int(request.form.get(AccountSchema.TYPE_CD)),
+            password=self.encodingPassword(
+                request.form.get(AccountSchema.PASSWORD)),
+            type_cd=int(request.form.get(AccountSchema.TYPE_CD) or '0'),
             is_deleted=False,
         )
-        if  not self.validateRegister(request):
-            return reject( newAccount , insertEmptyErrorMessage )
+        if not self.validateRegister(request):
+            return reject(newAccount, 'RE010003')
+
+        if not self.checkDuplicatingAccount(newAccount.email):
+            return reject(newAccount, 'RE010004')
 
         try:
-            # db.session.add( newAccount )
-            # db.session.commit()
-            return resolve( newAccount )
+            db.session.add(newAccount)
+            db.session.commit()
+            return resolve(newAccount)
         except:
-            return reject( newAccount, insertErrorMessage )
+            return reject(newAccount, 'RE010001')
 
     def update(self, id, request, resolve, reject):
         updatedAccount = Account.query.get_or_404(id)
-        
+
         if(updatedAccount.fullname != request.form.get(AccountSchema.FULLNAME) and request.form.get(AccountSchema.FULLNAME) != None):
             updatedAccount.fullname = request.form.get(AccountSchema.FULLNAME)
 
@@ -137,7 +148,7 @@ class AccountBusiness:
 
     def delete(self, id, resolve, reject):
         deleteAccount = Account.query.get_or_404(id)
-        
+
         try:
             db.session.delete(deleteAccount)
             db.session.commit()
@@ -145,45 +156,55 @@ class AccountBusiness:
         except:
             return reject()
 
+
 # --------- INIT --------------------------------------
 accountBusiness = AccountBusiness()
 
 # --------- ROUTERS --------------------------------------
+
+
 @app.route('/')
 def home():
     if not session.get("email"):
         return redirect('/login')
-    else :
-        return 'Someone is Logged'
+    else:
+        return render_template('index.html')
+
 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
     if request.method == 'POST':
-        response = accountBusiness.insert(request, accountBusiness.onReturn , accountBusiness.onError)
-        error = response['error']
+        response = accountBusiness.insert(
+            request, accountBusiness.onReturn, accountBusiness.onError)
+        message = response['message']
         data = response['data']
         isSuccess = response['isSuccess']
-        if response['isSuccess'] :
-            return render_template('login.html', error = error, data = data, isSuccess = isSuccess)
-        else: 
+        if response['isSuccess']:
+            return render_template('login.html', email=data.email)
+        else:
             # print ('Data: ', error,data,isSuccess)
             # print ('Type_cd: ',data.type_cd)
-            return render_template('register.html', error = error, email = data.email, fullname = data.fullname, type_cd = data.type_cd, isSuccess = isSuccess)
+            return render_template('register.html', message=message, email=data.email, fullname=data.fullname, type_cd=data.type_cd, isSuccess=isSuccess)
     return render_template('register.html')
+
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
-        # TODO : Encoding password & tokens maybe 
+        # TODO : Encoding password & tokens maybe
         isPassed = accountBusiness.validateLogin(request)
         # print('isPassed from Login page : ',isPassed)
         if isPassed:
             session['email'] = request.form.get(AccountSchema.EMAIL)
-            return redirect('/')   
-        return render_template('login.html')
+            return redirect('/')
+        return render_template('login.html', email=request.form.get(AccountSchema.EMAIL), message=AccountSchema.message['LO010001'], isSuccess=False)
     else:
         return render_template('login.html')
 
+@app.route('/logout')
+def logout():
+    session.pop('email', None)
+    return redirect('/')
 
 if __name__ == "__main__":
     app.run(debug=True)

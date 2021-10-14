@@ -29,7 +29,6 @@
             <h1>Welcome to DNSChain !</h1>
             <h4>Register your account</h4>
           </div>
-          <!-- TODO: For loop input[type=radio] here  -->
           <div class="type-img-box animation popup">
             {% if not type_cd or type_cd == 2 %}
               <label class="img-box checked" id="type-box-2">
@@ -58,11 +57,19 @@
             {% endif %}
           </div>
         </div>
-        <!-- TODO: Alert when success or failed -->
-        <div class="form-alert error animation popup longest">
-          This is alert
-        </div>
-        <!-- TODO : Loop FormItems here -->
+        {% if message %}
+          {% if isSuccess == True %}
+            <div class="form-alert success animation popup longest">
+              {{ message }}
+            </div>
+          {% else %}
+            {% if isSuccess == False %}
+            <div class="form-alert error animation popup longest">
+              {{ message }}
+            </div>  
+            {% endif %}
+          {% endif %}
+        {% endif %}
         <div class="form-section animation slidetoLeft">
           <label for="name">Name</label>
           <input

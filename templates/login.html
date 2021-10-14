@@ -27,6 +27,19 @@
       </div>
       <!-- TODO : Loop FormItems here -->
       <form class="form" method="POST" action="/login">
+        {% if message %}
+          {% if isSuccess == True %}
+            <div class="form-alert success animation popup longest">
+              {{ message }}
+            </div>
+          {% else %}
+            {% if isSuccess == False %}
+            <div class="form-alert error animation popup longest">
+              {{ message }}
+            </div>  
+            {% endif %}
+          {% endif %}
+        {% endif %}
         <div class="form-section animation slidetoLeft">
           <label for="email">Email</label>
           <input
@@ -35,6 +48,7 @@
             id="input-email"
             placeholder="daiphan@gmail.com"
             required
+            value ="{{ email or '' }}"
           />
         </div>
         <div class="form-section animation slidetoLeft">
@@ -43,8 +57,8 @@
             type="password"
             name="password"
             id="input-password"
-            placeholder="8+ characters"
-            pattern=".{8,}"
+            placeholder="8+ characters, 1 lowercase, 1 uppercase and 1 special character"
+            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$@!%&*?])[A-Za-z\d#$@!%&*?]{8,30}$"
             required
           />
         </div>

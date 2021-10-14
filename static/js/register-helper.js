@@ -1,17 +1,24 @@
 // - CSS Class 
 CHECKED_CLASS = 'checked'
 BORDER_ERROR_CLASS ='border-error'
+DISABLED_CLASS = 'disabled'
 // - Error 
 function disableError(){
   if($("#input-password").hasClass(BORDER_ERROR_CLASS)) $("#input-password").removeClass(BORDER_ERROR_CLASS)
   if($("#input-repassword").hasClass(BORDER_ERROR_CLASS)) $("#input-repassword").removeClass(BORDER_ERROR_CLASS)
-  $("input[type=submit]").removeAttr("disabled");
+  $("input[type=submit]").removeAttr("disabled").removeClass('disabled');
 }
 
 function enableError( className ){
   $(className).addClass(BORDER_ERROR_CLASS)
-  $("input[type=submit]").attr('disabled', 'disabled');
+  $("input[type=submit]").attr('disabled', 'disabled').addClass('disabled');
 }
+
+function hideAlertWhenClick( ){
+  $('.form-alert').addClass('d-none')
+}
+
+$('input').click(hideAlertWhenClick)
 
 $(".img-box").click(function () {
   $(".img-box").removeClass(CHECKED_CLASS);

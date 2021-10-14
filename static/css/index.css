@@ -13,3 +13,7 @@
 .border-error{
     border: 2px solid var(--error-color) !important;
 }
+
+.disabled{
+    background-color: gray;
+}
