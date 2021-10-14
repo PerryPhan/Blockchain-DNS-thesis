@@ -3,16 +3,17 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_session import Session
 from werkzeug.utils import redirect
 from business.model.account import AccountSchema
-import json
 
 # --------- SETTINGS --------------------------------------
 app = Flask(__name__)
+
 # Setting SESSION
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:1234@localhost/students'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:1234@localhost/dnschain2'
 app.config['SESSION_PERMANENT'] = False
 app.config['SESSION_TYPE'] = 'filesystem'
 app.secret_key = 'super secret key'
 Session(app)
+
 # Setting DB
 db = SQLAlchemy(app)
 
@@ -33,6 +34,7 @@ class Account(db.Model):
         self.password = password
         self.type_cd = type_cd
         self.is_deleted = is_deleted
+
 # --------- BUSINESS -----------------------------------
 class AccountBusiness:
     def __init__(self):
@@ -41,7 +43,7 @@ class AccountBusiness:
     def selectAll(self):
         return Account.query.order_by(Account.id).all()
 
-    def validate(self, request):
+    def validateLogin(self, request):
         email = request.form.get(AccountSchema.EMAIL)
         password = request.form.get(AccountSchema.PASSWORD)
         account = Account.query.filter(Account.email == email).all()
@@ -50,20 +52,67 @@ class AccountBusiness:
             return True
         return False
 
+    def validateRegister(self, request):
+        fullname = request.form.get(AccountSchema.FULLNAME)
+        email = request.form.get(AccountSchema.EMAIL)
+        password = request.form.get(AccountSchema.PASSWORD)
+        repassword = request.form.get(AccountSchema.REPASSWORD)
+        type_cd = request.form.get(AccountSchema.TYPE_CD)
+        # print("Fullname : ",fullname)
+        # print("Email : ",email)
+        # print("Password : ",password)
+        # print("RePassword : ",repassword)
+        # print("Type code : ",type_cd)
+        isPassed = False
+        isPassed = type_cd != None
+        isPassed = password == repassword 
+        # print('Validating register: ', isPassed)
+        return isPassed
+
+    def onReturn(self, data ) :
+        if data != None : data.password = None
+        response = {
+            'isSuccess' : True,
+            'data' : data,
+            'error' : None 
+        }
+        # print('Success: ', response['isSuccess'])
+        # print('Data : ', data.email)
+        return response
+
+    def onError(self ,data ,error_message ):
+        if data != None : data.password = None
+        response = {
+            'isSuccess' : False,
+            'data' : data,
+            'error' : error_message 
+        }
+        # print('Success: ', response['isSuccess'])
+        # print('Error Message : ', error_message)
+        return response
+
     def insert(self, request, resolve, reject):
+        # TODO : set error message in Dist
+        insertErrorMessage = '[E0100001] Error in inserting account' 
+        insertEmptyErrorMessage = '[E0100002] Data not match' 
+        if  resolve == None or reject == None or request == None : 
+            return reject( None , insertEmptyErrorMessage )
         newAccount = Account(
             fullname=request.form.get(AccountSchema.FULLNAME),
             email=request.form.get(AccountSchema.EMAIL),
             password=request.form.get(AccountSchema.PASSWORD),
-            type_cd=request.form.get(AccountSchema.TYPE_CD),
+            type_cd= int(request.form.get(AccountSchema.TYPE_CD)),
             is_deleted=False,
         )
+        if  not self.validateRegister(request):
+            return reject( newAccount , insertEmptyErrorMessage )
+
         try:
-            db.session.add(newAccount)
-            db.session.commit()
-            return resolve(newAccount)
+            # db.session.add( newAccount )
+            # db.session.commit()
+            return resolve( newAccount )
         except:
-            return reject()
+            return reject( newAccount, insertErrorMessage )
 
     def update(self, id, request, resolve, reject):
         updatedAccount = Account.query.get_or_404(id)
@@ -95,8 +144,10 @@ class AccountBusiness:
             return resolve(deleteAccount)
         except:
             return reject()
+
 # --------- INIT --------------------------------------
 accountBusiness = AccountBusiness()
+
 # --------- ROUTERS --------------------------------------
 @app.route('/')
 def home():
@@ -108,15 +159,23 @@ def home():
 @app.route('/register', methods=['POST', 'GET'])
 def register():
     if request.method == 'POST':
-        return render_template('register.html')
-    else:
-        return render_template('register.html')
+        response = accountBusiness.insert(request, accountBusiness.onReturn , accountBusiness.onError)
+        error = response['error']
+        data = response['data']
+        isSuccess = response['isSuccess']
+        if response['isSuccess'] :
+            return render_template('login.html', error = error, data = data, isSuccess = isSuccess)
+        else: 
+            # print ('Data: ', error,data,isSuccess)
+            # print ('Type_cd: ',data.type_cd)
+            return render_template('register.html', error = error, email = data.email, fullname = data.fullname, type_cd = data.type_cd, isSuccess = isSuccess)
+    return render_template('register.html')
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
-        # TODO : authentication with AccountBusiness.validate
-        isPassed = accountBusiness.validate(request)
+        # TODO : Encoding password & tokens maybe 
+        isPassed = accountBusiness.validateLogin(request)
         # print('isPassed from Login page : ',isPassed)
         if isPassed:
             session['email'] = request.form.get(AccountSchema.EMAIL)

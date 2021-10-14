@@ -18,37 +18,61 @@
   </div>
   <div class="section" id="right">
     <div class="panel content-right animation popup">
-      <p>Already have an account?</p>
+      <p>Already have an account? </p>
       <a href="/login" class="btn btn-link" id="signup">Sign in</a>
     </div>
     <div class="form-container">
-      <div class="form-header animation popup">
-        <div class="text-box">
-          <h1>Welcome to DNSChain !</h1>
-          <h4>Register your account</h4>
-        </div>
-        <div class="type-img-box animation popup ">
-          <div class="img-box ">
-            <img src="{{url_for('static',filename='img/client-type.jpg')}}" alt="Client" />
-            <p>Client</p>
-          </div>
-          <div class="img-box">
-            <img src="{{url_for('static',filename='img/hoster-type.jpg')}}" alt="Hoster" />
-            <p>Hoster</p>
-          </div>          
-        </div>
-      </div>
-      <!-- TODO : Loop FormItems here -->
       <form class="form" method="POST" action="/register">
+        
+        <div class="form-header animation popup">
+          <div class="text-box">
+            <h1>Welcome to DNSChain !</h1>
+            <h4>Register your account</h4>
+          </div>
+          <!-- TODO: For loop input[type=radio] here  -->
+          <div class="type-img-box animation popup">
+            {% if not type_cd or type_cd == 2 %}
+              <label class="img-box checked" id="type-box-2">
+                <input type="radio" name="type_cd" value="2" id="2" checked>
+                <img src="{{url_for('static',filename='img/client-type.jpg')}}" alt="Client"/>
+                <p>Client</p>
+              </label>
+              <label class="img-box" id="type-box-3">
+                <input type="radio" name="type_cd" value="3" id="3">
+                <img src="{{url_for('static',filename='img/hoster-type.jpg')}}" alt="Hoster"/>
+                <p>Hoster</p>
+              </label>
+            {% else %}
+              {% if type_cd == 3 %}
+              <label class="img-box " id="type-box-2">
+                <input type="radio" name="type_cd" value="client" id="2" >
+                <img src="{{url_for('static',filename='img/client-type.jpg')}}" alt="Client"/>
+                <p>Client</p>
+              </label>
+              <label class="img-box checked" id="type-box-3">
+                <input type="radio" name="type_cd" value="hoster" id="3" checked>
+                <img src="{{url_for('static',filename='img/hoster-type.jpg')}}" alt="Hoster"/>
+                <p>Hoster</p>
+              </label>
+              {% endif %}
+            {% endif %}
+          </div>
+        </div>
+        <!-- TODO: Alert when success or failed -->
+        <div class="form-alert error animation popup longest">
+          This is alert
+        </div>
+        <!-- TODO : Loop FormItems here -->
         <div class="form-section animation slidetoLeft">
           <label for="name">Name</label>
           <input
             type="text"
-            name="name"
+            name="fullname"
             id="input-name"
             placeholder="At least 2 words seperate with space"
             pattern="^[a-zA-Z]+[ a-zA-Z]*$"
             required
+            value = "{{ fullname or '' }}"
           />
         </div>
         <div class="form-section animation slidetoLeft">
@@ -59,6 +83,7 @@
             id="input-email"
             placeholder="daiphan308@gmail.com"
             required
+            value = "{{ email or '' }}"
           />
         </div>
         <div class="form-section animation slidetoLeft">
@@ -67,8 +92,8 @@
             type="password"
             name="password"
             id="input-password"
-            placeholder="8+ characters"
-            pattern=".{8,}"
+            placeholder="8+ characters, 1 lowercase, 1 uppercase and 1 special character"
+            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$@!%&*?])[A-Za-z\d#$@!%&*?]{8,30}$"
             required
           />
         </div>
@@ -79,7 +104,7 @@
             name="repassword"
             id="input-repassword"
             placeholder="Must be same as password"
-            pattern=".{8,}"
+            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$@!%&*?])[A-Za-z\d#$@!%&*?]{8,30}$"
             required
           />
         </div>
@@ -94,3 +119,6 @@
   </div>
 </div>
 {% endblock %}
+{% block script %}
+<script src="{{url_for('static',filename='js/register-helper.js')}}"></script>
+{% endblock %} 

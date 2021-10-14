@@ -27,6 +27,12 @@
 .animation.slidetoLeft:nth-child(4){
     animation-delay: 1.25s;
 }
+.animation.slidetoLeft:nth-child(5){
+    animation-delay: 1.5s;
+}
+.animation.slidetoLeft:nth-child(6){
+    animation-delay: 1.75s;
+}
 .submit.animation.popup:last-child{
     animation-delay: 1s;
 }
