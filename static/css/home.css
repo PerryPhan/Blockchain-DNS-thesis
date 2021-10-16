@@ -1,0 +1,56 @@
+.home.container{
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
+    color: black;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    --home-tab-bgcolor: #A982DB;
+    --home-main-bgcolor: #F2EFFF;
+    --home-main-heading-text-color: #9F38A7;
+    --home-main-sub-heading-text-color: #9B889C;
+    --home-main-disabled-text-color: #9B889C;
+    --home-notificator-bgcolor: white;
+    --home-padding-top: 30px;
+}
+.home .heading-text-color{
+    color: var(--home-main-heading-text-color);
+}
+.home .sub-heading-text-color{
+    color: var(--home-main-sub-heading-text-color);
+}
+.home .disabled-text-color{
+    color: var(--home-main-disabled-text-color);
+}
+.home > div {
+    padding-top: var(--home-padding-top);
+}
+.home .tab-navigator{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+
+    width: 15%;
+    height: 100%;
+    background-color: var(--home-tab-bgcolor);
+}
+.home .tab-navigator .logo-side{
+    width: 200px;
+    height: 200px;
+}
+.home .tab-navigator .logo-side img{
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.home .main{
+    background-color: var(--home-main-bgcolor);
+    width: 50%;
+    height: 100%;
+}
+.home .notificator{
+    background-color: white;
+    width: 30%;
+    height: 100%;
+}

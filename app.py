@@ -165,10 +165,11 @@ accountBusiness = AccountBusiness()
 
 @app.route('/')
 def home():
-    if not session.get("email"):
-        return redirect('/login')
-    else:
+    if session.get("email"):
         return render_template('index.html')
+    else:
+        return redirect('/login')
+        
 
 
 @app.route('/register', methods=['POST', 'GET'])
