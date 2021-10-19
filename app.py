@@ -165,10 +165,11 @@ accountBusiness = AccountBusiness()
 
 @app.route('/')
 def home():
-    if session.get("email"):
-        return render_template('index.html')
-    else:
-        return redirect('/login')
+    print( session )
+    # if session and session.get("email"):
+    return render_template('index.html')
+    # else:
+    #     return redirect('/login')
         
 
 
@@ -194,7 +195,6 @@ def login():
     if request.method == 'POST':
         # TODO : Encoding password & tokens maybe
         isPassed = accountBusiness.validateLogin(request)
-        # print('isPassed from Login page : ',isPassed)
         if isPassed:
             session['email'] = request.form.get(AccountSchema.EMAIL)
             return redirect('/')
