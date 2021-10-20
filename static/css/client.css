@@ -1,0 +1,34 @@
+.client.container{
+    width: 100%;
+    height: 100%;
+}
+.client .header{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    max-height: 100px;
+    background-color: aliceblue;
+    padding: 15px 30px; 
+
+}
+.client .header > div{
+    width: 50%;
+}
+.client .header .left{
+    display: flex;
+    align-items: center;
+}
+.client .header .left .logo .logo-link{
+    display: flex;
+}
+.client .header .left .logo a .img-box{
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+}
+.client .header .left .logo a img{
+
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}

@@ -1,0 +1,47 @@
+{% extends 'base.html' %} {% block title %} DNSChain homepage {% endblock %} {%
+block body %}
+<div class="client container">
+  <div class="header">
+    <div class="left">
+      <div class="menu-btn">
+        <button>
+          <img src="#" alt="btn-menu-img" />
+        </button>
+      </div>
+      <div class="logo">
+        <a href="#">
+          <div class="logo-link">
+            <div class="img-box">
+              <img
+                src="{{url_for('static',filename='img/dnschain-logo-last.png')}}"
+                alt="logo"
+              />
+            </div>
+            <span>dnschain</span>
+          </div>
+        </a>
+      </div>
+      <div class="search">
+        <img
+          src="{{url_for('static',filename='img/search-icon.png')}}"
+          alt="search-icon"
+        />
+        <input type="text" placeholder="Search infromation in profile" />
+      </div>
+    </div>
+    <div class="right">
+      <div class="user">
+        <div class="hello">Hi. <span class="name">Phan Dai</span></div>
+        <div class="type client">Client</div>
+      </div>
+    </div>
+  </div>
+  <div class="aside">
+    <div class="tab-title">Table</div>
+    <div class="tab-title">Connecting</div>
+  </div>
+  <div class="main">
+    <table></table>
+  </div>
+</div>
+{% endblock %}

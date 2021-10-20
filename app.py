@@ -167,7 +167,8 @@ accountBusiness = AccountBusiness()
 def home():
     print( session )
     # if session and session.get("email"):
-    return render_template('index.html')
+    # return render_template('index.html')
+    return render_template('client.html')
     # else:
     #     return redirect('/login')
         
