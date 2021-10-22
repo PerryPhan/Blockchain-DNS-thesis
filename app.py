@@ -165,7 +165,6 @@ accountBusiness = AccountBusiness()
 
 @app.route('/')
 def home():
-    print( session )
     # if session and session.get("email"):
     # return render_template('index.html')
     return render_template('client.html')
