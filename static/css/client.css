@@ -2,10 +2,12 @@
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background-color: gray;
+    background-color: rgb(241, 241, 241);
     
     --client-search-input-bgcolor: #F6F6F6;
     --client-user-type-client-color: #069550;
+    --client-hovered-tab-title-bgcolor: #34424A;
+    --client-hovered-tab-title-after-bgcolor: #1A89C9
 }
 .client .header{
     width: 100%;
@@ -27,6 +29,7 @@
     background-color: none;
     border: none;
     outline: none;
+    cursor: pointer;
 }
 .client .header .left .logo{
     margin-left: 15px;
@@ -81,6 +84,17 @@
     display: flex;
     justify-content: flex-end;
 }
+
+.client .header .right .user .hello{
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+.client .header .right .user .hello .name{
+    margin-left: 10px;
+}
 .client .header .right .user .type{
     background-color: rgb(219, 219, 219);
     width: fit-content;
@@ -88,13 +102,52 @@
     margin-top: 2px;
     margin-left: 10px;
     border-radius: 12px;
+    font-size: 16px;
     color: white;
 }
 .client .header .right .user .type.client{
     background-color: var(--client-user-type-client-color);
 }
+.client .header .right .user a{
+    color: #FF0000;    
+    text-decoration: none;
+}
+.client .header .right .user a .img-box{
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+.client .header .right .user a .img-box img{
+    margin-left: 5px;
+}
 .client .aside{
-    width: 15%;
+    overflow: hidden;
+    width: 0%;
     height: 100%;
     background-color: #465A65;
+}
+.client .aside .tab-title{
+    cursor: pointer;
+    color: white;
+    padding: 20px;
+    margin-bottom: 5px;
+    border: 1px solid white;
+    transition: .2s;
+    position: relative;
+}
+.client .aside .tab-title:hover{
+    background-color: var(--client-hovered-tab-title-bgcolor);
+}
+.client .aside .tab-title.active{
+    padding-left: 30px;
+    background-color: var(--client-hovered-tab-title-bgcolor);
+}
+.client .aside .tab-title.active::after{
+    content: '';
+    position: absolute;
+    top:0;
+    left:0;
+    width: 10px;
+    height: 100%;
+    background-color: var(--client-hovered-tab-title-after-bgcolor);    
 }

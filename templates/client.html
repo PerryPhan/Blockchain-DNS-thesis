@@ -4,7 +4,7 @@ block body %}
   <div class="header">
     <div class="left">
       <div class="menu-btn">
-        <button>
+        <button id="menu-toggler">
           <img src="{{url_for('static',filename='img/menu-icon.png')}}" alt="btn-menu-img" />
         </button>
       </div>
@@ -31,17 +31,29 @@ block body %}
     </div>
     <div class="right">
       <div class="user">
-        <h3 class="hello">Hi. <span class="name">Phan Dai</span></h3>
-        <div class="type client">Client</div>
+        <div class="hello">Hi <div class="name">Phan Dai</div><div class="type client">Client</div></div>
+        <a href="/logout">
+          <div class="img-box">
+            Logout 
+            <img src="{{url_for('static',filename='img/logout-icon.png')}}" alt="logout-icon">
+          </div>
+        </a>
       </div>
     </div>
   </div>
-  <div class="aside">
-    <div class="tab-title">Table</div>
-    <div class="tab-title">Connecting</div>
+  <div class="aside animation">
+    <div class="tab-title active">
+      <h3>Table</h3>
+    </div>
+    <div class="tab-title">
+      <h3>Connecting</h3>
+    </div>
   </div>
   <div class="main">
     <table></table>
   </div>
 </div>
 {% endblock %}
+{% block script %}
+<script src="{{url_for('static',filename='js/client-helper.js')}}"></script>
+{% endblock %} 

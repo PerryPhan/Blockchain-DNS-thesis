@@ -4,21 +4,23 @@ from flask_session import Session
 from werkzeug.utils import redirect
 from business.model.account import AccountSchema
 from werkzeug.security import generate_password_hash, check_password_hash
-
+from datetime import timedelta
 # --------- SETTINGS --------------------------------------
 app = Flask(__name__)
 
 # Setting SESSION
+app.config['SESSION_PERMANENT'] = True
+app.permanent_session_lifetime = timedelta(minutes=30)
+# Setting DB
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:1234@localhost/dnschain'
-app.config['SESSION_PERMANENT'] = False
-app.config['SESSION_TYPE'] = 'filesystem'
+app.config['SESSION_TYPE'] = 'sqlalchemy'
+db = SQLAlchemy(app)
+app.config['SESSION_SQLALCHEMY'] = db
+# Setting SESSION 2
 app.secret_key = 'super secret key'
 Session(app)
-# Setting DB
-db = SQLAlchemy(app)
 
 # --------- MODELS --------------------------------------
-
 
 class Account(db.Model):
     __tablename__ = 'accounts'
@@ -38,7 +40,6 @@ class Account(db.Model):
 
 # --------- BUSINESS -----------------------------------
 
-
 class AccountBusiness:
     def __init__(self):
         pass
@@ -51,9 +52,14 @@ class AccountBusiness:
         password = request.form.get(AccountSchema.PASSWORD)
         account = Account.query.filter(Account.email == email).all()
         # print("Account: ", account[0].password)
-        if check_password_hash(account[0].password, password):
+        if password and check_password_hash(account[0].password, password):
             return True
         return False
+
+    def getType(self, email):
+        account = Account.query.filter(
+            Account.email == email, Account.is_deleted == False).all()
+        return account[0].type_cd if account else -1  
 
     def validateRegister(self, request):
         fullname = request.form.get(AccountSchema.FULLNAME)
@@ -162,16 +168,17 @@ accountBusiness = AccountBusiness()
 
 # --------- ROUTERS --------------------------------------
 
-
 @app.route('/')
 def home():
-    # if session and session.get("email"):
-    # return render_template('index.html')
-    return render_template('client.html')
-    # else:
-    #     return redirect('/login')
+    if session and session.get("email"):
+        type_cd = session.get("type_cd")
+        if type_cd and type_cd == 2:
+            return render_template('client.html')
+        else : 
+            return render_template('index.html')
+    else:
+        return redirect('/login')
         
-
 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
@@ -193,18 +200,20 @@ def register():
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
-        # TODO : Encoding password & tokens maybe
         isPassed = accountBusiness.validateLogin(request)
         if isPassed:
             session['email'] = request.form.get(AccountSchema.EMAIL)
+            session['type_cd'] = accountBusiness.getType(session['email'])
             return redirect('/')
         return render_template('login.html', email=request.form.get(AccountSchema.EMAIL), message=AccountSchema.message['LO010001'], isSuccess=False)
     else:
         return render_template('login.html')
 
+
 @app.route('/logout')
 def logout():
     session.pop('email', None)
+    session.pop('type_cd', None)
     return redirect('/')
 
 if __name__ == "__main__":

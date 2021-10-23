@@ -14,6 +14,13 @@
     animation : slidetoLeft 1s cubic-bezier(0.23, 1, 0.320, 1) forwards;
 }
 
+.animation.asideSlidetoRight{
+    animation : asideSlidetoRight 1s cubic-bezier(0.23, 1, 0.320, 1) forwards !important;
+}
+.animation.asideSlidetoLeft{
+    animation : asideSlidetoLeft 1s cubic-bezier(0.23, 1, 0.320, 1) forwards;
+
+}
 /*  Login  */
 .animation.slidetoLeft:nth-child(1){
     animation-delay: .5s;
@@ -63,6 +70,32 @@
     100%{
         opacity: 1;
         transform: translateX(0%);
+    }
+}
+
+@keyframes asideSlidetoRight { 
+    0%{
+        width: 0px;
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+    100%{
+        width: 15%;
+        opacity: 1;
+        transform: translateX(0%);
+    }
+}
+
+@keyframes asideSlidetoLeft { 
+    0%{ 
+        width: 15%;
+        opacity: 1;
+        transform: translateX(0%);
+    }
+    100%{
+        width: 0px;
+        opacity: 0;
+        transform: translateX(-100%);
     }
 }
 
