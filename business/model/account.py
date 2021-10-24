@@ -12,7 +12,8 @@ class AccountSchema():
         'RE010004': 'Validating failed : This email is already registed',
         'RE01XXXX': 'Registering successfully',
         # Login
-        'LO010001': 'Validating failed: Wrong password' 
+        'LO010001': 'Validating failed: Wrong password', 
+        'LO010002': 'This email didn\'t exist in DB or DB may empty' 
     }
 
 

@@ -30,26 +30,26 @@
             <h4>Register your account</h4>
           </div>
           <div class="type-img-box animation popup">
-            {% if not type_cd or type_cd == 2 %}
+            {% if not type_cd or type_cd == 3 %}
               <label class="img-box checked" id="type-box-2">
-                <input type="radio" name="type_cd" value="2" id="2" checked>
+                <input type="radio" name="type_cd" value="3" id="3" checked>
                 <img src="{{url_for('static',filename='img/client-type.jpg')}}" alt="Client"/>
                 <p>Client</p>
               </label>
               <label class="img-box" id="type-box-3">
-                <input type="radio" name="type_cd" value="3" id="3">
+                <input type="radio" name="type_cd" value="2" id="2">
                 <img src="{{url_for('static',filename='img/hoster-type.jpg')}}" alt="Hoster"/>
                 <p>Hoster</p>
               </label>
             {% else %}
-              {% if type_cd == 3 %}
+              {% if type_cd == 2 %}
               <label class="img-box " id="type-box-2">
-                <input type="radio" name="type_cd" value="client" id="2" >
+                <input type="radio" name="type_cd" value="3" id="3" >
                 <img src="{{url_for('static',filename='img/client-type.jpg')}}" alt="Client"/>
                 <p>Client</p>
               </label>
               <label class="img-box checked" id="type-box-3">
-                <input type="radio" name="type_cd" value="hoster" id="3" checked>
+                <input type="radio" name="type_cd" value="2" id="2" checked>
                 <img src="{{url_for('static',filename='img/hoster-type.jpg')}}" alt="Hoster"/>
                 <p>Hoster</p>
               </label>

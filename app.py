@@ -14,6 +14,7 @@ app.permanent_session_lifetime = timedelta(minutes=30)
 # Setting DB
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:1234@localhost/dnschain'
 app.config['SESSION_TYPE'] = 'sqlalchemy'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 app.config['SESSION_SQLALCHEMY'] = db
 # Setting SESSION 2
@@ -47,19 +48,27 @@ class AccountBusiness:
     def selectAll(self):
         return Account.query.order_by(Account.id).all()
 
-    def validateLogin(self, request):
+    def validateLoginOrReturnErrorCode(self, request):
         email = request.form.get(AccountSchema.EMAIL)
         password = request.form.get(AccountSchema.PASSWORD)
-        account = Account.query.filter(Account.email == email).all()
+        accounts = Account.query.filter(Account.email == email).all()
         # print("Account: ", account[0].password)
-        if password and check_password_hash(account[0].password, password):
-            return True
-        return False
+        if accounts :
+            if password and check_password_hash(accounts[0].password, password):
+                return True
+            else:
+                return 'LO010001'
 
-    def getType(self, email):
+        return 'LO010002'
+
+    def getProtectedAccount(self, email):
         account = Account.query.filter(
             Account.email == email, Account.is_deleted == False).all()
-        return account[0].type_cd if account else -1  
+        if account : 
+            account[0].password = ''
+            return account[0]
+        else: 
+            return None
 
     def validateRegister(self, request):
         fullname = request.form.get(AccountSchema.FULLNAME)
@@ -170,10 +179,11 @@ accountBusiness = AccountBusiness()
 
 @app.route('/')
 def home():
-    if session and session.get("email"):
-        type_cd = session.get("type_cd")
-        if type_cd and type_cd == 2:
-            return render_template('client.html')
+    if session and session.get("protected_account"):
+        protectedAccount = session.get("protected_account")
+        type_cd = protectedAccount.type_cd
+        if type_cd and type_cd != 1:
+            return render_template('table.html', type_cd = type_cd, protectedAccount = protectedAccount )
         else : 
             return render_template('index.html')
     else:
@@ -200,12 +210,13 @@ def register():
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
-        isPassed = accountBusiness.validateLogin(request)
-        if isPassed:
+        isPassedOrErrorCode = accountBusiness.validateLoginOrReturnErrorCode(request)
+        if isPassedOrErrorCode == True:
             session['email'] = request.form.get(AccountSchema.EMAIL)
-            session['type_cd'] = accountBusiness.getType(session['email'])
+            session['protected_account'] = accountBusiness.getProtectedAccount(session.get('email'))
             return redirect('/')
-        return render_template('login.html', email=request.form.get(AccountSchema.EMAIL), message=AccountSchema.message['LO010001'], isSuccess=False)
+        else : 
+            return render_template('login.html', email=request.form.get(AccountSchema.EMAIL), message=AccountSchema.message[isPassedOrErrorCode], isSuccess=False)
     else:
         return render_template('login.html')
 
