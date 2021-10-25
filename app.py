@@ -5,6 +5,8 @@ from werkzeug.utils import redirect
 from business.model.account import AccountSchema
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import timedelta
+import math
+import json
 # --------- SETTINGS --------------------------------------
 app = Flask(__name__)
 
@@ -65,7 +67,6 @@ class AccountBusiness:
         account = Account.query.filter(
             Account.email == email, Account.is_deleted == False).all()
         if account : 
-            account[0].password = ''
             return account[0]
         else: 
             return None
@@ -171,24 +172,67 @@ class AccountBusiness:
         except:
             return reject()
 
+# --------- HELPER ------------------------------------
+class PaginationHelper:
+    def __init__(self, perPage, numberOfData ):
+        self.perPage = perPage
+        self.numberOfData = numberOfData
+        self.arrayOfIndexingData = self.getArrayOfIndexingData()
+    
+    def getCeilingNumber(self):
+        return math.ceil(self.numberOfData / self.perPage)
+
+    def getArrayOfIndexingData(self):
+        n = self.getCeilingNumber()
+        arrayOfIndexing = []
+        for x in range(n):
+            distance = (x)*self.perPage + self.perPage -1 
+            toValue = distance if distance <= self.numberOfData else self.numberOfData 
+            arrayOfIndexing.append( { 
+                'from' : (x)*self.perPage,
+                'to' : toValue
+            } )
+        return arrayOfIndexing
 
 # --------- INIT --------------------------------------
 accountBusiness = AccountBusiness()
-
+paginationHelper = PaginationHelper(12,13)
 # --------- ROUTERS --------------------------------------
 
 @app.route('/')
 def home():
     if session and session.get("protected_account"):
-        protectedAccount = session.get("protected_account")
-        type_cd = protectedAccount.type_cd
-        if type_cd and type_cd != 1:
-            return render_template('table.html', type_cd = type_cd, protectedAccount = protectedAccount )
+        type_cd = session.get("protected_account").type_cd
+        if type_cd and type_cd != 1: #ADMIN
+            return redirect('/table')
         else : 
             return render_template('index.html')
     else:
         return redirect('/login')
-        
+
+@app.route('/table', methods=['POST','GET'])
+def table():
+    if request.method == 'POST':
+        pass
+    else :
+        protectedAccount = session.get("protected_account")
+        # Pagination
+        page = request.args.get('page', default = 1, type = int)
+        totalPageNumber = paginationHelper.getCeilingNumber()
+        arrayOfIndexingData = paginationHelper.arrayOfIndexingData
+        paginationObj = {
+            'page': page,
+            'totalPageNumber': totalPageNumber,
+            'from': arrayOfIndexingData[page-1]['from'],
+            'to': arrayOfIndexingData[page-1]['to']
+        } 
+        # print(page)
+        # print(totalPageNumber)
+        # for i in range(len(arrayOfIndexingData)):
+        #     print( json.dumps( arrayOfIndexingData[i] ) )
+
+        return render_template('table.html', protectedAccount = protectedAccount, paginationObj = paginationObj )
+
 
 @app.route('/register', methods=['POST', 'GET'])
 def register():

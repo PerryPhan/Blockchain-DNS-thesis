@@ -37,7 +37,7 @@ block body %}
         <div class="hello">
           Hi.
           <div class="name">{{ protectedAccount.fullname }}</div>
-          {% if type_cd and type_cd == 3 %}
+          {% if protectedAccount.type_cd and protectedAccount.type_cd == 3 %}
           <div class="type client">Client</div>
           {%else%}
           <div class="type hoster">Hoster</div>
@@ -83,6 +83,7 @@ block body %}
         </div>
       </div>
       <div class="table-box">
+        
         <table>
           <thead>
             <tr>
@@ -93,9 +94,11 @@ block body %}
               <th class="status-field">Status</th>
               <th class="created-date-field">Created Date</th>
               <th class="operations">Operations</th>
-          </tr>
+            </tr>
           </thead>
           <tbody>
+            {% for i in range(paginationObj.from, paginationObj.to) %}
+            <!-- #Once -->
             <tr>
               <td class="index-field">001</td>
               <td class="domain-name-field">domainname.com</td>
@@ -104,14 +107,13 @@ block body %}
               <td class="status-field">
                 <div class="status on">On</div>
               </td>
-              <td class="created-date-field">
-                23-10-2021
-              </td>
+              <td class="created-date-field">23-10-2021</td>
               <td class="operations">
                 <a href="#" class="save-btn">Save</a>
               </td>
             </tr>
-            <tr>
+            {% endfor %}
+            <!-- <tr>
               <td class="index-field">002</td>
               <td class="domain-name-field">namedomain.com</td>
               <td class="ip-address-field">127.0.0.2</td>
@@ -119,13 +121,12 @@ block body %}
               <td class="status-field">
                 <div class="status off">Off</div>
               </td>
-              <td class="created-date-field">
-                24-10-2021
-              </td>
+              <td class="created-date-field">24-10-2021</td>
               <td class="operations">
                 <a href="#" class="save-btn">Save</a>
               </td>
-            </tr>
+            </tr> -->
+            
           </tbody>
         </table>
       </div>
@@ -133,26 +134,31 @@ block body %}
         <div class="btn-box">
           <div class="first-side">
             <span>
-              <a href="#">First</a>
+              <a href="/table">First</a>
             </span>
-            <span
-              ><img
-                src="{{url_for('static',filename='img/arrow-left-icon.png')}}"
-                alt="left-icon"
-            /></span>
+            <span >
+              <a href="#" id="a-table-previous" class="nohref"
+                ><img
+                  src="{{url_for('static',filename='img/arrow-left-icon.png')}}"
+                  alt="left-icon" /></a
+            ></span>
           </div>
           <div class="index-side">
-            <span>1</span>
+            <span id="span-table-index-page">{{paginationObj.page}}</span>
             <span>/</span>
-            <span>10</span>
+            <span id="span-table-total-page">{{paginationObj.totalPageNumber}}</span>
           </div>
           <div class="last-side">
-            <span
-              ><img
-                src="{{url_for('static',filename='img/arrow-right-icon.png')}}"
-                alt="right-icon"
-            /></span>
-            <span>Last</span>
+            <span >
+              <a href="#" id="a-table-next">
+                <img
+                  src="{{url_for('static',filename='img/arrow-right-icon.png')}}"
+                  alt="right-icon"
+              /></a>
+            </span>
+            <span>
+              <a href="/table?page={{paginationObj.totalPageNumber}}">Last</a>
+            </span>
           </div>
         </div>
       </div>
@@ -167,5 +173,5 @@ block body %}
   </div>
 </div>
 {% endblock %} {% block script %}
-<script src="{{url_for('static',filename='js/client-helper.js')}}"></script>
+<script src="{{url_for('static',filename='js/table-helper.js')}}"></script>
 {% endblock %}

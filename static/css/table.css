@@ -200,6 +200,7 @@
 }
 .client .main .table-side .table-box{
     height: 70%;
+    overflow: hidden;
 }
 .client .main .table-side .table-box table{
     width: 100%;
@@ -286,6 +287,10 @@
     color: var(--client-hovered-tab-title-after-bgcolor);
     margin: 0 15px;
 }
+.client .main .table-side .pagination .btn-box .first-side span a{
+    color: var(--client-hovered-tab-title-after-bgcolor); 
+}
+
 .client .main .table-side .pagination .btn-box .index-side span{
     margin: 0 5px;
     color: grey;
@@ -297,6 +302,9 @@
     color: var(--client-hovered-tab-title-after-bgcolor);
     margin: 0 15px;
     font-weight: 600;
+}
+.client .main .table-side .pagination .btn-box .last-side span a{
+    color: var(--client-hovered-tab-title-after-bgcolor); 
 }
 .client .main .table-side .pagination .btn-box a{
     text-decoration: none;
