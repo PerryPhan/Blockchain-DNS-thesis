@@ -4,6 +4,7 @@
     overflow: hidden;
     --client-search-input-bgcolor: #F6F6F6;
     --client-user-type-client-color: #069550;
+    --client-user-type-hoster-color: #061495;
     --client-hovered-tab-title-bgcolor: #34424A;
     --client-hovered-tab-title-after-bgcolor: #1A89C9;
     --client-table-title-left-h4-color: #9F9F9F;
@@ -114,6 +115,9 @@
 .client .header .right .user .type.client{
     background-color: var(--client-user-type-client-color);
 }
+.client .header .right .user .type.hoster{
+    background-color: var(--client-user-type-hoster-color);
+}
 .client .header .right .user a{
     color: #FF0000;    
     text-decoration: none;
@@ -155,6 +159,10 @@
     width: 10px;
     height: 100%;
     background-color: var(--client-hovered-tab-title-after-bgcolor);    
+}
+.client .aside .tab-title a{
+    color: inherit;
+    text-decoration: none;
 }
 .client .main{
     height: 100%;

@@ -1,5 +1,10 @@
-{% extends 'base.html' %} {% block title %} DNS Table {% endblock %} {%
-block body %}
+{% extends 'base.html' %} {% block title %} DNS Storage {% endblock %} {% block
+head %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/storage.css')}}"
+/>
+{% endblock %} {% block body %}
 <div class="client container">
   <div class="header">
     <div class="left">
@@ -57,14 +62,14 @@ block body %}
   </div>
   <div class="main">
     <div class="aside animation">
-      <div class="tab-title active">
-        <h3>Table</h3>
-      </div>
       <div class="tab-title">
-        <a href="/storage"><h3>Storage</h3></a>
+        <a href="/table"><h3>Table</h3></a>
+      </div>
+      <div class="tab-title active">
+        <a href="#"><h3>Storage</h3></a>
       </div>
     </div>
-    <div class="table-side">
+    <div class="storage table-side">
       <div class="titles">
         <div class="title-left">
           <h1>Domain Names Table</h1>
@@ -83,7 +88,6 @@ block body %}
         </div>
       </div>
       <div class="table-box">
-        
         <table>
           <thead>
             <tr>
@@ -97,7 +101,7 @@ block body %}
             </tr>
           </thead>
           <tbody>
-            {% for i in range(paginationObj.from, paginationObj.to) %}
+            {% for i in range( paginationObj.from,paginationObj.to) %}
             <!-- #Once -->
             <tr>
               <td class="index-field">001</td>
@@ -106,6 +110,7 @@ block body %}
               <td class="hoster-field">Dai Hoster</td>
               <td class="status-field">
                 <div class="status on">On</div>
+                <!-- <div class="status off">Off</div> -->
               </td>
               <td class="created-date-field">23-10-2021</td>
               <td class="operations">
@@ -113,20 +118,6 @@ block body %}
               </td>
             </tr>
             {% endfor %}
-            <!-- <tr>
-              <td class="index-field">002</td>
-              <td class="domain-name-field">namedomain.com</td>
-              <td class="ip-address-field">127.0.0.2</td>
-              <td class="hoster-field">Dai Hoster</td>
-              <td class="status-field">
-                <div class="status off">Off</div>
-              </td>
-              <td class="created-date-field">24-10-2021</td>
-              <td class="operations">
-                <a href="#" class="save-btn">Save</a>
-              </td>
-            </tr> -->
-            
           </tbody>
         </table>
       </div>
@@ -136,7 +127,7 @@ block body %}
             <span>
               <a href="/table">First</a>
             </span>
-            <span >
+            <span>
               <a href="#" id="a-table-previous" class="nohref"
                 ><img
                   src="{{url_for('static',filename='img/arrow-left-icon.png')}}"
@@ -146,10 +137,12 @@ block body %}
           <div class="index-side">
             <span id="span-table-index-page">{{paginationObj.page}}</span>
             <span>/</span>
-            <span id="span-table-total-page">{{paginationObj.totalPageNumber}}</span>
+            <span id="span-table-total-page"
+              >{{paginationObj.totalPageNumber}}</span
+            >
           </div>
           <div class="last-side">
-            <span >
+            <span>
               <a href="#" id="a-table-next">
                 <img
                   src="{{url_for('static',filename='img/arrow-right-icon.png')}}"
@@ -161,6 +154,65 @@ block body %}
             </span>
           </div>
         </div>
+      </div>
+      <div class="storage dataform">
+        <h1>Data Form</h1>
+        <form action="">
+          <div class="form-control">
+            <label for="domain-name">
+              <h3>Domain name</h3>
+            </label>
+            <input
+              type="text"
+              name="domain-name"
+              placeholder="8+ characters for name, have 2+ characters for extension"
+              pattern="(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]"
+              required
+            />
+          </div>
+          <div class="form-control">
+            <label for="ip-address">
+              <h3>IP address</h3>
+            </label>
+            <input
+              type="text"
+              name="ip-address"
+              placeholder="IP private from 192.168.0.0 – 192.168.255.255"
+              pattern="^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+              required
+            />
+          </div>
+          <div class="form-control">
+            <label for="status">
+              <h3>Status</h3>
+            </label>
+            <label class="status-box on checked" id="type-box-2">
+              <input type="radio" name="type_cd" value="1" id="1" checked />
+              <div class="status on">On</div>
+            </label>
+            <label class="status-box off" id="type-box-2">
+              <input type="radio" name="type_cd" value="0" id="0" />
+              <div class="status off">Off</div>
+            </label>
+          </div>
+          <div class="form-control">
+            <label for="created-date">
+              <h3>Created Date</h3>
+            </label>
+            <p>26/10/2021</p>
+          </div>
+          <div class="form-control">
+            <label for="created-by">
+              <h3>Created By</h3>
+            </label>
+            <p>Dai Hoster</p>
+          </div>
+          <div class="form-btn-group">
+            <button type="reset" class="btn reset">Reset</button>
+            <button type="button" class="btn cancel">Cancel</button>
+            <button class="btn ok" type="submit">OK</button>
+          </div>
+        </form>
       </div>
       <p class="createdby">
         This project is made by Phan Dai
@@ -174,4 +226,5 @@ block body %}
 </div>
 {% endblock %} {% block script %}
 <script src="{{url_for('static',filename='js/table-helper.js')}}"></script>
+<script src="{{url_for('static',filename='js/storage-helper.js')}}"></script>
 {% endblock %}

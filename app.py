@@ -186,7 +186,7 @@ class PaginationHelper:
         n = self.getCeilingNumber()
         arrayOfIndexing = []
         for x in range(n):
-            distance = (x)*self.perPage + self.perPage -1 
+            distance = (x)*self.perPage + self.perPage 
             toValue = distance if distance <= self.numberOfData else self.numberOfData 
             arrayOfIndexing.append( { 
                 'from' : (x)*self.perPage,
@@ -196,7 +196,6 @@ class PaginationHelper:
 
 # --------- INIT --------------------------------------
 accountBusiness = AccountBusiness()
-paginationHelper = PaginationHelper(12,13)
 # --------- ROUTERS --------------------------------------
 
 @app.route('/')
@@ -212,14 +211,19 @@ def home():
 
 @app.route('/table', methods=['POST','GET'])
 def table():
+    if not session or not session.get("protected_account"):
+        return redirect('/login')
     if request.method == 'POST':
         pass
     else :
         protectedAccount = session.get("protected_account")
         # Pagination
+        paginationHelper = PaginationHelper(12,13)
         page = request.args.get('page', default = 1, type = int)
         totalPageNumber = paginationHelper.getCeilingNumber()
         arrayOfIndexingData = paginationHelper.arrayOfIndexingData
+        page = totalPageNumber if page >= totalPageNumber else page
+        print( json.dumps(arrayOfIndexingData) )
         paginationObj = {
             'page': page,
             'totalPageNumber': totalPageNumber,
@@ -232,6 +236,24 @@ def table():
         #     print( json.dumps( arrayOfIndexingData[i] ) )
 
         return render_template('table.html', protectedAccount = protectedAccount, paginationObj = paginationObj )
+
+@app.route('/storage', methods=['POST','GET'] )
+def storage():
+    protectedAccount = session.get("protected_account")
+    # Pagination
+    paginationHelper = PaginationHelper(3,13)
+    page = request.args.get('page', default = 1, type = int)
+    totalPageNumber = paginationHelper.getCeilingNumber()
+    arrayOfIndexingData = paginationHelper.arrayOfIndexingData
+    print( json.dumps(arrayOfIndexingData) )
+    page = totalPageNumber if page >= totalPageNumber else page
+    paginationObj = {
+        'page': page,
+        'totalPageNumber': totalPageNumber,
+        'from': arrayOfIndexingData[page-1]['from'],
+        'to': arrayOfIndexingData[page-1]['to']
+    } 
+    return render_template('storage.html', protectedAccount = protectedAccount, paginationObj = paginationObj)
 
 
 @app.route('/register', methods=['POST', 'GET'])
@@ -268,7 +290,7 @@ def login():
 @app.route('/logout')
 def logout():
     session.pop('email', None)
-    session.pop('type_cd', None)
+    session.pop('protected_account', None)
     return redirect('/')
 
 if __name__ == "__main__":
