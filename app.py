@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_session import Session
 from werkzeug.utils import redirect
 from business.model.account import AccountSchema
+from business.model.domainvalue import DomainSchema
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import timedelta
 import math
@@ -223,7 +224,7 @@ def table():
         totalPageNumber = paginationHelper.getCeilingNumber()
         arrayOfIndexingData = paginationHelper.arrayOfIndexingData
         page = totalPageNumber if page >= totalPageNumber else page
-        print( json.dumps(arrayOfIndexingData) )
+        # print( json.dumps(arrayOfIndexingData) )
         paginationObj = {
             'page': page,
             'totalPageNumber': totalPageNumber,
@@ -239,6 +240,17 @@ def table():
 
 @app.route('/storage', methods=['POST','GET'] )
 def storage():
+    if not session or not session.get("protected_account"):
+        return redirect('/login')
+    if request.method == 'POST':
+        domainName = request.form.get(DomainSchema.DOMAINNAME)
+        ipAddress = request.form.get(DomainSchema.IPADDRESS)
+        hosterName = request.form.get(DomainSchema.HOSTER)
+        status = request.form.get(DomainSchema.STATUS)
+        createdDate = request.form.get(DomainSchema.CREATEDDATE)
+        # TODO : THINKING WORKING BLOCKCHAIN
+        return domainName + " " + ipAddress + " " + hosterName + " " + status + " " + createdDate
+
     protectedAccount = session.get("protected_account")
     # Pagination
     paginationHelper = PaginationHelper(3,13)

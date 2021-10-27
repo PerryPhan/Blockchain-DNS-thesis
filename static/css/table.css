@@ -8,13 +8,15 @@
     --client-hovered-tab-title-bgcolor: #34424A;
     --client-hovered-tab-title-after-bgcolor: #1A89C9;
     --client-table-title-left-h4-color: #9F9F9F;
-    --client-table-body-bgcolor: #EDEDED;
     --client-table-head-bgcolor: #f0e5fd;
     --client-table-head-color: #591590;
+    --client-table-body-bgcolor: #EDEDED;
+    --client-hovered-table-row-bgcolor: #D4D4D4;
     --client-table-status-on-bgcolor: #13aa61;
     --client-table-status-off-bgcolor: #d33f3f;
     --client-table-save-btn-bgcolor: #5890D2;
     --client-none-bgcolor: rgb(199, 199, 199);
+
 }
 .client .header{
     width: 100%;
@@ -228,9 +230,15 @@
     font-size: 18px;
 }
 .client .main .table-side .table-box table tbody tr{
+    cursor: pointer;
     height: 50px;
     border-bottom: 1px solid rgb(173, 173, 173);
 }
+.client .main .table-side .table-box table tbody tr:hover,
+.client .main .table-side .table-box table tbody tr.active{
+    background-color: var(--client-hovered-table-row-bgcolor);
+}
+
 .client .main .table-side .table-box table tbody tr td{
     font-weight: 500;
     padding: 10px;
