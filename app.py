@@ -8,7 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import timedelta
 import math
 # -------------------- 2 Blockchain NEED -------------------------------------
-from uuid import getnode, uuid4
+from uuid import  uuid4
 import random
 import threading
 import re
@@ -181,6 +181,12 @@ class NodesBusiness:
     def getNetwork(self):
         return models.Nodes.query.filter(models.Nodes.is_deleted == False).all()
 
+    def getIPNode(self, ip):
+        return models.Nodes.query.filter(
+            models.Nodes.ip == ip,
+            models.Nodes.is_deleted == False
+            ).all()
+
     def getNode(self, ip, port):
         return models.Nodes.query.filter(
             models.Nodes.ip == ip,
@@ -192,10 +198,11 @@ class NodesBusiness:
         # 3 Cases :  
         #   - Empty network  :OK
         #   - Duplicate node :OK 
-        #   - Not duplicate node :OK 
+        #   - Not duplicate node : - New IP 
+        #   -           "        : - Old IP, new Port
         network = self.getNetwork()
         id = str(uuid4()).replace('-', '') 
-        if not network :      
+        if not network : # Empty network, create new
             return self.registerNode(
                 id,
                 ip, 
@@ -203,15 +210,25 @@ class NodesBusiness:
                 nodename
             )
         else : 
-            node = self.getNode(ip, port)
-            # Node get random port when it is duplicate. Don't worry duplicate again cause of later validator
-            port = port if not node else random.randint( self.PORT_START, self.PORT_END )
-            return self.registerNode(
-                id,
-                ip, 
-                port,
-                nodename
-            ) 
+            # nodeIP = self.getIPNode(ip)
+            # if not nodeIP : # Don't have this IP in DB, create new  
+            #     return self.registerNode(
+            #         id,
+            #         ip, 
+            #         port,
+            #         nodename
+            #     )   
+            nodeIPPort = self.getNode(ip, port) 
+            if not nodeIPPort : # Have this IP but wrong port, create new with random port 
+                return self.registerNode(
+                    id,
+                    ip, 
+                    random.randint( self.PORT_START, self.PORT_END ),
+                    nodename
+                ) 
+            else : # Keep that one to use
+                return nodeIPPort, 201
+
     
     def validateNode(self,node):
         checked = True
@@ -404,102 +421,100 @@ def logout():
 
 # --------- #2. API ROUTERS --------------------------------------
 # Make a DNS layer as resolver - as communicator between Server and Blockchain
-# dns_resolver = dns(node_identifier = node_identifier)
-
 # Route 1: Make sure this node is working - Need when init  
-# @app.route('/debug/alive',methods=['GET'])
-# def check_alive():
-# 	response = 'The node is alive'
-# 	return  jsonify(response),200
+@app.route('/debug/alive',methods=['GET'])
+def check_alive():
+	response = 'The node is alive'
+	return  jsonify(response),200
 
-# # Route 2: Registry a node (Machine) to network - Need when init
-# @app.route('/nodes/new',methods=['POST'])
-# def register_node():
-# 	"""
-# 	Calls underlying functions to register new node in network
-# 	"""
-# 	values = request.get_json()
-# 	nodes = values.get('nodes')
+# Route 2: Registry a node (Machine) to network - Need when init
+@app.route('/nodes/new',methods=['POST'])
+def register_node():
+	"""
+	Calls underlying functions to register new node in network
+	"""
+	values = request.get_json()
+	nodes = values.get('nodes')
 
-# 	if nodes is None:
-# 		# Nếu không có giá trị gì gửi lên sẽ trả STATUS CODE 400 
-# 		response, return_code = "No node supplied",400
-# 	else:
-# 		for node in nodes:
-# 			# DNS resolver tạo node mới 
-# 			dns_resolver.register_node(node)
+	if nodes is None:
+		# Nếu không có giá trị gì gửi lên sẽ trả STATUS CODE 400 
+		response, return_code = "No node supplied",400
+	else:
+		for node in nodes:
+			# DNS resolver tạo node mới 
+			dns_resolver.register_node(node)
 		
-# 		# Nếu thêm thành công sẽ trả STATUS CODE 201 và message 	
-# 		response, return_code = {
-# 			'message': 'New nodes have been added',
-# 			'total_nodes': dns_resolver.get_network_size(),
-# 		}, 201
+		# Nếu thêm thành công sẽ trả STATUS CODE 201 và message 	
+		response, return_code = {
+			'message': 'New nodes have been added',
+			'total_nodes': dns_resolver.get_network_size(),
+		}, 201
 
-# 	return jsonify(response),return_code
+	return jsonify(response),return_code
 
-# # Route 3: Add more new DNS - insert code when request POST in /storage 
-# @app.route('/dns/new',methods=['POST'])
-# def new_transaction():
-# 	"""
-# 	adds new entries into our resolver instance
-# 	"""
-# 	values = request.get_json()
-# 	# print(values)
-# 	required = ['hostname', 'ip', 'port']
-# 	bad_entries = []
+# Route 3: Add more new DNS - insert code when request POST in /storage 
+@app.route('/dns/new',methods=['POST'])
+def new_transaction():
+	"""
+	adds new entries into our resolver instance
+	"""
+	values = request.get_json()
+	# print(values)
+	required = ['hostname', 'ip', 'port']
+	bad_entries = []
 
-# 	for value in values:
-# 		#print(k in values[value] for k in required)
-# 		if all(k in values[value] for k in required):
-# 			value = values[value]
-# 			# Nếu các key của giá trị request trùng với các key của required thì sẽ được tạo mới
-# 			dns_resolver.new_entry(value['hostname'],value['ip'],value['port'])
-# 		else:
-# 			bad_entries.append(value)
+	for value in values:
+		#print(k in values[value] for k in required)
+		if all(k in values[value] for k in required):
+			value = values[value]
+			# Nếu các key của giá trị request trùng với các key của required thì sẽ được tạo mới
+			dns_resolver.new_entry(value['hostname'],value['ip'],value['port'])
+		else:
+			bad_entries.append(value)
 
-# 	if bad_entries:
-# 		return jsonify(bad_entries),400
-# 	else:
-# 		response = 'New DNS entry added'
-# 		return jsonify(response), 201
+	if bad_entries:
+		return jsonify(bad_entries),400
+	else:
+		response = 'New DNS entry added'
+		return jsonify(response), 201
 
-# # Route 4: Sending request to resolver and receive response with data - need to change the table
-# @app.route('/dns/request',methods=['POST'])
-# def dns_lookup():
-# 	"""
-# 	receives a dns request and responses after resolving
-# 	"""
-# 	values = request.get_json()
-# 	required = ['hostname']
-# 	if not all(k in values for k in required):
-# 		return 'Missing values', 400
+# Route 4: Sending request to resolver and receive response with data - need to change the table
+@app.route('/dns/request',methods=['POST'])
+def dns_lookup():
+	"""
+	receives a dns request and responses after resolving
+	"""
+	values = request.get_json()
+	required = ['hostname']
+	if not all(k in values for k in required):
+		return 'Missing values', 400
 
-# 	try:
-# 		# Gửi giá trị của thuộc tính hostname cho DNS resolver để tìm kiếm
-# 		host, port = dns_resolver.lookup(values['hostname'])
-# 		response = {
-# 			'ip':host,
-# 			'port': port
-# 		}
-# 		return_code = 200
-# 	except LookupError:
-# 		response = "No existing entry"
-# 		return_code = 401
+	try:
+		# Gửi giá trị của thuộc tính hostname cho DNS resolver để tìm kiếm
+		host, port = dns_resolver.lookup(values['hostname'])
+		response = {
+			'ip':host,
+			'port': port
+		}
+		return_code = 200
+	except LookupError:
+		response = "No existing entry"
+		return_code = 401
 	
-# 	# Tìm thấy thì 200 , không thì 401 
-# 	return jsonify(response), return_code
+	# Tìm thấy thì 200 , không thì 401 
+	return jsonify(response), return_code
 
-# # Route 5: Solving node's conflict from change
-# @app.route('/nodes/resolve',methods=['GET'])
-# def consensus():
-# 	"""
-# 	triggers the blockchain to check chain against other neighbors'
-# 	chain, and uses the longest chain to achieve consensus ( đoàn kết )
-# 	"""
-# 	t = threading.Thread(target=dns_resolver.blockchain.resolve_conflicts)
-# 	t.start()
+# Route 5: Solving node's conflict from change
+@app.route('/nodes/resolve',methods=['GET'])
+def consensus():
+	"""
+	triggers the blockchain to check chain against other neighbors'
+	chain, and uses the longest chain to achieve consensus ( đoàn kết )
+	"""
+	t = threading.Thread(target=dns_resolver.blockchain.resolve_conflicts)
+	t.start()
 
-# 	return jsonify(None), 200
+	return jsonify(None), 200
 
 if __name__ == "__main__":
     from argparse import ArgumentParser
@@ -514,12 +529,19 @@ if __name__ == "__main__":
     host = args.host 
     # Khai báo node
     APP_NODE, code = nodeBusiness.handleNodeInformation(host, port)
+    dns_resolver = dns(node_identifier = APP_NODE.id)
     if code == 200 : 
         print( '//----------------------------------------//' )
         print( ' WELCOME NODE ', APP_NODE.id )
+        print( '//----------------------------------------//' )
+        app.run(host=host, port = port,  debug=True, use_reloader=False)
+    elif code == 201 :
+        print( '//----------------------------------------//' )
+        print( ' WELCOME BACK NODE ', APP_NODE.id )
         print( '//----------------------------------------//' )
         app.run(host=host, port = port,  debug=True, use_reloader=False)
     else :
         print( 'WRONG INFORMATION !! PLEASE TRY AGAIN WITH OTHER VALID HOSTNAME OR PORT' )
         print( 'Port must be from [ 5000, 5999] ' )
         print( 'Hostname must have right format of IPv4 ' )
+    
