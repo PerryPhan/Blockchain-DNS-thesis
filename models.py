@@ -1,7 +1,10 @@
 from app import db
 
+db.drop_all()
+
 class Accounts(db.Model): 
     __tablename__ = 'accounts'
+    __table_args__ = {'extend_existing': True} 
     id = db.Column(db.Integer, primary_key=True)
     fullname = db.Column(db.String(40), nullable=False)
     email = db.Column(db.String(40), nullable=False)
@@ -13,6 +16,7 @@ class Accounts(db.Model):
 
 class Nodes(db.Model):
     __tablename__ = 'nodes'
+    __table_args__ = {'extend_existing': True} 
     id = db.Column(db.String(40), primary_key=True)
     nodename = db.Column(db.String(64), nullable=True)
     ip = db.Column(db.String(16), nullable=False)
@@ -23,6 +27,7 @@ class Nodes(db.Model):
 
 class Transactions(db.Model):
     __tablename__ = 'transactions'
+    __table_args__ = {'extend_existing': True} 
     id = db.Column(db.Integer, primary_key=True)
     hostname = db.Column(db.String(64), nullable=True)
     ip = ip = db.Column(db.String(16), nullable=False)
@@ -33,6 +38,7 @@ class Transactions(db.Model):
     
 class Blocks(db.Model):
     __tablename__ = 'blocks'
+    __table_args__ = {'extend_existing': True} 
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.Float, nullable=False)
     nonce = db.Column(db.Integer, nullable=False)
@@ -41,5 +47,4 @@ class Blocks(db.Model):
     node_id = db.Column(db.String(64), db.ForeignKey('nodes.id'))
     transactions = db.relationship('Transactions',backref="block")
 
-db.drop_all()
 db.create_all()

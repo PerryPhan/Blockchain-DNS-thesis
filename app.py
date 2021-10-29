@@ -1,16 +1,15 @@
 #            Phan Dai - N17DCAT013 - D17CQAT01-N - Blockchain DNS 
 # -------------------- 1 UI and Basic NEED -------------------------------------
 from flask import Flask, render_template, url_for, request, session, redirect, jsonify
-from flask.scaffold import F
 from flask_sqlalchemy import SQLAlchemy
 from flask_session import Session
-from sqlalchemy.orm import backref
 from werkzeug.utils import redirect
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import timedelta
 import math
 # -------------------- 2 Blockchain NEED -------------------------------------
-from uuid import uuid4
+from uuid import getnode, uuid4
+import random
 import threading
 import re
 import json
@@ -21,7 +20,7 @@ from dnschain.dns import dns_layer as dns
 app = Flask(__name__)
 app.config['SERVER_NAME'] = 'dai:5000'
 # ID of this Flask app 
-node_identifier = str(uuid4()).replace('-', '') 
+APP_NODE = None
 
 # Setting SESSION
 app.config['SESSION_PERMANENT'] = True
@@ -175,7 +174,7 @@ class AccountBusiness:
 
 class NodesBusiness:
     PORT_START = 5000 
-    PORT_END = 50000
+    PORT_END = 5999
     def __init__(self):
         pass
 
@@ -189,25 +188,50 @@ class NodesBusiness:
             models.Nodes.is_deleted == False
             ).first()
 
+    def handleNodeInformation(self, ip: str, port: int, nodename = '' ):
+        # 3 Cases :  
+        #   - Empty network  :OK
+        #   - Duplicate node :OK 
+        #   - Not duplicate node :OK 
+        network = self.getNetwork()
+        id = str(uuid4()).replace('-', '') 
+        if not network :      
+            return self.registerNode(
+                id,
+                ip, 
+                port,
+                nodename
+            )
+        else : 
+            node = self.getNode(ip, port)
+            # Node get random port when it is duplicate. Don't worry duplicate again cause of later validator
+            port = port if not node else random.randint( self.PORT_START, self.PORT_END )
+            return self.registerNode(
+                id,
+                ip, 
+                port,
+                nodename
+            ) 
+    
     def validateNode(self,node):
         checked = True
-        if not node :
+        if not node : # check node ( not null )
             checked = False
-        if not node.id or len(node.id) > 40 : 
+        if not node.id or len(node.id) > 40 : # check id ( not null, < 40 chars)
             checked = False
-        if not node.nodename or len(node.nodename) > 64 :
+        if len(node.nodename) > 64 : # check nodename ( null, 64 chars)
             checked = False
-        if not node.ip or len(node.ip) > 16 : 
+        if not node.ip or len(node.ip) > 16 : # check IP ( not null, 16 chars, match regex )
             checked = False
         else : 
             checked = False if not re.search('^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', node.ip) else True  
-        if not node.port or node.port <= self.PORT_START or node.port > self.PORT_END : 
+        if not node.port or node.port < self.PORT_START or node.port > self.PORT_END : 
             checked = False
-        if self.getNode( node.ip, node.port ): 
+        if self.getNode( node.ip, node.port ): # check duplicate
             checked = False
         return checked 
 
-    def registerNode(self, id, ip, port, nodename = ''):
+    def registerNode(self, id: str, ip: str, port: int, nodename = ''):
         node = models.Nodes(
             id = id,
             ip = ip,
@@ -380,116 +404,122 @@ def logout():
 
 # --------- #2. API ROUTERS --------------------------------------
 # Make a DNS layer as resolver - as communicator between Server and Blockchain
-dns_resolver = dns(node_identifier = node_identifier)
+# dns_resolver = dns(node_identifier = node_identifier)
 
 # Route 1: Make sure this node is working - Need when init  
-@app.route('/debug/alive',methods=['GET'])
-def check_alive():
-	response = 'The node is alive'
-	return  jsonify(response),200
+# @app.route('/debug/alive',methods=['GET'])
+# def check_alive():
+# 	response = 'The node is alive'
+# 	return  jsonify(response),200
 
-# Route 2: Registry a node (Machine) to network - Need when init
-@app.route('/nodes/new',methods=['POST'])
-def register_node():
-	"""
-	Calls underlying functions to register new node in network
-	"""
-	values = request.get_json()
-	nodes = values.get('nodes')
+# # Route 2: Registry a node (Machine) to network - Need when init
+# @app.route('/nodes/new',methods=['POST'])
+# def register_node():
+# 	"""
+# 	Calls underlying functions to register new node in network
+# 	"""
+# 	values = request.get_json()
+# 	nodes = values.get('nodes')
 
-	if nodes is None:
-		# Nếu không có giá trị gì gửi lên sẽ trả STATUS CODE 400 
-		response, return_code = "No node supplied",400
-	else:
-		for node in nodes:
-			# DNS resolver tạo node mới 
-			dns_resolver.register_node(node)
+# 	if nodes is None:
+# 		# Nếu không có giá trị gì gửi lên sẽ trả STATUS CODE 400 
+# 		response, return_code = "No node supplied",400
+# 	else:
+# 		for node in nodes:
+# 			# DNS resolver tạo node mới 
+# 			dns_resolver.register_node(node)
 		
-		# Nếu thêm thành công sẽ trả STATUS CODE 201 và message 	
-		response, return_code = {
-			'message': 'New nodes have been added',
-			'total_nodes': dns_resolver.get_network_size(),
-		}, 201
+# 		# Nếu thêm thành công sẽ trả STATUS CODE 201 và message 	
+# 		response, return_code = {
+# 			'message': 'New nodes have been added',
+# 			'total_nodes': dns_resolver.get_network_size(),
+# 		}, 201
 
-	return jsonify(response),return_code
+# 	return jsonify(response),return_code
 
-# Route 3: Add more new DNS - insert code when request POST in /storage 
-@app.route('/dns/new',methods=['POST'])
-def new_transaction():
-	"""
-	adds new entries into our resolver instance
-	"""
-	values = request.get_json()
-	# print(values)
-	required = ['hostname', 'ip', 'port']
-	bad_entries = []
+# # Route 3: Add more new DNS - insert code when request POST in /storage 
+# @app.route('/dns/new',methods=['POST'])
+# def new_transaction():
+# 	"""
+# 	adds new entries into our resolver instance
+# 	"""
+# 	values = request.get_json()
+# 	# print(values)
+# 	required = ['hostname', 'ip', 'port']
+# 	bad_entries = []
 
-	for value in values:
-		#print(k in values[value] for k in required)
-		if all(k in values[value] for k in required):
-			value = values[value]
-			# Nếu các key của giá trị request trùng với các key của required thì sẽ được tạo mới
-			dns_resolver.new_entry(value['hostname'],value['ip'],value['port'])
-		else:
-			bad_entries.append(value)
+# 	for value in values:
+# 		#print(k in values[value] for k in required)
+# 		if all(k in values[value] for k in required):
+# 			value = values[value]
+# 			# Nếu các key của giá trị request trùng với các key của required thì sẽ được tạo mới
+# 			dns_resolver.new_entry(value['hostname'],value['ip'],value['port'])
+# 		else:
+# 			bad_entries.append(value)
 
-	if bad_entries:
-		return jsonify(bad_entries),400
-	else:
-		response = 'New DNS entry added'
-		return jsonify(response), 201
+# 	if bad_entries:
+# 		return jsonify(bad_entries),400
+# 	else:
+# 		response = 'New DNS entry added'
+# 		return jsonify(response), 201
 
-# Route 4: Sending request to resolver and receive response with data - need to change the table
-@app.route('/dns/request',methods=['POST'])
-def dns_lookup():
-	"""
-	receives a dns request and responses after resolving
-	"""
-	values = request.get_json()
-	required = ['hostname']
-	if not all(k in values for k in required):
-		return 'Missing values', 400
+# # Route 4: Sending request to resolver and receive response with data - need to change the table
+# @app.route('/dns/request',methods=['POST'])
+# def dns_lookup():
+# 	"""
+# 	receives a dns request and responses after resolving
+# 	"""
+# 	values = request.get_json()
+# 	required = ['hostname']
+# 	if not all(k in values for k in required):
+# 		return 'Missing values', 400
 
-	try:
-		# Gửi giá trị của thuộc tính hostname cho DNS resolver để tìm kiếm
-		host, port = dns_resolver.lookup(values['hostname'])
-		response = {
-			'ip':host,
-			'port': port
-		}
-		return_code = 200
-	except LookupError:
-		response = "No existing entry"
-		return_code = 401
+# 	try:
+# 		# Gửi giá trị của thuộc tính hostname cho DNS resolver để tìm kiếm
+# 		host, port = dns_resolver.lookup(values['hostname'])
+# 		response = {
+# 			'ip':host,
+# 			'port': port
+# 		}
+# 		return_code = 200
+# 	except LookupError:
+# 		response = "No existing entry"
+# 		return_code = 401
 	
-	# Tìm thấy thì 200 , không thì 401 
-	return jsonify(response), return_code
+# 	# Tìm thấy thì 200 , không thì 401 
+# 	return jsonify(response), return_code
 
-# Route 5: Solving node's conflict from change
-@app.route('/nodes/resolve',methods=['GET'])
-def consensus():
-	"""
-	triggers the blockchain to check chain against other neighbors'
-	chain, and uses the longest chain to achieve consensus ( đoàn kết )
-	"""
-	t = threading.Thread(target=dns_resolver.blockchain.resolve_conflicts)
-	t.start()
+# # Route 5: Solving node's conflict from change
+# @app.route('/nodes/resolve',methods=['GET'])
+# def consensus():
+# 	"""
+# 	triggers the blockchain to check chain against other neighbors'
+# 	chain, and uses the longest chain to achieve consensus ( đoàn kết )
+# 	"""
+# 	t = threading.Thread(target=dns_resolver.blockchain.resolve_conflicts)
+# 	t.start()
 
-	return jsonify(None), 200
+# 	return jsonify(None), 200
 
 if __name__ == "__main__":
     from argparse import ArgumentParser
-    parser = ArgumentParser()
-    # Khi chạy chương trình, -> tự động thêm node vào Database
-    # Nếu node đó trùng ip trùng port thì sao ? -> Update port mới 
-    # Nếu node đó trùng ip khác port thì sao ? -> Dùng luôn 
-    # Nếu node đó khác ip khác port thì sao ? -> Thêm node
     # ------------------------------- 
-    parser.add_argument('-p', '--port', default=5000, type=int, help='port to listen on')
-    
+    parser = ArgumentParser()
+    # ------------------------------- 
+    parser.add_argument('-host', '--host', default='0.0.0.0', type=str, help='IPv4 string in your network or 0.0.0.0 in default')
+    parser.add_argument('-p', '--port', default=5000, type=int, help='Port Number to listen on or auto-handle in default')
     args = parser.parse_args()
+    # ------------------------------- 
     port = args.port
-    # node = models.Node(
-        
-    # )
-    app.run(host='0.0.0.0', port = port,  debug=True)
+    host = args.host 
+    # Khai báo node
+    APP_NODE, code = nodeBusiness.handleNodeInformation(host, port)
+    if code == 200 : 
+        print( '//----------------------------------------//' )
+        print( ' WELCOME NODE ', APP_NODE.id )
+        print( '//----------------------------------------//' )
+        app.run(host=host, port = port,  debug=True, use_reloader=False)
+    else :
+        print( 'WRONG INFORMATION !! PLEASE TRY AGAIN WITH OTHER VALID HOSTNAME OR PORT' )
+        print( 'Port must be from [ 5000, 5999] ' )
+        print( 'Hostname must have right format of IPv4 ' )
