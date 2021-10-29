@@ -1,24 +1,25 @@
 #            Phan Dai - N17DCAT013 - D17CQAT01-N - Blockchain DNS 
 # -------------------- 1 UI and Basic NEED -------------------------------------
 from flask import Flask, render_template, url_for, request, session, redirect, jsonify
+from flask.scaffold import F
 from flask_sqlalchemy import SQLAlchemy
 from flask_session import Session
+from sqlalchemy.orm import backref
 from werkzeug.utils import redirect
-from business.model.account import AccountSchema
-from business.model.domainvalue import DomainSchema
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import timedelta
 import math
-import json
 # -------------------- 2 Blockchain NEED -------------------------------------
 from uuid import uuid4
 import threading
+import re
+import json
 from dnschain.dns import dns_layer as dns
 
 # --------- SETTINGS --------------------------------------
 # Common 
 app = Flask(__name__)
-
+app.config['SERVER_NAME'] = 'dai:5000'
 # ID of this Flask app 
 node_identifier = str(uuid4()).replace('-', '') 
 
@@ -37,36 +38,24 @@ app.config['SESSION_SQLALCHEMY'] = db
 app.secret_key = 'super secret key'
 Session(app)
 
+# --------- SCHEMA -------------------------------------
+from schema.AccountSchema import AccountSchema
+from schema.DomainSchema import DomainSchema
 # --------- MODELS --------------------------------------
-class Account(db.Model):
-    __tablename__ = 'accounts'
-    id = db.Column(db.Integer, primary_key=True)
-    fullname = db.Column(db.String(40), nullable=False)
-    email = db.Column(db.String(40), nullable=False)
-    password = db.Column(db.String(255), nullable=False)
-    type_cd = db.Column(db.Integer, nullable=False)
-    is_deleted = db.Column(db.Boolean, nullable=False)
-
-    def __init__(self, fullname, email, password, type_cd, is_deleted):
-        self.fullname = fullname
-        self.email = email
-        self.password = password
-        self.type_cd = type_cd
-        self.is_deleted = is_deleted
-
+import models
 # --------- BUSINESS -----------------------------------
 class AccountBusiness:
     def __init__(self):
         pass
 
     def selectAll(self):
-        return Account.query.order_by(Account.id).all()
+        return models.Accounts.query.order_by(models.Accounts.id).all()
 
     def validateLoginOrReturnErrorCode(self, request):
         email = request.form.get(AccountSchema.EMAIL)
         password = request.form.get(AccountSchema.PASSWORD)
-        accounts = Account.query.filter(Account.email == email).all()
-        # print("Account: ", account[0].password)
+        accounts = models.Accounts.query.filter(models.Accounts.email == email).all()
+        # print("models.Accounts: ", account[0].password)
         if accounts :
             if password and check_password_hash(accounts[0].password, password):
                 return True
@@ -76,10 +65,10 @@ class AccountBusiness:
         return 'LO010002'
 
     def getProtectedAccount(self, email):
-        account = Account.query.filter(
-            Account.email == email, Account.is_deleted == False).all()
+        account = models.Accounts.query.filter(
+            models.Accounts.email == email, models.Accounts.is_deleted == False).first()
         if account : 
-            return account[0]
+            return account
         else: 
             return None
 
@@ -125,14 +114,14 @@ class AccountBusiness:
         return generate_password_hash(password)
 
     def checkDuplicatingAccount(self, email):
-        accounts = Account.query.filter(
-            Account.email == email, Account.is_deleted == False).all()
+        accounts = models.Accounts.query.filter(
+            models.Accounts.email == email, models.Accounts.is_deleted == False).all()
         return len(accounts) if len(accounts) > 0 else True
 
     def insert(self, request, resolve, reject):
         if resolve == None or reject == None or request == None:
             return reject(None, 'RE010002')
-        newAccount = Account(
+        newAccount = models.Accounts(
             fullname=request.form.get(AccountSchema.FULLNAME),
             email=request.form.get(AccountSchema.EMAIL),
             password=self.encodingPassword(
@@ -154,7 +143,7 @@ class AccountBusiness:
             return reject(newAccount, 'RE010001')
 
     def update(self, id, request, resolve, reject):
-        updatedAccount = Account.query.get_or_404(id)
+        updatedAccount = models.Accounts.query.get_or_404(id)
 
         if(updatedAccount.fullname != request.form.get(AccountSchema.FULLNAME) and request.form.get(AccountSchema.FULLNAME) != None):
             updatedAccount.fullname = request.form.get(AccountSchema.FULLNAME)
@@ -175,7 +164,7 @@ class AccountBusiness:
             return reject()
 
     def delete(self, id, resolve, reject):
-        deleteAccount = Account.query.get_or_404(id)
+        deleteAccount = models.Accounts.query.get_or_404(id)
 
         try:
             db.session.delete(deleteAccount)
@@ -183,6 +172,81 @@ class AccountBusiness:
             return resolve(deleteAccount)
         except:
             return reject()
+
+class NodesBusiness:
+    PORT_START = 5000 
+    PORT_END = 50000
+    def __init__(self):
+        pass
+
+    def getNetwork(self):
+        return models.Nodes.query.filter(models.Nodes.is_deleted == False).all()
+
+    def getNode(self, ip, port):
+        return models.Nodes.query.filter(
+            models.Nodes.ip == ip,
+            models.Nodes.port == port,
+            models.Nodes.is_deleted == False
+            ).first()
+
+    def validateNode(self,node):
+        checked = True
+        if not node :
+            checked = False
+        if not node.id or len(node.id) > 40 : 
+            checked = False
+        if not node.nodename or len(node.nodename) > 64 :
+            checked = False
+        if not node.ip or len(node.ip) > 16 : 
+            checked = False
+        else : 
+            checked = False if not re.search('^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', node.ip) else True  
+        if not node.port or node.port <= self.PORT_START or node.port > self.PORT_END : 
+            checked = False
+        if self.getNode( node.ip, node.port ): 
+            checked = False
+        return checked 
+
+    def registerNode(self, id, ip, port, nodename = ''):
+        node = models.Nodes(
+            id = id,
+            ip = ip,
+            port = port,
+            nodename = nodename,
+            is_deleted = False
+        )
+        if not self.validateNode(node):
+            return node, 403
+        
+        try:
+            db.session.add(node)
+            db.session.commit()
+            return node, 200
+        except:
+            return node, 404
+
+    def updateNode(self, node):
+        if not self.validateNode(node):
+            return node, 403
+            
+        try:
+            db.session.commit()
+            return node, 200
+        except:
+            return node, 404
+
+    def stopNode(self, node):
+        if not self.validateNode(node):
+            return node, 403
+        try:
+            db.session.delete(node)
+            db.session.commit()
+            return node, 200 
+        except:
+            return node, 404
+
+# class TransactionBusiness
+# class BlockchainBusiness
 
 # --------- HELPER ------------------------------------
 class PaginationHelper:
@@ -208,6 +272,7 @@ class PaginationHelper:
 
 # --------- INIT --------------------------------------
 accountBusiness = AccountBusiness()
+nodeBusiness = NodesBusiness()
 
 # --------- #1. UI ROUTERS --------------------------------------
 @app.route('/')
@@ -314,7 +379,6 @@ def logout():
     return redirect('/')
 
 # --------- #2. API ROUTERS --------------------------------------
-
 # Make a DNS layer as resolver - as communicator between Server and Blockchain
 dns_resolver = dns(node_identifier = node_identifier)
 
@@ -415,9 +479,17 @@ def consensus():
 
 if __name__ == "__main__":
     from argparse import ArgumentParser
-
     parser = ArgumentParser()
+    # Khi chạy chương trình, -> tự động thêm node vào Database
+    # Nếu node đó trùng ip trùng port thì sao ? -> Update port mới 
+    # Nếu node đó trùng ip khác port thì sao ? -> Dùng luôn 
+    # Nếu node đó khác ip khác port thì sao ? -> Thêm node
+    # ------------------------------- 
     parser.add_argument('-p', '--port', default=5000, type=int, help='port to listen on')
+    
     args = parser.parse_args()
     port = args.port
-    app.run(host='0.0.0.0', port=port, debug=True)
+    # node = models.Node(
+        
+    # )
+    app.run(host='0.0.0.0', port = port,  debug=True)

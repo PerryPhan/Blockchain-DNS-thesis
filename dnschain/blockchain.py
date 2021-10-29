@@ -2,7 +2,6 @@
 Implementation referenced from https://github.com/dvf/blockchain
 Modified to fit the DNS scenario
 """
-
 import hashlib
 from time import time
 from uuid import uuid4
