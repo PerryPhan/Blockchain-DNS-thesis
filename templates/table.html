@@ -60,9 +60,11 @@ block body %}
       <div class="tab-title active">
         <h3>Table</h3>
       </div>
+      {% if protectedAccount.type_cd and protectedAccount.type_cd == 2 %}
       <div class="tab-title">
         <a href="/storage"><h3>Storage</h3></a>
       </div>
+      {%endif%}
     </div>
     <div class="table-side">
       <div class="titles">

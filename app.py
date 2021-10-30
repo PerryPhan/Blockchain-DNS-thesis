@@ -18,7 +18,6 @@ from dnschain.dns import dns_layer as dns
 # --------- SETTINGS --------------------------------------
 # Common 
 app = Flask(__name__)
-app.config['SERVER_NAME'] = 'dai:5000'
 # ID of this Flask app 
 APP_NODE = None
 
@@ -40,6 +39,8 @@ Session(app)
 # --------- SCHEMA -------------------------------------
 from schema.AccountSchema import AccountSchema
 from schema.DomainSchema import DomainSchema
+IP_REGEX_STRING = '^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
+HOSTNAME_REGEX_STRING = '(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]'
 # --------- MODELS --------------------------------------
 import models
 # --------- BUSINESS -----------------------------------
@@ -182,7 +183,7 @@ class NodesBusiness:
         return models.Nodes.query.filter(models.Nodes.is_deleted == False).all()
 
     def getActiveNetwork(self):
-        return models.Nodes.query.filter(models.Nodes.is_active == False ,models.Nodes.is_deleted == False).all()
+        return models.Nodes.query.filter(models.Nodes.is_active == True ,models.Nodes.is_deleted == False).all()
     
     def getNodeWithIP(self, ip):
         return models.Nodes.query.filter(
@@ -197,13 +198,28 @@ class NodesBusiness:
             models.Nodes.is_deleted == False
             ).first()
 
+    def activeNode(self, node):
+        oldNode = node
+        if node.is_active != True :
+            node.is_active = True
+            return self.updateNode(oldNode, node)
+        return node
+
+    def inActiveNode(self, node):
+        oldNode = node
+        if node.is_active != False :
+            node.is_active = False
+            return self.updateNode(oldNode, node)
+        return node
+
     def handleNodeInformation(self, ip: str, port: int, nodename = '' ):
-        # 3 Cases :  
-        #   - Empty network  :OK
-        #   - Duplicate node :OK 
-        #   - Not duplicate node : - New IP 
-        #   -           "        : - Old IP, new Port
-        network = self.getNetwork()
+        # 5 Cases :  
+        #   - Empty network  : Create OK 
+        #   - New IP : Create OK  
+        #   - New port : Create OK  
+        #   - Already been active : Search in nodeIP 
+        #   - Not been active yet : Active node OK 
+        network = self.getNetwork() # Found all node ( not-working status )
         id = str(uuid4()).replace('-', '') 
         if not network : # Empty network, create new
             return self.registerNode(
@@ -224,7 +240,7 @@ class NodesBusiness:
                     True
                 )   
             nodeIPPort = self.getNodeWithIPAndPort(ip, port) 
-            if not nodeIPPort : # Have this IP but wrong port, create new with random port 
+            if not nodeIPPort  : # Have this IP but wrong port, create new with random port 
                 return self.registerNode(
                     id,
                     ip, 
@@ -232,10 +248,25 @@ class NodesBusiness:
                     nodename,
                     True
                 ) 
-            else : # Keep that one to use
+            elif nodeIPPort.is_active == True: # This node already active
+                anotherNode = [ node for node in nodeIP if node.is_active == False and node.ip == nodeIPPort.ip] 
+                if len(anotherNode) <= 0: # No node same IP spared 
+                    return self.registerNode(
+                        id,
+                        ip, 
+                        random.randint( self.PORT_START, self.PORT_END ),
+                        nodename,
+                        True
+                    )
+                else : # This node has same IP, different port and haven't used yet
+                    self.activeNode(anotherNode[0])
+                    anotherNode[0].is_active = True
+                    return anotherNode[0], 201
+            else: # This node is not used by anyone
+                self.activeNode(nodeIPPort)
+                nodeIPPort.is_active = True
                 return nodeIPPort, 201
 
-    
     def validateNode(self,node, noCheckDuplicate = False):
         checked = True
         if not node : # check node ( not null )
@@ -247,7 +278,7 @@ class NodesBusiness:
         if not node.ip or len(node.ip) > 16 : # check IP ( not null, 16 chars, match regex )
             checked = False
         else : 
-            checked = False if not re.search('^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', node.ip) else True  
+            checked = False if not re.search(IP_REGEX_STRING, node.ip) else True  
         if not node.port or node.port < self.PORT_START or node.port > self.PORT_END : 
             checked = False
         if noCheckDuplicate and self.getNodeWithIPAndPort( node.ip, node.port ): # check duplicate
@@ -273,9 +304,9 @@ class NodesBusiness:
         except:
             return node, 404
 
-    def updateNode(self, node ):
-        if not self.validateNode(node):
-            return 403
+    def updateNode(self, oldNode ,node ):
+        if not self.validateNode(oldNode):
+            return oldNode,403
             
         try:
             db.session.query(models.Nodes).filter(
@@ -288,9 +319,9 @@ class NodesBusiness:
                 ,"is_active": node.is_active
             })
             db.session.commit()
-            return 200
+            return node,200
         except:
-            return  404
+            return oldNode,404
 
     def deleteNode(self, node):
         node = models.Nodes.query.filter(
@@ -307,8 +338,102 @@ class NodesBusiness:
         except:
             return node, 404
 
-# class TransactionBusiness
-# class BlockchainBusiness
+class TransactionBusiness:
+    def __init__(self):
+        self.transactions = self.getCurrentTransactions() 
+        self.badTransactions = []
+    
+    # Transactions that haven't had block id 
+    def getCurrentTransactions(self):
+        return models.Transactions.query.filter( models.Transactions.block_id == None ).all()
+
+    # Transaction must have corrected format of ip, hostname, port
+    def validateTransaction(self, transaction):
+        checked = True
+        if not transaction : # check transaction ( not null )
+            checked = False
+        if not transaction.hostname or len(transaction.hostname) > 64 : # check hostname ( not null, <= 64 chars)
+            checked = False
+        else : 
+            checked = False if not re.search(HOSTNAME_REGEX_STRING, transaction.hostname) else True
+        if not transaction.ip or len(transaction.ip) > 16 : # check IP ( not null, 16 chars, match regex )
+            checked = False
+        else : 
+            checked = False if not re.search(IP_REGEX_STRING, transaction.ip) else True   
+        if not transaction.port or transaction.port <= 0 : # check Port ( not null, > 0)
+            checked = False
+        if not transaction.reward or transaction.reward <= 0 : # check Reward ( not null, > 0):
+            checked = False
+        return checked
+
+    # New current Transactions 
+    def addTransactions(self, hostname:str, ip:str, port=80 ,reward = 10):
+        transaction = models.Transactions( 
+            hostname = hostname,
+            ip= ip,
+            port= port,
+            reward = reward
+        )
+
+        if not self.validateTransaction(transaction, True):
+            return transaction, 403
+        
+        try:
+            db.session.add(transaction)
+            db.session.commit()
+            self.transactions.append(transaction) # Adding to buffer 
+            return transaction, 200
+        except:
+            return transaction, 404
+
+    # No update, delete cause every transaction is unique 
+
+class BlockchainBusiness:
+    def __init__(self, node_id ):
+        self.node_id = node_id
+        self.transactionBusiness = TransactionBusiness()
+        self.chain = self.getChain() # Must be load from DB 
+
+    def getChain(self):
+        return models.Blocks.query.order_by(models.Blocks.id).all()
+
+    @property 
+    def wallet(self): 
+        chain = self.chain
+        wallet = 10 # Start with 10    
+
+        if len(chain) <= 0 : return wallet
+        
+        # Get only block which has correct node id 
+        for block in [block for block in chain if block.node_id == self.node_id]:          
+            for transaction in block.transactions:
+                wallet += transaction.reward
+        return wallet
+    
+    @property
+    def last_block(self):
+        return self.chain[-1]
+
+    @property
+    def current_transaction(self):
+        return self.transactionBusiness.transactions
+
+    # Proof_of_work
+    #  sub - Number_generator 
+    
+    # Resolve_conflicts 
+
+    # Tạo
+    # Sửa 
+    # Tải
+    # Thống kê
+
+class DNSBusiness: 
+    def __init__(self):
+        self.BUFFER_MAX_LEN = 20
+        self.MINE_REWARD = 10
+        self.blockchain = BlockchainBusiness()
+        pass
 
 # --------- HELPER ------------------------------------
 class PaginationHelper:
@@ -334,6 +459,7 @@ class PaginationHelper:
 
 # --------- INIT --------------------------------------
 accountBusiness = AccountBusiness()
+
 nodeBusiness = NodesBusiness()
 
 # --------- #1. UI ROUTERS --------------------------------------
@@ -390,12 +516,13 @@ def storage():
         return domainName + " " + ipAddress + " " + hosterName + " " + status + " " + createdDate
 
     protectedAccount = session.get("protected_account")
+    # Client don't have permission to go here
+    if protectedAccount.type_cd == 3 : return redirect('/table')
     # Pagination
     paginationHelper = PaginationHelper(3,13)
     page = request.args.get('page', default = 1, type = int)
     totalPageNumber = paginationHelper.getCeilingNumber()
     arrayOfIndexingData = paginationHelper.arrayOfIndexingData
-    print( json.dumps(arrayOfIndexingData) )
     page = totalPageNumber if page >= totalPageNumber else page
     paginationObj = {
         'page': page,
@@ -444,37 +571,37 @@ def logout():
 if __name__ == "__main__":
     from argparse import ArgumentParser
     import atexit
-    def close_running_threads():    
-        # nodeBusiness.inActiveNode(APP_NODE)
-        print (f"-------- NODE {APP_NODE.id} IS INACTIVE ------")
-        print ("-------- SHUTTING DOWN ------")
-    atexit.register(close_running_threads)
+    import socket
+    print( 'Data is processing please wait ... ')
+    def onClosingNode():    
+        if APP_NODE:
+            nodeBusiness.inActiveNode(APP_NODE)
+            print (f"\n-------- NODE {APP_NODE.id} IS INACTIVE ------")
+            print ("-------- GOODBYE !! ------")
+    atexit.register(onClosingNode)
     # ------------------------------- 
     parser = ArgumentParser()
     # ------------------------------- 
-    parser.add_argument('-host', '--host', default='0.0.0.0', type=str, help='IPv4 string in your network or 0.0.0.0 in default')
+    parser.add_argument('-host', '--host', default='', type=str, help='IPv4 string in your network or blank in default')
     parser.add_argument('-p', '--port', default=5000, type=int, help='Port Number to listen on or auto-handle in default')
     args = parser.parse_args()
-    # ------------------------------- 
-    port = args.port
-    host = args.host 
+    # -------------------------------   
+    port = args.port 
+    host = args.host or socket.gethostbyname(socket.gethostname()) 
     # Khai báo node
     APP_NODE, code = nodeBusiness.handleNodeInformation(host, port)
-    APP_NODE.nodename = 'daidd'
-    APP_NODE.port = 5001
-    APP_NODE.is_active = True
-    print(nodeBusiness.updateNode(APP_NODE))
     dns_resolver = dns(node_identifier = APP_NODE.id)
+    print('OK')
     if code == 200 : 
         print( '//----------------------------------------//' )
         print( ' WELCOME NODE ', APP_NODE.id )
         print( '//----------------------------------------//' )
-        app.run(host=host, port = port,  debug=True, use_reloader=False)
+        app.run(host=APP_NODE.ip, port = APP_NODE.port,  debug=True, use_reloader=False)
     elif code == 201 :
         print( '//----------------------------------------//' )
         print( ' WELCOME BACK NODE ', APP_NODE.id )
         print( '//----------------------------------------//' )
-        app.run(host=host, port = port,  debug=True, use_reloader=False)
+        app.run(host=APP_NODE.ip, port = APP_NODE.port,  debug=True, use_reloader=False)
     else :
         print( 'WRONG INFORMATION !! PLEASE TRY AGAIN WITH OTHER VALID HOSTNAME OR PORT' )
         print( 'Port must be from [ 5000, 5999] ' )

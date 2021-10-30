@@ -66,7 +66,8 @@ class dns_layer(object):
 		
 		"""
 		last_block = self.blockchain.last_block
-		# TODO : proof này giữ gì ? -> Proof như là 1 số Nonce của Block trước 
+		# TODO : proof này giữ gì ?
+		# -> Proof như là 1 số Nonce của Block trước 
 		last_proof = last_block['proof']
 		proof = self.blockchain.proof_of_work(last_proof)
 

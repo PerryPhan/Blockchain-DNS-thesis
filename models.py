@@ -31,7 +31,8 @@ class Transactions(db.Model):
     __table_args__ = {'extend_existing': True} 
     id = db.Column(db.Integer, primary_key=True)
     hostname = db.Column(db.String(64), nullable=True)
-    ip = ip = db.Column(db.String(16), nullable=False)
+    ip = db.Column(db.String(16), nullable=False)
+    reward = db.Column(db.Integer, nullable=False)
     port = db.Column(db.Integer, nullable=False)
     # ============== 
     account_id = db.Column(db.Integer, db.ForeignKey('accounts.id'))
