@@ -22,6 +22,7 @@ class Nodes(db.Model):
     ip = db.Column(db.String(16), nullable=False)
     port = db.Column(db.Integer, nullable=False)
     is_deleted = db.Column(db.Boolean, nullable=False)
+    is_active = db.Column(db.Boolean, nullable=False)
     # ============== 
     blocks = db.relationship('Blocks', backref="node")
 

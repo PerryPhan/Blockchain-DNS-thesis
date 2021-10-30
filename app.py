@@ -181,13 +181,16 @@ class NodesBusiness:
     def getNetwork(self):
         return models.Nodes.query.filter(models.Nodes.is_deleted == False).all()
 
-    def getIPNode(self, ip):
+    def getActiveNetwork(self):
+        return models.Nodes.query.filter(models.Nodes.is_active == False ,models.Nodes.is_deleted == False).all()
+    
+    def getNodeWithIP(self, ip):
         return models.Nodes.query.filter(
             models.Nodes.ip == ip,
             models.Nodes.is_deleted == False
             ).all()
 
-    def getNode(self, ip, port):
+    def getNodeWithIPAndPort(self, ip, port):
         return models.Nodes.query.filter(
             models.Nodes.ip == ip,
             models.Nodes.port == port,
@@ -207,30 +210,33 @@ class NodesBusiness:
                 id,
                 ip, 
                 port,
-                nodename
+                nodename,
+                True
             )
         else : 
-            # nodeIP = self.getIPNode(ip)
-            # if not nodeIP : # Don't have this IP in DB, create new  
-            #     return self.registerNode(
-            #         id,
-            #         ip, 
-            #         port,
-            #         nodename
-            #     )   
-            nodeIPPort = self.getNode(ip, port) 
+            nodeIP = self.getNodeWithIP(ip)
+            if not nodeIP : # Don't have this IP in DB, create new  
+                return self.registerNode(
+                    id,
+                    ip, 
+                    port,
+                    nodename,
+                    True
+                )   
+            nodeIPPort = self.getNodeWithIPAndPort(ip, port) 
             if not nodeIPPort : # Have this IP but wrong port, create new with random port 
                 return self.registerNode(
                     id,
                     ip, 
                     random.randint( self.PORT_START, self.PORT_END ),
-                    nodename
+                    nodename,
+                    True
                 ) 
             else : # Keep that one to use
                 return nodeIPPort, 201
 
     
-    def validateNode(self,node):
+    def validateNode(self,node, noCheckDuplicate = False):
         checked = True
         if not node : # check node ( not null )
             checked = False
@@ -244,19 +250,20 @@ class NodesBusiness:
             checked = False if not re.search('^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', node.ip) else True  
         if not node.port or node.port < self.PORT_START or node.port > self.PORT_END : 
             checked = False
-        if self.getNode( node.ip, node.port ): # check duplicate
+        if noCheckDuplicate and self.getNodeWithIPAndPort( node.ip, node.port ): # check duplicate
             checked = False
         return checked 
 
-    def registerNode(self, id: str, ip: str, port: int, nodename = ''):
+    def registerNode(self, id: str, ip: str, port: int, nodename = '', is_active = False ):
         node = models.Nodes(
             id = id,
             ip = ip,
             port = port,
             nodename = nodename,
-            is_deleted = False
+            is_deleted = False,
+            is_active = is_active
         )
-        if not self.validateNode(node):
+        if not self.validateNode(node, True):
             return node, 403
         
         try:
@@ -266,21 +273,35 @@ class NodesBusiness:
         except:
             return node, 404
 
-    def updateNode(self, node):
+    def updateNode(self, node ):
         if not self.validateNode(node):
-            return node, 403
+            return 403
             
         try:
+            db.session.query(models.Nodes).filter(
+                models.Nodes.id == node.id,
+                models.Nodes.is_deleted == False
+            ).update({
+                "ip" : node.ip
+                ,"port": node.port
+                ,"nodename" : node.nodename 
+                ,"is_active": node.is_active
+            })
             db.session.commit()
-            return node, 200
+            return 200
         except:
-            return node, 404
+            return  404
 
-    def stopNode(self, node):
+    def deleteNode(self, node):
+        node = models.Nodes.query.filter(
+            models.Nodes.id == node.id,
+            models.Nodes.is_deleted == False
+        ).first()
+
         if not self.validateNode(node):
             return node, 403
         try:
-            db.session.delete(node)
+            node.is_delete = True
             db.session.commit()
             return node, 200 
         except:
@@ -419,105 +440,15 @@ def logout():
     session.pop('protected_account', None)
     return redirect('/')
 
-# --------- #2. API ROUTERS --------------------------------------
-# Make a DNS layer as resolver - as communicator between Server and Blockchain
-# Route 1: Make sure this node is working - Need when init  
-@app.route('/debug/alive',methods=['GET'])
-def check_alive():
-	response = 'The node is alive'
-	return  jsonify(response),200
-
-# Route 2: Registry a node (Machine) to network - Need when init
-@app.route('/nodes/new',methods=['POST'])
-def register_node():
-	"""
-	Calls underlying functions to register new node in network
-	"""
-	values = request.get_json()
-	nodes = values.get('nodes')
-
-	if nodes is None:
-		# Nếu không có giá trị gì gửi lên sẽ trả STATUS CODE 400 
-		response, return_code = "No node supplied",400
-	else:
-		for node in nodes:
-			# DNS resolver tạo node mới 
-			dns_resolver.register_node(node)
-		
-		# Nếu thêm thành công sẽ trả STATUS CODE 201 và message 	
-		response, return_code = {
-			'message': 'New nodes have been added',
-			'total_nodes': dns_resolver.get_network_size(),
-		}, 201
-
-	return jsonify(response),return_code
-
-# Route 3: Add more new DNS - insert code when request POST in /storage 
-@app.route('/dns/new',methods=['POST'])
-def new_transaction():
-	"""
-	adds new entries into our resolver instance
-	"""
-	values = request.get_json()
-	# print(values)
-	required = ['hostname', 'ip', 'port']
-	bad_entries = []
-
-	for value in values:
-		#print(k in values[value] for k in required)
-		if all(k in values[value] for k in required):
-			value = values[value]
-			# Nếu các key của giá trị request trùng với các key của required thì sẽ được tạo mới
-			dns_resolver.new_entry(value['hostname'],value['ip'],value['port'])
-		else:
-			bad_entries.append(value)
-
-	if bad_entries:
-		return jsonify(bad_entries),400
-	else:
-		response = 'New DNS entry added'
-		return jsonify(response), 201
-
-# Route 4: Sending request to resolver and receive response with data - need to change the table
-@app.route('/dns/request',methods=['POST'])
-def dns_lookup():
-	"""
-	receives a dns request and responses after resolving
-	"""
-	values = request.get_json()
-	required = ['hostname']
-	if not all(k in values for k in required):
-		return 'Missing values', 400
-
-	try:
-		# Gửi giá trị của thuộc tính hostname cho DNS resolver để tìm kiếm
-		host, port = dns_resolver.lookup(values['hostname'])
-		response = {
-			'ip':host,
-			'port': port
-		}
-		return_code = 200
-	except LookupError:
-		response = "No existing entry"
-		return_code = 401
-	
-	# Tìm thấy thì 200 , không thì 401 
-	return jsonify(response), return_code
-
-# Route 5: Solving node's conflict from change
-@app.route('/nodes/resolve',methods=['GET'])
-def consensus():
-	"""
-	triggers the blockchain to check chain against other neighbors'
-	chain, and uses the longest chain to achieve consensus ( đoàn kết )
-	"""
-	t = threading.Thread(target=dns_resolver.blockchain.resolve_conflicts)
-	t.start()
-
-	return jsonify(None), 200
 
 if __name__ == "__main__":
     from argparse import ArgumentParser
+    import atexit
+    def close_running_threads():    
+        # nodeBusiness.inActiveNode(APP_NODE)
+        print (f"-------- NODE {APP_NODE.id} IS INACTIVE ------")
+        print ("-------- SHUTTING DOWN ------")
+    atexit.register(close_running_threads)
     # ------------------------------- 
     parser = ArgumentParser()
     # ------------------------------- 
@@ -529,6 +460,10 @@ if __name__ == "__main__":
     host = args.host 
     # Khai báo node
     APP_NODE, code = nodeBusiness.handleNodeInformation(host, port)
+    APP_NODE.nodename = 'daidd'
+    APP_NODE.port = 5001
+    APP_NODE.is_active = True
+    print(nodeBusiness.updateNode(APP_NODE))
     dns_resolver = dns(node_identifier = APP_NODE.id)
     if code == 200 : 
         print( '//----------------------------------------//' )
