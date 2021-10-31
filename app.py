@@ -39,6 +39,7 @@ Session(app)
 # --------- SCHEMA -------------------------------------
 from schema.AccountSchema import AccountSchema
 from schema.DomainSchema import DomainSchema
+
 IP_REGEX_STRING = '^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
 HOSTNAME_REGEX_STRING = '(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]'
 # --------- MODELS --------------------------------------
@@ -420,9 +421,28 @@ class BlockchainBusiness:
 
     # Proof_of_work
     #  sub - Number_generator 
+
+    # Proof_of_work
+    def proof_of_work(self, last_proof):
+        salt_gen = self.salt_generator()
+        salt = next(salt_gen)
+        while not self.valid_proof(last_proof,salt):
+            salt = next(salt_gen)
+        print("POW generated")
+        return salt
+        
+    # Static Override function
+    @staticmethod
+    def salt_generator():
+        num = 0
+        while True:
+            yield num
+            num += 1
+            if num%100 == 0:
+                print("Generating salt...")
     
     # Resolve_conflicts 
-
+    
     # Tạo
     # Sửa 
     # Tải
