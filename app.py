@@ -344,6 +344,9 @@ class TransactionBusiness:
         self.transactions = self.getCurrentTransactions() 
         self.badTransactions = []
     
+    def getAllTransactions(self):
+        return models.Transactions.query.order_by().all()
+
     # Transactions that haven't had block id 
     def getCurrentTransactions(self):
         return models.Transactions.query.filter( models.Transactions.block_id == None ).all()
@@ -387,6 +390,7 @@ class TransactionBusiness:
         except:
             return transaction, 404
 
+    
     # No update, delete cause every transaction is unique 
 
 class BlockchainBusiness:
@@ -416,8 +420,12 @@ class BlockchainBusiness:
         return self.chain[-1]
 
     @property
-    def current_transaction(self):
+    def current_transactions(self):
         return self.transactionBusiness.transactions
+    
+    @property
+    def all_transactions(self):
+        return self.transactionBusiness.getAllTransactions()
 
     # Proof_of_work
     #  sub - Number_generator 
@@ -433,7 +441,7 @@ class BlockchainBusiness:
         
     # Static Override function
     @staticmethod
-    def salt_generator():
+    def salt_generator(self):
         num = 0
         while True:
             yield num
@@ -442,11 +450,17 @@ class BlockchainBusiness:
                 print("Generating salt...")
     
     # Resolve_conflicts 
-    
     # Tạo
     # Sửa 
     # Tải
     # Thống kê
+
+    def getDomainSet(self):
+        # Get source from all Transactions 
+        # Get rid of same transactions
+        # -> sub-query, group by hostname
+        # TODO : Need to read reference again
+        return set(self.all_transactions)
 
 class DNSBusiness: 
     def __init__(self):
@@ -586,7 +600,6 @@ def logout():
     session.pop('email', None)
     session.pop('protected_account', None)
     return redirect('/')
-
 
 if __name__ == "__main__":
     from argparse import ArgumentParser

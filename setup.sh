@@ -1,0 +1,1 @@
+python models.py && python sample.py 

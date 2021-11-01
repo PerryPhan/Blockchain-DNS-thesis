@@ -1,3 +1,5 @@
-from models import Blocks, Accounts
+from app import BlockchainBusiness
 
-print( type(Blocks), type(Accounts))
+blockchain = BlockchainBusiness(1)
+print( blockchain.all_transactions)
+print( blockchain.getDomainSet( ) )

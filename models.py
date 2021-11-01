@@ -1,4 +1,4 @@
-from app import db
+from app import db, generate_password_hash, random
 
 db.drop_all()
 
