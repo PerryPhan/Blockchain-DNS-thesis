@@ -1,3 +1,108 @@
+# --------- #1. UI ROUTERS --------------------------------------
+@app.route('/')
+def home():
+    if session and session.get("protected_account"):
+        type_cd = session.get("protected_account").type_cd
+        if type_cd and type_cd != 1: #ADMIN
+            return redirect('/table')
+        else : 
+            return render_template('index.html')
+    else:
+        return redirect('/login')
+
+@app.route('/table', methods=['POST','GET'])
+def table():
+    if not session or not session.get("protected_account"):
+        return redirect('/login')
+    if request.method == 'POST':
+        pass
+    else :
+        protectedAccount = session.get("protected_account")
+        # Pagination
+        paginationHelper = PaginationHelper(12,13)
+        page = request.args.get('page', default = 1, type = int)
+        totalPageNumber = paginationHelper.getCeilingNumber()
+        arrayOfIndexingData = paginationHelper.arrayOfIndexingData
+        page = totalPageNumber if page >= totalPageNumber else page
+        # print( json.dumps(arrayOfIndexingData) )
+        paginationObj = {
+            'page': page,
+            'totalPageNumber': totalPageNumber,
+            'from': arrayOfIndexingData[page-1]['from'],
+            'to': arrayOfIndexingData[page-1]['to']
+        } 
+        # print(page)
+        # print(totalPageNumber)
+        # for i in range(len(arrayOfIndexingData)):
+        #     print( json.dumps( arrayOfIndexingData[i] ) )
+
+        return render_template('table.html', protectedAccount = protectedAccount, paginationObj = paginationObj )
+
+@app.route('/storage', methods=['POST','GET'] )
+def storage():
+    if not session or not session.get("protected_account"):
+        return redirect('/login')
+    if request.method == 'POST':
+        domainName = request.form.get(DomainSchema.DOMAINNAME)
+        ipAddress = request.form.get(DomainSchema.IPADDRESS)
+        hosterName = request.form.get(DomainSchema.HOSTER)
+        status = request.form.get(DomainSchema.STATUS)
+        createdDate = request.form.get(DomainSchema.CREATEDDATE)
+        # TODO : THINKING WORKING BLOCKCHAIN
+        return domainName + " " + ipAddress + " " + hosterName + " " + status + " " + createdDate
+
+    protectedAccount = session.get("protected_account")
+    # Client don't have permission to go here
+    if protectedAccount.type_cd == 3 : return redirect('/table')
+    # Pagination
+    paginationHelper = PaginationHelper(3,13)
+    page = request.args.get('page', default = 1, type = int)
+    totalPageNumber = paginationHelper.getCeilingNumber()
+    arrayOfIndexingData = paginationHelper.arrayOfIndexingData
+    page = totalPageNumber if page >= totalPageNumber else page
+    paginationObj = {
+        'page': page,
+        'totalPageNumber': totalPageNumber,
+        'from': arrayOfIndexingData[page-1]['from'],
+        'to': arrayOfIndexingData[page-1]['to']
+    } 
+    return render_template('storage.html', protectedAccount = protectedAccount, paginationObj = paginationObj)
+
+@app.route('/register', methods=['POST', 'GET'])
+def register():
+    if request.method == 'POST':
+        response = accountBusiness.insert(
+            request, accountBusiness.onReturn, accountBusiness.onError)
+        message = response['message']
+        data = response['data']
+        isSuccess = response['isSuccess']
+        if response['isSuccess']:
+            return render_template('login.html', email=data.email)
+        else:
+            # print ('Data: ', error,data,isSuccess)
+            # print ('Type_cd: ',data.type_cd)
+            return render_template('register.html', message=message, email=data.email, fullname=data.fullname, type_cd=data.type_cd, isSuccess=isSuccess)
+    return render_template('register.html')
+
+@app.route('/login', methods=['POST', 'GET'])
+def login():
+    if request.method == 'POST':
+        isPassedOrErrorCode = accountBusiness.validateLoginOrReturnErrorCode(request)
+        if isPassedOrErrorCode == True:
+            session['email'] = request.form.get(AccountSchema.EMAIL)
+            session['protected_account'] = accountBusiness.getProtectedAccount(session.get('email'))
+            return redirect('/')
+        else : 
+            return render_template('login.html', email=request.form.get(AccountSchema.EMAIL), message=AccountSchema.message[isPassedOrErrorCode], isSuccess=False)
+    else:
+        return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('email', None)
+    session.pop('protected_account', None)
+    return redirect('/')
+
 # --------- #2. API ROUTERS --------------------------------------
 # Make a DNS layer as resolver - as communicator between Server and Blockchain
 # Route 1: Make sure this node is working - Need when init  

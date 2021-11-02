@@ -3,6 +3,7 @@
 from flask import Flask, render_template, url_for, request, session, redirect, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_session import Session
+from werkzeug.datastructures import D
 from werkzeug.utils import redirect
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import timedelta
@@ -10,9 +11,14 @@ import math
 # -------------------- 2 Blockchain NEED -------------------------------------
 from uuid import  uuid4
 import random
+import requests
 import threading
 import re
 import json
+import hashlib
+import time
+
+from werkzeug.wrappers import response
 from dnschain.dns import dns_layer as dns
 
 # --------- SETTINGS --------------------------------------
@@ -43,20 +49,66 @@ from schema.DomainSchema import DomainSchema
 IP_REGEX_STRING = '^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
 HOSTNAME_REGEX_STRING = '(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]'
 # --------- MODELS --------------------------------------
-import models
+class Accounts(db.Model): 
+    __tablename__ = 'accounts'
+    __table_args__ = {'extend_existing': True} 
+    id = db.Column(db.Integer, primary_key=True)
+    fullname = db.Column(db.String(40), nullable=False)
+    email = db.Column(db.String(40), nullable=False)
+    password = db.Column(db.String(255), nullable=False)
+    type_cd = db.Column(db.Integer, nullable=False)
+    is_deleted = db.Column(db.Boolean, nullable=False)
+    # ============== 
+    transactions = db.relationship('Transactions',backref="owner")
+
+class Nodes(db.Model):
+    __tablename__ = 'nodes'
+    __table_args__ = {'extend_existing': True} 
+    id = db.Column(db.String(40), primary_key=True)
+    nodename = db.Column(db.String(64), nullable=True)
+    ip = db.Column(db.String(16), nullable=False)
+    port = db.Column(db.Integer, nullable=False)
+    is_deleted = db.Column(db.Boolean, nullable=False)
+    is_active = db.Column(db.Boolean, nullable=False)
+    # ============== 
+    blocks = db.relationship('Blocks', backref="node")
+
+class Transactions(db.Model):
+    __tablename__ = 'transactions'
+    __table_args__ = {'extend_existing': True} 
+    id = db.Column(db.Integer, primary_key=True)
+    hostname = db.Column(db.String(64), nullable=True)
+    ip = db.Column(db.String(16), nullable=False)
+    reward = db.Column(db.Integer, nullable=False)
+    port = db.Column(db.Integer, nullable=False)
+    # ============== 
+    account_id = db.Column(db.Integer, db.ForeignKey('accounts.id'))
+    block_id = db.Column(db.Integer, db.ForeignKey('blocks.id'))
+    
+class Blocks(db.Model):
+    __tablename__ = 'blocks'
+    __table_args__ = {'extend_existing': True} 
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.Float, nullable=False)
+    nonce = db.Column(db.Integer, nullable=False)
+    previous_hash = db.Column(db.String(255), nullable=False)
+    # ===============
+    node_id = db.Column(db.String(64), db.ForeignKey('nodes.id'))
+    transactions = db.relationship('Transactions',backref="block")
+
 # --------- BUSINESS -----------------------------------
 class AccountBusiness:
     def __init__(self):
         pass
 
     def selectAll(self):
-        return models.Accounts.query.order_by(models.Accounts.id).all()
+        return Accounts.query.order_by(Accounts.id).all()
 
     def validateLoginOrReturnErrorCode(self, request):
         email = request.form.get(AccountSchema.EMAIL)
         password = request.form.get(AccountSchema.PASSWORD)
-        accounts = models.Accounts.query.filter(models.Accounts.email == email).all()
-        # print("models.Accounts: ", account[0].password)
+        accounts = Accounts.query.filter(Accounts.email == email).all()
+        # print("Accounts: ", account[0].password)
         if accounts :
             if password and check_password_hash(accounts[0].password, password):
                 return True
@@ -66,8 +118,8 @@ class AccountBusiness:
         return 'LO010002'
 
     def getProtectedAccount(self, email):
-        account = models.Accounts.query.filter(
-            models.Accounts.email == email, models.Accounts.is_deleted == False).first()
+        account = Accounts.query.filter(
+            Accounts.email == email, Accounts.is_deleted == False).first()
         if account : 
             return account
         else: 
@@ -115,14 +167,14 @@ class AccountBusiness:
         return generate_password_hash(password)
 
     def checkDuplicatingAccount(self, email):
-        accounts = models.Accounts.query.filter(
-            models.Accounts.email == email, models.Accounts.is_deleted == False).all()
+        accounts = Accounts.query.filter(
+            Accounts.email == email, Accounts.is_deleted == False).all()
         return len(accounts) if len(accounts) > 0 else True
 
     def insert(self, request, resolve, reject):
         if resolve == None or reject == None or request == None:
             return reject(None, 'RE010002')
-        newAccount = models.Accounts(
+        newAccount = Accounts(
             fullname=request.form.get(AccountSchema.FULLNAME),
             email=request.form.get(AccountSchema.EMAIL),
             password=self.encodingPassword(
@@ -144,7 +196,7 @@ class AccountBusiness:
             return reject(newAccount, 'RE010001')
 
     def update(self, id, request, resolve, reject):
-        updatedAccount = models.Accounts.query.get_or_404(id)
+        updatedAccount = Accounts.query.get_or_404(id)
 
         if(updatedAccount.fullname != request.form.get(AccountSchema.FULLNAME) and request.form.get(AccountSchema.FULLNAME) != None):
             updatedAccount.fullname = request.form.get(AccountSchema.FULLNAME)
@@ -165,7 +217,7 @@ class AccountBusiness:
             return reject()
 
     def delete(self, id, resolve, reject):
-        deleteAccount = models.Accounts.query.get_or_404(id)
+        deleteAccount = Accounts.query.get_or_404(id)
 
         try:
             db.session.delete(deleteAccount)
@@ -181,22 +233,22 @@ class NodesBusiness:
         pass
 
     def getNetwork(self):
-        return models.Nodes.query.filter(models.Nodes.is_deleted == False).all()
+        return Nodes.query.filter(Nodes.is_deleted == False).all()
 
     def getActiveNetwork(self):
-        return models.Nodes.query.filter(models.Nodes.is_active == True ,models.Nodes.is_deleted == False).all()
+        return Nodes.query.filter(Nodes.is_active == True ,Nodes.is_deleted == False).all()
     
     def getNodeWithIP(self, ip):
-        return models.Nodes.query.filter(
-            models.Nodes.ip == ip,
-            models.Nodes.is_deleted == False
+        return Nodes.query.filter(
+            Nodes.ip == ip,
+            Nodes.is_deleted == False
             ).all()
 
     def getNodeWithIPAndPort(self, ip, port):
-        return models.Nodes.query.filter(
-            models.Nodes.ip == ip,
-            models.Nodes.port == port,
-            models.Nodes.is_deleted == False
+        return Nodes.query.filter(
+            Nodes.ip == ip,
+            Nodes.port == port,
+            Nodes.is_deleted == False
             ).first()
 
     def activeNode(self, node):
@@ -287,7 +339,7 @@ class NodesBusiness:
         return checked 
 
     def registerNode(self, id: str, ip: str, port: int, nodename = '', is_active = False ):
-        node = models.Nodes(
+        node = Nodes(
             id = id,
             ip = ip,
             port = port,
@@ -310,9 +362,9 @@ class NodesBusiness:
             return oldNode,403
             
         try:
-            db.session.query(models.Nodes).filter(
-                models.Nodes.id == node.id,
-                models.Nodes.is_deleted == False
+            db.session.query(Nodes).filter(
+                Nodes.id == node.id,
+                Nodes.is_deleted == False
             ).update({
                 "ip" : node.ip
                 ,"port": node.port
@@ -325,9 +377,9 @@ class NodesBusiness:
             return oldNode,404
 
     def deleteNode(self, node):
-        node = models.Nodes.query.filter(
-            models.Nodes.id == node.id,
-            models.Nodes.is_deleted == False
+        node = Nodes.query.filter(
+            Nodes.id == node.id,
+            Nodes.is_deleted == False
         ).first()
 
         if not self.validateNode(node):
@@ -341,15 +393,16 @@ class NodesBusiness:
 
 class TransactionBusiness:
     def __init__(self):
-        self.transactions = self.getCurrentTransactions() 
+        self.alltransactions = self.getAllTransactions()
+        self.transactions = self.getCurrentTransactions() # -> These are transactions that not in block yet 
         self.badTransactions = []
     
     def getAllTransactions(self):
-        return models.Transactions.query.order_by().all()
+        return Transactions.query.order_by().all()
 
     # Transactions that haven't had block id 
     def getCurrentTransactions(self):
-        return models.Transactions.query.filter( models.Transactions.block_id == None ).all()
+        return Transactions.query.filter( Transactions.block_id == None ).all()
 
     # Transaction must have corrected format of ip, hostname, port
     def validateTransaction(self, transaction):
@@ -371,8 +424,8 @@ class TransactionBusiness:
         return checked
 
     # New current Transactions 
-    def addTransactions(self, hostname:str, ip:str, port=80 ,reward = 10):
-        transaction = models.Transactions( 
+    def addTransactions(self, hostname:str, ip:str, port= 80 ,reward = 10):
+        transaction = Transactions( 
             hostname = hostname,
             ip= ip,
             port= port,
@@ -390,18 +443,47 @@ class TransactionBusiness:
         except:
             return transaction, 404
 
+    # Get Domain List
+    def getDomainNamesList(self):
+        if len(self.alltransactions) == 0 : 
+            return []
+        noDuplicateAndSortedSet = set( [ trans.hostname for trans in self.alltransactions ] )
+        return [ hostname for hostname in noDuplicateAndSortedSet ]
+    
+    # Search Domain due to domainName
+    def searchDomainInformation(self, domainName):
+        result = [ trans for trans in self.alltransactions if trans.hostname == domainName]
+        return result
     
     # No update, delete cause every transaction is unique 
 
 class BlockchainBusiness:
-    def __init__(self, node_id ):
+    def __init__(self ):
+        self.node_id = None
+        self.nodeBusiness = NodesBusiness()
+        self.chain = self.loadChain( ) # Must be load from DB 
+
+    def configNodeID( self, node_id ):
         self.node_id = node_id
-        self.transactionBusiness = TransactionBusiness()
-        self.chain = self.getChain() # Must be load from DB 
 
-    def getChain(self):
-        return models.Blocks.query.order_by(models.Blocks.id).all()
+    def getGenesisBlock( self ):
+        return Blocks(
+            id = '1',
+            timestamp = '1',
+            nonce = 1,
+            previous_hash = '0'*255,
+            node_id = self.node_id,
+            transactions = None
+        )
 
+    def loadChain(self):
+        result = [self.getGenesisBlock()]
+        blocksDBList = Blocks.query.order_by(Blocks.id).all()
+        if len(blocksDBList) > 0 :
+            return [ result.append(block) for block in blocksDBList ] 
+        return result
+
+    # 1. Quota - all rewards in blockchain
     @property 
     def wallet(self): 
         chain = self.chain
@@ -415,33 +497,14 @@ class BlockchainBusiness:
                 wallet += transaction.reward
         return wallet
     
+    # 2. Get the last block
     @property
     def last_block(self):
         return self.chain[-1]
 
-    @property
-    def current_transactions(self):
-        return self.transactionBusiness.transactions
-    
-    @property
-    def all_transactions(self):
-        return self.transactionBusiness.getAllTransactions()
-
-    # Proof_of_work
-    #  sub - Number_generator 
-
-    # Proof_of_work
-    def proof_of_work(self, last_proof):
-        salt_gen = self.salt_generator()
-        salt = next(salt_gen)
-        while not self.valid_proof(last_proof,salt):
-            salt = next(salt_gen)
-        print("POW generated")
-        return salt
-        
-    # Static Override function
+    # 3. Proof of works support : Generate Nonce  
     @staticmethod
-    def salt_generator(self):
+    def saltGenerator():
         num = 0
         while True:
             yield num
@@ -449,25 +512,143 @@ class BlockchainBusiness:
             if num%100 == 0:
                 print("Generating salt...")
     
-    # Resolve_conflicts 
-    # Tạo
-    # Sửa 
-    # Tải
-    # Thống kê
+    # 4. Proof of works support : check if last_proof and proof hash will be '00xxx'  
+    @staticmethod
+    def validateProof( last_proof, proof):
+        guess = f'{last_proof}{proof}'.encode()
+        guess_hash = hashlib.sha256(guess).hexdigest()
+        # Kiểm tra việc encode last_proof và proof với nhau có ra "00xxx" không 
+        return guess_hash[:2] == "00"
+   
+    # 5. Proof of work
+    def proofOfWork(self, last_proof):
+        salt_gen = self.saltGenerator()
+        salt = next(salt_gen)
+        while not self.validateProof(last_proof,salt):
+            salt = next(salt_gen)
+        print("POW generated")
+        return salt
 
-    def getDomainSet(self):
-        # Get source from all Transactions 
-        # Get rid of same transactions
-        # -> sub-query, group by hostname
-        # TODO : Need to read reference again
-        return set(self.all_transactions)
+    # 6. Resolve_conflicts : Overide the longest chain in whole network 
+    def resolveConflicts(self):
+        network = self.nodeBusiness.getNetwork()
+        new_chain = None
 
-class DNSBusiness: 
-    def __init__(self):
-        self.BUFFER_MAX_LEN = 20
-        self.MINE_REWARD = 10
-        self.blockchain = BlockchainBusiness()
+        # We're only looking for chains longer than ours
+        max_length = len(self.chain)
+
+        # Grab and verify the chains from all the nodes in our network
+        for node in network:
+            # TODO: Create route for solving conflict 
+            node_addr = f'http://{node.ip}/nodes/chain'
+            response = requests.get(node_addr)
+
+            if response.status_code == 200:
+                length = response.json()['length']
+                chain = response.json()['chain']
+
+                # Check if the length is longer and the chain is valid
+                if length > max_length and self.validateChain(chain):
+                    max_length = length
+                    new_chain = chain
+
+        # Replace our chain if we discovered a new, valid chain longer than ours
+        if new_chain:
+            self.chain = new_chain
+            return True
+
+        return False
+
+    # 7. Resolve conflicts support : Validate each block in longest chain
+    def validateChain( self, chain):
+        previous_block = chain[0]
+        current_index = 1
+
+        while current_index < len(self.chain):
+            block = chain[current_index]
+            
+            if block['previous_hash'] != self.hash(previous_block):
+                return False
+
+            if not self.validateProof( previous_block.nonce, block.nonce ):
+                return False
+            
+            previous_block = block
+            current_index += 1
+
+        return True
+
+    # 8. Creating Block  
+    def newBlock(self, transactions, proof, previous_hash):
+        # Declare new Block 
+        block = Blocks(
+            id = len(self.chain) + 1,
+            node_id = self.node_id,
+            timestamp = time(),
+            transactions = transactions,
+            nonce = proof,
+            previous_hash = previous_hash or self.hash(self.chain[-1]),
+        )
+        # Free transactions - DNS 
+        # Get last Block 
+        self.chain.append(block)
+        # Proof of Work 
+        try: 
+            db.session.add(block)
+            db.session.commit()
+            return block, 200
+        except:
+            return block, 404
+    
+    # 9. Mining Block
+    def miningBlock(self, transactions):
+        last_block = self.last_block
+        last_block_nonce = last_block.nonce
+        last_block_hash = self.hash(last_block)
+        
+        
         pass
+
+    # SHA hashing function
+    @staticmethod
+    def hash(block):
+        block_string = json.dumps(block, sort_keys=True).encode()
+        return hashlib.sha256(block_string).hexdigest()
+
+class DNSBusiness: # This class will interact with request
+    def __init__( self ):
+        self.MINE_REWARD = 10
+        self.BUFFER_MAX_LEN = 20
+        self.transactionBusiness = TransactionBusiness()
+        self.blockchainBusiness = BlockchainBusiness()
+        pass
+
+    def configNodeID( self, node_id ): 
+        self.blockchainBusiness.configNodeID( node_id )
+    
+    def getDomainNamesList( self ):
+        return self.transactionBusiness.getDomainNamesList()
+
+    def resolveDomainName( self, domainName ):
+        domainInformation = self.transactionBusiness.searchDomainInformation(domainName)
+        return domainInformation[0].ip , domainInformation[0].port
+    
+    def getBlockChain( self ):
+        return {
+            'chain': self.blockchainBusiness.chain,
+            'length': len(self.blockchainBusiness.chain)    
+        }
+    
+    def registerDNS( self, hostname, ip, port ):
+        # Add transaction -> TransactionBusiness
+        self.transactionBusiness.addTransactions(hostname,ip,port, self.MINE_REWARD ) 
+        buffer_len = len( self.transactionBusiness.transactions )
+        # Transaction Quantity is larger than MAX_LEN or don't have money to pay failed block in worst decision
+        if buffer_len >= self.BUFFER_MAX_LEN or buffer_len >= self.blockchainBusiness.wallet - self.BUFFER_MAX_LEN:
+            # Start mining 
+            pass
+            # return Status code 
+        return 0
 
 # --------- HELPER ------------------------------------
 class PaginationHelper:
@@ -493,113 +674,30 @@ class PaginationHelper:
 
 # --------- INIT --------------------------------------
 accountBusiness = AccountBusiness()
-
 nodeBusiness = NodesBusiness()
+dnsBusiness = DNSBusiness()
 
 # --------- #1. UI ROUTERS --------------------------------------
 @app.route('/')
 def home():
-    if session and session.get("protected_account"):
-        type_cd = session.get("protected_account").type_cd
-        if type_cd and type_cd != 1: #ADMIN
-            return redirect('/table')
-        else : 
-            return render_template('index.html')
-    else:
-        return redirect('/login')
+    list = ''
+    for a in dnsBusiness.getDomainNamesList():
+        list += f'<a href="resolve?domain={a}">{a}</a><br>'
+    return list
 
-@app.route('/table', methods=['POST','GET'])
-def table():
-    if not session or not session.get("protected_account"):
-        return redirect('/login')
-    if request.method == 'POST':
-        pass
-    else :
-        protectedAccount = session.get("protected_account")
-        # Pagination
-        paginationHelper = PaginationHelper(12,13)
-        page = request.args.get('page', default = 1, type = int)
-        totalPageNumber = paginationHelper.getCeilingNumber()
-        arrayOfIndexingData = paginationHelper.arrayOfIndexingData
-        page = totalPageNumber if page >= totalPageNumber else page
-        # print( json.dumps(arrayOfIndexingData) )
-        paginationObj = {
-            'page': page,
-            'totalPageNumber': totalPageNumber,
-            'from': arrayOfIndexingData[page-1]['from'],
-            'to': arrayOfIndexingData[page-1]['to']
-        } 
-        # print(page)
-        # print(totalPageNumber)
-        # for i in range(len(arrayOfIndexingData)):
-        #     print( json.dumps( arrayOfIndexingData[i] ) )
+@app.route('/resolve')
+def resolve():
+    domain = request.args.get('domain', default = '', type = str)
+    if len(domain) > 0 : # and right format
+        ip, port = dnsBusiness.resolveDomainName(domain)
+        return "<h1>"+ domain +" in "+ip+" with "+str(port)+"</h1>"
+    return "Sorry, can't find it "
 
-        return render_template('table.html', protectedAccount = protectedAccount, paginationObj = paginationObj )
-
-@app.route('/storage', methods=['POST','GET'] )
-def storage():
-    if not session or not session.get("protected_account"):
-        return redirect('/login')
-    if request.method == 'POST':
-        domainName = request.form.get(DomainSchema.DOMAINNAME)
-        ipAddress = request.form.get(DomainSchema.IPADDRESS)
-        hosterName = request.form.get(DomainSchema.HOSTER)
-        status = request.form.get(DomainSchema.STATUS)
-        createdDate = request.form.get(DomainSchema.CREATEDDATE)
-        # TODO : THINKING WORKING BLOCKCHAIN
-        return domainName + " " + ipAddress + " " + hosterName + " " + status + " " + createdDate
-
-    protectedAccount = session.get("protected_account")
-    # Client don't have permission to go here
-    if protectedAccount.type_cd == 3 : return redirect('/table')
-    # Pagination
-    paginationHelper = PaginationHelper(3,13)
-    page = request.args.get('page', default = 1, type = int)
-    totalPageNumber = paginationHelper.getCeilingNumber()
-    arrayOfIndexingData = paginationHelper.arrayOfIndexingData
-    page = totalPageNumber if page >= totalPageNumber else page
-    paginationObj = {
-        'page': page,
-        'totalPageNumber': totalPageNumber,
-        'from': arrayOfIndexingData[page-1]['from'],
-        'to': arrayOfIndexingData[page-1]['to']
-    } 
-    return render_template('storage.html', protectedAccount = protectedAccount, paginationObj = paginationObj)
-
-@app.route('/register', methods=['POST', 'GET'])
-def register():
-    if request.method == 'POST':
-        response = accountBusiness.insert(
-            request, accountBusiness.onReturn, accountBusiness.onError)
-        message = response['message']
-        data = response['data']
-        isSuccess = response['isSuccess']
-        if response['isSuccess']:
-            return render_template('login.html', email=data.email)
-        else:
-            # print ('Data: ', error,data,isSuccess)
-            # print ('Type_cd: ',data.type_cd)
-            return render_template('register.html', message=message, email=data.email, fullname=data.fullname, type_cd=data.type_cd, isSuccess=isSuccess)
-    return render_template('register.html')
-
-@app.route('/login', methods=['POST', 'GET'])
-def login():
-    if request.method == 'POST':
-        isPassedOrErrorCode = accountBusiness.validateLoginOrReturnErrorCode(request)
-        if isPassedOrErrorCode == True:
-            session['email'] = request.form.get(AccountSchema.EMAIL)
-            session['protected_account'] = accountBusiness.getProtectedAccount(session.get('email'))
-            return redirect('/')
-        else : 
-            return render_template('login.html', email=request.form.get(AccountSchema.EMAIL), message=AccountSchema.message[isPassedOrErrorCode], isSuccess=False)
-    else:
-        return render_template('login.html')
-
-@app.route('/logout')
-def logout():
-    session.pop('email', None)
-    session.pop('protected_account', None)
-    return redirect('/')
+@app.route('/debug/dump_chain')
+@app.route('/nodes/chain')
+def getBlockchain():
+    response = dnsBusiness.getBlockChain()
+    return jsonify(response), 200
 
 if __name__ == "__main__":
     from argparse import ArgumentParser
@@ -623,7 +721,8 @@ if __name__ == "__main__":
     host = args.host or socket.gethostbyname(socket.gethostname()) 
     # Khai báo node
     APP_NODE, code = nodeBusiness.handleNodeInformation(host, port)
-    dns_resolver = dns(node_identifier = APP_NODE.id)
+    # dns_resolver = dns(node_identifier = APP_NODE.id)
+    dnsBusiness.configNodeID(APP_NODE.id)
     print('OK')
     if code == 200 : 
         print( '//----------------------------------------//' )

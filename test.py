@@ -1,5 +1,14 @@
-from app import BlockchainBusiness
+class A:
+    REWARD = 0
+    def __init__(self, reward) :
+        self.REWARD = reward
+        print('REWARD = ',self.REWARD)
 
-blockchain = BlockchainBusiness(1)
-print( blockchain.all_transactions)
-print( blockchain.getDomainSet( ) )
+    def calc(self, multi = REWARD) :
+        print('MULTI = ',multi)
+        return self.REWARD*multi
+class B:
+    a = A(10)
+
+b = B()
+print( b.a.calc() ) 
