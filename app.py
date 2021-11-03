@@ -3,7 +3,6 @@
 from flask import Flask, render_template, url_for, request, session, redirect, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_session import Session
-from werkzeug.datastructures import D
 from werkzeug.utils import redirect
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import timedelta
@@ -48,6 +47,7 @@ from schema.DomainSchema import DomainSchema
 
 IP_REGEX_STRING = '^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
 HOSTNAME_REGEX_STRING = '(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]'
+
 # --------- MODELS --------------------------------------
 class Accounts(db.Model): 
     __tablename__ = 'accounts'
@@ -473,7 +473,7 @@ class BlockchainBusiness:
             nonce = 1,
             previous_hash = '0'*255,
             node_id = self.node_id,
-            transactions = None
+            transactions = []
         )
 
     def loadChain(self):
@@ -593,21 +593,31 @@ class BlockchainBusiness:
         # Get last Block 
         self.chain.append(block)
         # Proof of Work 
-        try: 
-            db.session.add(block)
-            db.session.commit()
-            return block, 200
-        except:
-            return block, 404
+        # try: 
+        #     db.session.add(block)
+        #     db.session.commit()
+        return block, 200
+        # except:
+            # return block, 404
     
     # 9. Mining Block
     def miningBlock(self, transactions):
         last_block = self.last_block
         last_block_nonce = last_block.nonce
-        last_block_hash = self.hash(last_block)
         
+        nonce = self.proofOfWork(last_block_nonce)
+        
+        previous_hash = self.hash(last_block)
+        block = self.newBlock(transactions, nonce, previous_hash)
+        
+        self.broadcastingNewBlock()
         
         pass
+    
+    # 10. Broadcast new Block
+    def broadcastingNewBlock(self):
+        for node in self.nodeBusiness.getNetwork():
+            request.get(f'http://{node}/nodes/resolve')
 
     # SHA hashing function
     @staticmethod
@@ -675,29 +685,35 @@ class PaginationHelper:
 # --------- INIT --------------------------------------
 accountBusiness = AccountBusiness()
 nodeBusiness = NodesBusiness()
-dnsBusiness = DNSBusiness()
+# dnsBusiness = DNSBusiness()
 
 # --------- #1. UI ROUTERS --------------------------------------
-@app.route('/')
-def home():
-    list = ''
-    for a in dnsBusiness.getDomainNamesList():
-        list += f'<a href="resolve?domain={a}">{a}</a><br>'
-    return list
+# @app.route('/')
+# def home():
+#     list = ''
+#     for a in dnsBusiness.getDomainNamesList():
+#         list += f'<a href="resolve?domain={a}">{a}</a><br>'
+#     return list
 
-@app.route('/resolve')
-def resolve():
-    domain = request.args.get('domain', default = '', type = str)
-    if len(domain) > 0 : # and right format
-        ip, port = dnsBusiness.resolveDomainName(domain)
-        return "<h1>"+ domain +" in "+ip+" with "+str(port)+"</h1>"
-    return "Sorry, can't find it "
+# @app.route('/resolve')
+# def resolve():
+#     domain = request.args.get('domain', default = '', type = str)
+#     if len(domain) > 0 : # and right format
+#         ip, port = dnsBusiness.resolveDomainName(domain)
+#         return "<h1>"+ domain +" in "+ip+" with "+str(port)+"</h1>"
+#     return "Sorry, can't find it "
 
-@app.route('/debug/dump_chain')
-@app.route('/nodes/chain')
-def getBlockchain():
-    response = dnsBusiness.getBlockChain()
-    return jsonify(response), 200
+# @app.route('/debug/dump_chain')
+# @app.route('/nodes/chain')
+# def getBlockchain():
+#     response = dnsBusiness.getBlockChain()
+#     return jsonify(response), 200
+
+# @app.route('/node/resolve')
+# def consensus():
+    # # TODO : replace with chain = [ Its own Genesis + loading from DB ]
+    # t = threading.Thread(target=dnsBusiness.blockchainBusiness.resolveConflicts)
+    # t.start()
 
 if __name__ == "__main__":
     from argparse import ArgumentParser
@@ -722,7 +738,7 @@ if __name__ == "__main__":
     # Khai báo node
     APP_NODE, code = nodeBusiness.handleNodeInformation(host, port)
     # dns_resolver = dns(node_identifier = APP_NODE.id)
-    dnsBusiness.configNodeID(APP_NODE.id)
+    # dnsBusiness.configNodeID(APP_NODE.id)
     print('OK')
     if code == 200 : 
         print( '//----------------------------------------//' )

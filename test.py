@@ -12,3 +12,14 @@ class B:
 
 b = B()
 print( b.a.calc() ) 
+from models import Parent, db
+parent_one = Parent(list_of_items=[{
+    'id': '1',
+    'name': 'Dai'
+}, {
+    'id': '2',
+    'name': 'Duc    '}]) 
+db.session.add(parent_one)
+db.session.commit()
+# Each one when query here, it'll become Type 'dict'
+
