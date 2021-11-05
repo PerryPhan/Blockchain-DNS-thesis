@@ -1,137 +1,23 @@
-{% extends 'base.html' %} {% block title %} DNSChain homepage {% endblock %} {%
-block body %}
-<div class="home container">
-  <div class="tab-navigator">
-    <div class="logo-side">
-      <img
-        src="{{url_for('static',filename='img/dnschain-logo-last.png')}}"
-        alt="Logo"
-      />
-    </div>
-    <div class="navigator-side"></div>
-    <div class="logout-side">
-      <a href="/logout">Logout</a>
-    </div>
+<form action="" method="POST">
+  <h1>Form for A Record</h1>
+  <div>
+    <label for="domain"> Domain </label>
+    <input type="text" name="domain" placeholder="Type your domain name here" required/>
   </div>
-  <div class="main">
-    <div class="top-side">
-      <h1 class="heading-text-color">Manager Tab</h1>
-      <h2 class="sub-heading-text-color">
-        Keep everything work nice and steady
-      </h2>
-    </div>
-    <div class="center-side">
-      <div class="part calendar-part">
-        <h3 class="heading-text-color">October 2021</h3>
-        <div class="calendar"></div>
-      </div>
-      <div class="part report-part">
-        <div class="report-title">
-          <h3 class="heading-text-color">Weekly Report</h3>
-          <div class="report-type">
-            <div class="daily disabled-text-color">Daily</div>
-            <div class="weekly heading-text-color">Weekly</div>
-            <div class="monthly disabled-text-color">Monthly</div>
-          </div>
-        </div>
-        <div class="reports">
-          <div class="report"></div>
-          <div class="report"></div>
-          <div class="report"></div>
-        </div>
-      </div>
-      <div class="part other-part">
-        <h1 class="heading-text-color">Something</h1>
-      </div>
-    </div>
-    <div class="bottom-side"></div>
+  <div>
+    <label for="type"> Type </label>
+    <input type="text" name="type" value="A" readonly/>
   </div>
-  <div class="notificator">
-    <div class="top">
-      <div class="search-side">
-        <img
-          src="{{url_for('static',filename='img/search-icon.png')}}"
-          alt="search-icon"
-        />
-        <input type="text" placeholder="Search infromation in profile" />
-      </div>
-      <div class="about-side">
-        <div class="ava-box">
-          <img src="{{url_for('static',filename='img/avatar.jpg')}}" alt="Avatar" />
-        </div>
-        <div class="name-box">
-          <h2>Phan Dai</h2>
-        </div>
-        <div class="job-box">
-          <h4 class="grey-h4">Information Security Student</h4>
-        </div>
-      </div>
-      <div class="more-infomation-box">
-        <div class="spending-box">
-          <h4 class="grey-h4">Spending</h4>
-          <h3>25hrs</h3>
-        </div>
-        <div class="guider-box">
-          <h4 class="grey-h4">Guider</h4>
-          <h3>Mr.Tam</h3>
-        </div>
-        <div class="year-box">
-          <h4 class="grey-h4">Year</h4>
-          <h3>4th</h3>
-        </div>
-      </div>
-    </div>
-
-    <div class="bottom">
-      <div class="notification-side">
-        <div class="notification-title">
-          <h1>Notifications</h1>
-          <a href="#">See all</a>
-        </div>
-        <div class="notification-content">
-          <div class="notification">
-            <div class="icon">
-              <img src="{{url_for('static',filename='img/account-icon.png')}}" alt="icon" />
-            </div>
-            <div class="text">
-              <h4>Someone name</h4>
-              <h5>has created account in DNSChain</h5>
-            </div>
-          </div>
-        <div class="notification-content">
-          <div class="notification">
-            <div class="icon">
-              <img src="{{url_for('static',filename='img/account-icon.png')}}" alt="icon" />
-            </div>
-            <div class="text">
-              <h4>Someone name</h4>
-              <h5>has created account in DNSChain</h5>
-            </div>
-          </div>
-        <div class="notification-content">
-          <div class="notification">
-            <div class="icon">
-              <img src="{{url_for('static',filename='img/dnsserver-icon.png')}}" alt="icon" />
-            </div>
-            <div class="text">
-              <h4>DNSServer by Someone</h4>
-              <h5>has been created and passed to DNSChain</h5>
-            </div>
-          </div>
-        <div class="notification-content">
-          <div class="notification">
-            <div class="icon">
-              <img src="{{url_for('static',filename='img/dnsserver-icon.png')}}" alt="icon" />
-            </div>
-            <div class="text">
-              <h4>DNSServer by Someone</h4>
-              <h5>has been created and passed to DNSChain</h5>
-            </div>
-          </div>
-          
-        </div>
-      </div>
-    </div>
+  <div>
+    <label for="ip"> IP </label>
+    <input type="text" name="ip" placeholder="Type your domain's IP here" required/>
   </div>
-</div>
-{% endblock %}
+  <div>
+    <label for="ttl"> Time to live </label>
+    <input type="number" name="ttl" value=14400 min=0 max=36000/>
+  </div>
+  <div>
+      <button type="reset">Reset</button>
+      <button type="submit">OK</button>
+  </div>
+</form>
