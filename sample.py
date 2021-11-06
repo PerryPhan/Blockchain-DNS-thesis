@@ -1,15 +1,15 @@
 from models import db, generate_password_hash, random
 from models import Accounts, Transactions
 # Accounts -------------------------------------------------------
-db.session.add(
-    Accounts( 
-        fullname='Phan Dai',
-        email='phandai@admin.com',
-        password=generate_password_hash('Phandai2@'),
-        type_cd=1, # ADMIN 
-        is_deleted=False
-    )
-) 
+# db.session.add(
+#     Accounts( 
+#         fullname='Phan Dai',
+#         email='phandai@admin.com',
+#         password=generate_password_hash('Phandai2@'),
+#         type_cd=1, # ADMIN 
+#         is_deleted=False
+#     )
+# ) 
 # Nodes ----------------------------------------------------------
 # Transactions ---------------------------------------------------
 numberOfTransactions = 10

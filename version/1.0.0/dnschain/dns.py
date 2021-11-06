@@ -50,7 +50,6 @@ class dns_layer(object):
 				# print(transaction)
 				if 'hostname' in transaction and transaction['hostname'] == hostname:
 					return (transaction['ip'],transaction['port'])
-		# TODO: Tìm hiểu Raise error 
 		raise LookupError('No existing entry matching hostname')
 
     # Hàm đào
