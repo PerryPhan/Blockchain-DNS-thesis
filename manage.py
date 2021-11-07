@@ -4,9 +4,12 @@ from business import *
 '''
   Run file 
   TODO: Làm Blockchain ở file business DOING 
-        * Làm add 
+        * Làm add 2/2 OK
+        * Làm resolve conflict OK
+        * Test bằng route 
   TODO: Check duplicate Transaction khi thêm từ file 
-  TODO: Tạo form style để chụp hình vào Word 
+  TODO: Tạo form style để chụp hình vào Word
+  TODO: Làm Proof of work chạy trên mọi node bằng Thread -> rồi xét thời gian nhỏ nhất   
 '''
 # Declare -------------------------------------------------
 dns = DNSResolver()
@@ -14,7 +17,7 @@ def check_file_extension( file ):
     return '.' in file and len(file.rsplit('.')) == 2 and file.rsplit('.',1)[1].lower() in ALLOWED_EXTS 
 
 
-# Router --------------------------------------------------
+# UI --------------------------------------------------
 @app.route('/')
 def index():
     return 'hi'
@@ -94,10 +97,11 @@ def form():
     # 1. Tạo simple form 
     return render_template('index.html', domainFormat = RECORD_FORMAT['domain'], ipFormat = RECORD_FORMAT['ip'])
 
-@app.route('/blockchain/load')
-def loadBlockchain():
-    return "Hi doin?"
+@app.route('/blockchain/show')
+def showBlockchain():
+    return dns.blockchain.chain
 
+# BACK ------------------------------------------------
 @app.route('/dns/resolve', methods=['GET', 'POST'])
 def resolve():
     # 1. Tạo route để phân giải
@@ -108,6 +112,14 @@ def resolve():
                 return tran
     return "Hi"
 
+@app.route('/blockchain/solving_conflict')
+def solvingConflict():
+    dns.blockchain.overrideTheLongestChain()
+
+@app.route('/blockchain/add_block')
+def addNewBlock():
+    # TODO : Testing that all nodes have the same blockchain after add new Block
+    pass
 
 # Run --------------------------------------------------
 if __name__ == "__main__":
@@ -134,7 +146,7 @@ if __name__ == "__main__":
     
     # SET NODE ------------------------------- 
     node, code = dns.nodes.handleNodeInformation(host, port)
-    dns.setThisNode( node )
+    dns.initBlockchain( node )
     # RETURN CODE MESSAGE ------------------------------- 
     if code == 200 : 
         print( '//----------------------------------------//' )

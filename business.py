@@ -1,3 +1,5 @@
+import requests
+from requests.models import Response
 from constant import *
 from database import *
 from uuid import uuid4
@@ -19,32 +21,27 @@ class DNSResolver:
             NodesBusiness nodes : Control of node in network
             Blockchain : Control of node in blockchain
         '''
-        self.nodes = NodesBusiness()
-        self.blockchain = Blockchain()
+        
+        self.blockchain = None
         pass
 
-    def setThisNode(self, node):
-        self.nodes.setThisNode(node)
-        self.blockchain.setNodeID(node.id)
+    def initBlockchain(self, node):
+        self.blockchain = Blockchain(node)
 
 # All systems will have only one Blockchain -----------------------------------
-
-
 class Blockchain:
     MINE_REWARD = 10
     BUFFER_MAX_LEN = 20
     DIFFICULTY = 1
-    node_id = 1
-    def __init__(self):
+
+    def __init__(self, node):
         '''
         Blockchain first get blocks by loading from DB 
         '''
+        self.nodes = NodesBusiness(node)
         self.current_transactions = []
         self.chain = []
         self.loadChainFromDB()
-
-    def setNodeID(self, id):
-        self.node_id = id
 
     def getGenesisBlock(self):
         return Blocks(
@@ -90,7 +87,7 @@ class Blockchain:
             nonce = 0,
             transactions = transactions, 
             previous_hash = hash(self.last_block) if len(self.chain)  > 1 else '0'*255, #genesis.hash
-            node_id = None,
+            node_id = self.node_id,
         )
 
     def addBlock(self):  # Mining new Block
@@ -99,9 +96,11 @@ class Blockchain:
         block = self.proofOfWork( block )
         
         # Broadcast new Block -> Overide the longest chain
+
         try:
             db.session.add(block)
             db.session.commit()
+            self.broadcastNewBlock()
             return block,200
         except:
             return block, 404
@@ -109,6 +108,17 @@ class Blockchain:
     def addTransaction(self, tran):
         self.current_transactions.append(tran)
 
+    def broadcastNewBlock(self):
+        neighbors = self.nodes.getActiveNetwork()
+        # 1. Send request to check database of every nodes
+        for node in neighbors:
+            requests.get(f'http://{node.ip}:{node.port}/blockchain/solving_conflict')
+        
+    def overrideTheLongestChain(self):
+        # 2. Override the longest chain - with this pj is the one in the Database
+        self.chain = self.loadChainFromDB()
+        # ! Is there any time 2 block is sending to database ?
+        
     @staticmethod
     def hash( block ):
         block_string = json.dumps( get_model_dict(block) , sort_keys=True).encode()
@@ -117,19 +127,20 @@ class Blockchain:
     @property
     def last_block(self):
         return self.chain[-1]
+
+    @property
+    def node_id(self):
+        return self.nodes.node.id
 # NodeBusiness  -----------------------------------
 
 
 class NodesBusiness:
     PORT_START = 5000
     PORT_END = 5999
-    THIS_NODE = None
 
-    def __init__(self):
+    def __init__(self, node):
+        self.node = node
         pass
-
-    def setThisNode(self, node):
-        self.THIS_NODE = node
 
     def getNetwork(self):
         return Nodes.query.filter(Nodes.is_deleted == False).all()
