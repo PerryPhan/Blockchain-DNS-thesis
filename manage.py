@@ -6,8 +6,14 @@ from business import *
   TODO: Làm Blockchain ở file business DOING 
         * Làm add 2/2 OK
         * Làm resolve conflict OK
+        * Show chain OK 
         * Test bằng route 
-  TODO: Check duplicate Transaction khi thêm từ file 
+            # 1. Turn 2 nodes on OK
+            # 2. Back route: new block OK
+            # 3. Show chain all node OK
+        * 
+  TODO: Check duplicate Transaction khi thêm từ file, ghép xử lý add Block khi POST vào 
+  TODO: Xử lý lấy wallet và ledger ở Blockchain  
   TODO: Tạo form style để chụp hình vào Word
   TODO: Làm Proof of work chạy trên mọi node bằng Thread -> rồi xét thời gian nhỏ nhất   
 '''
@@ -17,7 +23,7 @@ def check_file_extension( file ):
     return '.' in file and len(file.rsplit('.')) == 2 and file.rsplit('.',1)[1].lower() in ALLOWED_EXTS 
 
 
-# UI --------------------------------------------------
+# FRONT --------------------------------------------------
 @app.route('/')
 def index():
     return 'hi'
@@ -99,7 +105,7 @@ def form():
 
 @app.route('/blockchain/show')
 def showBlockchain():
-    return dns.blockchain.chain
+    return dns.blockchain.showChainDict()
 
 # BACK ------------------------------------------------
 @app.route('/dns/resolve', methods=['GET', 'POST'])
@@ -114,12 +120,13 @@ def resolve():
 
 @app.route('/blockchain/solving_conflict')
 def solvingConflict():
-    dns.blockchain.overrideTheLongestChain()
+    return dns.blockchain.overrideTheLongestChain()
 
 @app.route('/blockchain/add_block')
 def addNewBlock():
-    # TODO : Testing that all nodes have the same blockchain after add new Block
-    pass
+    dns.blockchain.current_transactions = ['1','1','2','2']
+    block, status = dns.blockchain.addBlock()
+    return jsonify({'status': status})
 
 # Run --------------------------------------------------
 if __name__ == "__main__":
@@ -129,9 +136,10 @@ if __name__ == "__main__":
     
     print( 'Data is processing please wait ... ')
     def onClosingNode():
-        if dns.nodes.THIS_NODE:
-            dns.nodes.inActiveNode(dns.nodes.THIS_NODE)
-            print (f"\n-------- NODE {dns.nodes.THIS_NODE.id} IS INACTIVE ------")
+        node = dns.blockchain.nodes.getNode()
+        if node:
+            dns.blockchain.nodes.inActiveNode(node)
+            print (f"\n-------- NODE {node.id} IS INACTIVE ------")
             print ("-------- GOODBYE !! ------")
     
     atexit.register(onClosingNode)
@@ -145,7 +153,7 @@ if __name__ == "__main__":
     host = args.host or socket.gethostbyname(socket.gethostname())
     
     # SET NODE ------------------------------- 
-    node, code = dns.nodes.handleNodeInformation(host, port)
+    node, code = dns.blockchain.nodes.handleNodeInformation(host, port)
     dns.initBlockchain( node )
     # RETURN CODE MESSAGE ------------------------------- 
     if code == 200 : 

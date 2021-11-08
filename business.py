@@ -22,11 +22,12 @@ class DNSResolver:
             Blockchain : Control of node in blockchain
         '''
         
-        self.blockchain = None
+        self.blockchain = Blockchain()
         pass
 
     def initBlockchain(self, node):
-        self.blockchain = Blockchain(node)
+        self.blockchain.nodes.setNode(node)
+        self.blockchain.loadChainFromDB()
 
 # All systems will have only one Blockchain -----------------------------------
 class Blockchain:
@@ -34,22 +35,27 @@ class Blockchain:
     BUFFER_MAX_LEN = 20
     DIFFICULTY = 1
 
-    def __init__(self, node):
+    def __init__(self):
         '''
         Blockchain first get blocks by loading from DB 
         '''
-        self.nodes = NodesBusiness(node)
+        self.nodes = NodesBusiness()
         self.current_transactions = []
         self.chain = []
-        self.loadChainFromDB()
+
+    def showChainDict(self):
+        return {
+            'chain' : [ get_model_dict(block) for block in self.chain],
+            'len' : len(self.chain)
+        }
+        pass
 
     def getGenesisBlock(self):
         return Blocks(
             id='1',
             timestamp=time(),
             nonce=1,
-            previous_hash = '0'*255,
-            hash='0'*255,
+            hash='0'*64,
             node_id=self.node_id,
             transactions=None
         ) if self.node_id else None
@@ -58,7 +64,7 @@ class Blockchain:
         genesisBlock = self.getGenesisBlock()
         if not genesisBlock:
             return 404
-        self.chain.append(genesisBlock)
+        self.chain = [genesisBlock]
         blocks_list = Blocks.query.order_by(Blocks.id).all()
         if len(blocks_list) > 0:
             for block in blocks_list:
@@ -76,23 +82,22 @@ class Blockchain:
         while not hash.startswith('0' * self.DIFFICULTY):
             block.nonce += 1
             hash = self.hash(block)
-        block.hash = hash 
         return block  
 
-    def newBlock(self, transactions):
+    def newBlock(self, transactions, node_id):
         # For adding purpose, so there is nothing on it
         return Blocks(
             id = len(self.chain) + 1,
             timestamp = time(),
             nonce = 0,
             transactions = transactions, 
-            previous_hash = hash(self.last_block) if len(self.chain)  > 1 else '0'*255, #genesis.hash
-            node_id = self.node_id,
+            previous_hash = self.hash(self.last_block) if len(self.chain)  > 1 else '0'*64, #genesis.hash
+            node_id = node_id,
         )
 
     def addBlock(self):  # Mining new Block
         # Launch Proof of Work -> return block
-        block = self.newBlock( self.current_transactions )
+        block = self.newBlock( self.current_transactions, self.node_id )
         block = self.proofOfWork( block )
         
         # Broadcast new Block -> Overide the longest chain
@@ -116,7 +121,7 @@ class Blockchain:
         
     def overrideTheLongestChain(self):
         # 2. Override the longest chain - with this pj is the one in the Database
-        self.chain = self.loadChainFromDB()
+        return self.loadChainFromDB()
         # ! Is there any time 2 block is sending to database ?
         
     @staticmethod
@@ -130,7 +135,7 @@ class Blockchain:
 
     @property
     def node_id(self):
-        return self.nodes.node.id
+        return self.nodes.getNode().id
 # NodeBusiness  -----------------------------------
 
 
@@ -138,9 +143,15 @@ class NodesBusiness:
     PORT_START = 5000
     PORT_END = 5999
 
-    def __init__(self, node):
-        self.node = node
+    def __init__(self):
+        self.node = None
         pass
+    
+    def setNode(self, node):
+        self.node = node
+
+    def getNode(self):
+        return self.node
 
     def getNetwork(self):
         return Nodes.query.filter(Nodes.is_deleted == False).all()

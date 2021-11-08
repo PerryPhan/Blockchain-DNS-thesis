@@ -4,7 +4,7 @@ from include import db
 '''
 
 
-def recreateDB():
+def recreate():
     db.drop_all()
     db.create_all()
 
@@ -12,7 +12,6 @@ def recreateDB():
 def get_model_dict(model):
     return dict((column.name, getattr(model, column.name))
                 for column in model.__table__.columns)
-
 
 class Accounts(db.Model):
     __tablename__ = 'accounts'
@@ -25,6 +24,7 @@ class Accounts(db.Model):
     is_deleted = db.Column(db.Boolean, nullable=False)
     # ==============
     # transactions = db.relationship('Transactions',backref="owner")
+    # To String 
 
 
 class Nodes(db.Model):
@@ -51,8 +51,8 @@ class Blocks(db.Model):
     # ===============
     node_id = db.Column(db.String(64), db.ForeignKey('nodes.id'))
     hash = None
-
-
+    
+    
 class Transaction:
     TRANSACTIONS = []
 
