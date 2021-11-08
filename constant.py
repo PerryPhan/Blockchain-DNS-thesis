@@ -7,7 +7,7 @@ MESSAGE = {
     'FileError02' : 'File don\'t have a name',
     'FileError03' : 'File wrong format',
 }
-ALLOWED_EXTS  = {"txt"}
+
 RECORD_FORMAT = {
     'domain' : '^[a-zA-Z0-9][a-zA-Z0-9-_]{0,61}[a-zA-Z0-9]{0,1}\.([a-zA-Z]{1,6}|[a-zA-Z0-9-]{1,30}\.[a-zA-Z]{2,3})$',   # Tên miền, ex : example.com
     'type'   : '^A$',   # Loại record, ex : A, CNAME

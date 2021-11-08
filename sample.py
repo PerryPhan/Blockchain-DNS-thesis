@@ -1,5 +1,6 @@
-from models import db, generate_password_hash, random
-from models import Accounts, Transactions
+# from models import db, generate_password_hash, random
+import random, json
+# from models import Accounts, Transactions
 # Accounts -------------------------------------------------------
 # db.session.add(
 #     Accounts( 
@@ -14,15 +15,19 @@ from models import Accounts, Transactions
 # Transactions ---------------------------------------------------
 numberOfTransactions = 10
 def autoInsertTransaction(number):
+    HEADER = "#[domain] [type] [ip] [port] [ttl-Timetolive]\n"
+    CONTENTS = []
     def generateDomains(number):
         FILE = 'words.txt'
         list = []
-
+        numberOfLine = 0
         with open(FILE) as file:
             for line in file:
                 list.append(line[:-1] + '.bit')
-
-        return list
+                numberOfLine = numberOfLine + 1
+        numberOfLine = 100 if numberOfLine == 0 else numberOfLine
+        return [ list[random.randint(i, numberOfLine)] for i in range(0,number)]
+    
     def generateIPs(number):
         FROM = 0
         TO = 255
@@ -34,17 +39,40 @@ def autoInsertTransaction(number):
             ip += str( random.randint( FROM, TO ) )  or '0' 
             list.append(ip)
         return list
-    ips = generateIPs(number)
+    
+    def generateRecordTransaction(domain, ip, type = 'A', port = 80, ttl = 14400):
+        return {
+            'domain' : domain,
+            'type' : type,
+            'ip' : ip,
+            'port' : port,
+            'ttl' : ttl
+        }
+    
     domains = generateDomains(number)
-    reward = 10
-    port = 80
-    for i in range( number ):
-        db.session.add(Transactions( 
-            hostname= domains[i],
-            ip= ips[i],
-            reward= reward,
-            port= port)) 
-autoInsertTransaction(10)
+    ips = generateIPs(number)
+    trans = [ generateRecordTransaction( domains[i], ips[i] ) for i in range(number)]
+    CONTENT = [ f"{tran['domain']} {tran['type']}  {tran['ip']} {tran['port']} {tran['ttl']}\n" for tran in trans]
+    
+    f = open("sample.txt", "w")
+    f.write(HEADER)
+    for content in CONTENT:
+        f.write(content)
+    f.close()
+    
+    
+    return json.dumps({
+        'len' : len(trans),
+        'transactions' : trans
+    })
+    # for i in range( number ):
+    #     db.session.add(Transactions( 
+    #         hostname= domains[i],
+    #         ip= ips[i],
+    #         reward= reward,
+    #         port= port)) 
+    
+autoInsertTransaction(numberOfTransactions)
 # Blocks ---------------------------------------------------------
 # PUSH ALL >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-db.session.commit()
+# db.session.commit()

@@ -21,7 +21,7 @@ class DNSResolver:
             NodesBusiness nodes : Control of node in network
             Blockchain : Control of node in blockchain
         '''
-        
+
         self.blockchain = Blockchain()
         pass
 
@@ -30,6 +30,8 @@ class DNSResolver:
         self.blockchain.loadChainFromDB()
 
 # All systems will have only one Blockchain -----------------------------------
+
+
 class Blockchain:
     MINE_REWARD = 10
     BUFFER_MAX_LEN = 20
@@ -40,13 +42,13 @@ class Blockchain:
         Blockchain first get blocks by loading from DB 
         '''
         self.nodes = NodesBusiness()
-        self.current_transactions = []
+        self.transactions = TransactionBusiness()
         self.chain = []
 
     def showChainDict(self):
         return {
-            'chain' : [ get_model_dict(block) for block in self.chain],
-            'len' : len(self.chain)
+            'chain': [get_model_dict(block) for block in self.chain],
+            'len': len(self.chain)
         }
         pass
 
@@ -74,59 +76,62 @@ class Blockchain:
     def proofOfWork(self, block):
         '''
             Proof of work will generate Nonce number until match condition 
-            
+
         '''
-        # Base on self.Difficulty 
+        # Base on self.Difficulty
         hash = self.hash(block)
-        block.nonce = 0 
+        block.nonce = 0
         while not hash.startswith('0' * self.DIFFICULTY):
             block.nonce += 1
             hash = self.hash(block)
-        return block  
+        return block
 
     def newBlock(self, transactions, node_id):
         # For adding purpose, so there is nothing on it
         return Blocks(
-            id = len(self.chain) + 1,
-            timestamp = time(),
-            nonce = 0,
-            transactions = transactions, 
-            previous_hash = self.hash(self.last_block) if len(self.chain)  > 1 else '0'*64, #genesis.hash
-            node_id = node_id,
+            id=len(self.chain) + 1,
+            timestamp=time(),
+            nonce=0,
+            transactions=transactions,
+            previous_hash=self.hash(self.last_block) if len(
+                self.chain) > 1 else '0'*64,  # genesis.hash
+            node_id=node_id,
         )
 
     def addBlock(self):  # Mining new Block
         # Launch Proof of Work -> return block
-        block = self.newBlock( self.current_transactions, self.node_id )
-        block = self.proofOfWork( block )
-        
+        block = self.newBlock(self.current_transactions, self.node_id)
+        block = self.proofOfWork(block)
+
         # Broadcast new Block -> Overide the longest chain
 
         try:
             db.session.add(block)
             db.session.commit()
             self.broadcastNewBlock()
-            return block,200
+            return block, 200
         except:
             return block, 404
-        
+
     def addTransaction(self, tran):
-        self.current_transactions.append(tran)
+        self.transactions.addTransaction(tran)
 
     def broadcastNewBlock(self):
         neighbors = self.nodes.getActiveNetwork()
         # 1. Send request to check database of every nodes
         for node in neighbors:
-            requests.get(f'http://{node.ip}:{node.port}/blockchain/solving_conflict')
-        
+            requests.get(
+                f'http://{node.ip}:{node.port}/blockchain/solving_conflict')
+
     def overrideTheLongestChain(self):
         # 2. Override the longest chain - with this pj is the one in the Database
         return self.loadChainFromDB()
         # ! Is there any time 2 block is sending to database ?
-        
+
     @staticmethod
-    def hash( block ):
-        block_string = json.dumps( get_model_dict(block) , sort_keys=True).encode()
+    def hash(block):
+        block_string = json.dumps(
+            get_model_dict(block), sort_keys=True).encode()
         return hashlib.sha256(block_string).hexdigest()
 
     @property
@@ -134,11 +139,63 @@ class Blockchain:
         return self.chain[-1]
 
     @property
+    def current_transaction(self):
+        return self.transactions.current_transactions
+
+    @property
     def node_id(self):
         return self.nodes.getNode().id
+
+# TransactionBusiness  -----------------------------------
+
+
+class TransactionBusiness:
+    def __init__(self):
+        self.current_transactions = []
+
+    def isExisted(self, tran):
+        try:
+            return self.current_transactions.index(tran)
+        except:
+            return False
+
+    def formatRecord(self, str):
+        props = str.split()
+        return {
+            'domain': props[0],
+            'type': props[1],
+            'ip': props[2],
+            'port': int(props[3]),
+            'ttl': int(props[4])
+        }
+
+    def checkRecordFormat(self, tran):
+        checked = copy(RECORD_FORMAT)
+        if type(tran) == str:
+            tran = tran.strip()
+            tran = self.formatRecord(tran)
+        # Check if tran has the same key and ammount of keys as checked
+        if tran.keys() == checked.keys():
+            for key in checked.keys():
+                checked[key] = True if re.match(
+                    # TODO : FIX BUG
+                    RECORD_FORMAT[key], tran[key]) else False
+                if checked[key] == False : break      
+        return False
+
+    def addTransaction(self, tran):
+        if self.checkRecordFormat(tran) == False:
+            return 500  # wrong format
+        if type(tran) == str:
+            tran = self.formatRecord(tran)
+        if self.isExisted(tran) == False:
+            self.current_transactions.append(tran)
+        else:
+            return 501  # duplicate
+        return 200
+
+
 # NodeBusiness  -----------------------------------
-
-
 class NodesBusiness:
     PORT_START = 5000
     PORT_END = 5999
@@ -146,7 +203,7 @@ class NodesBusiness:
     def __init__(self):
         self.node = None
         pass
-    
+
     def setNode(self, node):
         self.node = node
 

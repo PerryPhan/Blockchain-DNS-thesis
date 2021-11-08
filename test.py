@@ -12,9 +12,17 @@ RECORD_FORMAT = {
     'ttl'    : 14400          # Thời gian tồn tại
 }
 
-from business import *
+# from business import *
 
-bc = Blockchain()
-bc.current_transactions = ['1','2','3','4']
-print ( bc.addBlock() )
+# bc = Blockchain()
+# bc.current_transactions = ['1','2','3','4']
+# print ( bc.addBlock() )
 
+b = [1,2,3,4,5]
+
+def find(n):
+    try:
+        return b.index(n)
+    except:
+        return False
+    
