@@ -1,11 +1,19 @@
 #[domain] [type] [ip] [port] [ttl-Timetolive]
-here.bit A  192.168.51.190 80 14400
-people.bit A  192.168.168.82 80 14400
-and.bit A  192.168.157.189 80 14400
-these.bit A  192.168.57.80 80 14400
-but.bit A  192.168.179.245 80 14400
-way.bit A  192.168.121.171 80 14400
-think.bit A  192.168.192.87 80 14400
-get.bit A  192.168.58.150 80 14400
-time.bit A  192.168.254.116 80 14400
-could.bit A  192.168.5.210 80 14400
+michael.bit A  192.168.176.250 80 14400
+brooke.bit A  192.168.19.204 80 14400
+peter.bit A  192.168.153.197 80 14400
+zachary.bit A  192.168.182.248 80 14400
+david.bit A  192.168.249.180 80 14400
+thomas.bit A  192.168.16.16 80 14400
+curtis.bit A  192.168.88.116 80 14400
+dana.bit A  192.168.214.77 80 14400
+tara.bit A  192.168.94.164 80 14400
+samantha.bit A  192.168.222.19 80 14400
+samantha.bit A  192.168.222.19 80 14400
+samantha.bit A  192.168.222.20 80 14400
+samantha.bit A  192.168.222.19 81 14400
+samantha.bit A  192.168.222.19 80 14401
+samantha.bit A  192.168.222.20 80 14400
+
+
+

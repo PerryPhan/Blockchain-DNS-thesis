@@ -11,18 +11,60 @@ RECORD_FORMAT = {
     'value'  : '192.0.2.1',   # Giá trị IP
     'ttl'    : 14400          # Thời gian tồn tại
 }
+import hashlib, json
+import threading
+import time
 
-# from business import *
+block = {
+    'nonce': 0,
+    'hash' : '',
+    'id' : 1,
+}
+list = []
+def proofOfWork( block, index ):
+    '''
+        Proof of work will generate Nonce number until match condition 
+        Hash x nonce = Hash ['0x + 63chars']
+    '''
+    def getModelDict(model):
+        return dict((column.name, getattr(model, column.name))
+                    for column in model.__table__.columns)
 
-# bc = Blockchain()
-# bc.current_transactions = ['1','2','3','4']
-# print ( bc.addBlock() )
-
-b = [1,2,3,4,5]
-
-def find(n):
-    try:
-        return b.index(n)
-    except:
-        return False
+    def hash(block):
+        block_string = json.dumps(
+            (block), sort_keys=True).encode()
+        return hashlib.sha256(block_string).hexdigest()
     
+    DIFFICULTY = 3
+    block['hash'] = hash(block)
+    block['nonce'] = 0
+    block['id'] = index
+    
+    while not block['hash'].startswith('0' * DIFFICULTY):
+        block['nonce'] += 1
+        block['hash'] = hash(block)
+    list.append(block)
+
+    print("Time to do task #",index," : ", time.perf_counter())
+
+    return block
+
+# Demo : Testing 3 threads in local 
+for i in range(3):
+    x = threading.Thread(target=proofOfWork, args=[block, i])
+    x.start()
+
+for i in range(3):
+    x.join()
+
+# Real : 
+for (index, item) in enumerate(list):
+    print(f'------------------- Block {index} ----------------------------') 
+    print(' ',item)
+    print(f'------------------- { time.perf_counter() }-------------\n') 
+
+
+print(threading.active_count())
+print(threading.enumerate())
+print(time.perf_counter())
+

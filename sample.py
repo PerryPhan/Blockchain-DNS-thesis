@@ -17,13 +17,15 @@ numberOfTransactions = 10
 def autoInsertTransaction(number):
     HEADER = "#[domain] [type] [ip] [port] [ttl-Timetolive]\n"
     CONTENTS = []
+    FILENAME = 'names.txt'
+
     def generateDomains(number):
-        FILE = 'words.txt'
+        FILE = FILENAME
         list = []
         numberOfLine = 0
         with open(FILE) as file:
             for line in file:
-                list.append(line[:-1] + '.bit')
+                list.append(line[:-1].lower() + '.bit')
                 numberOfLine = numberOfLine + 1
         numberOfLine = 100 if numberOfLine == 0 else numberOfLine
         return [ list[random.randint(i, numberOfLine)] for i in range(0,number)]
@@ -52,11 +54,11 @@ def autoInsertTransaction(number):
     domains = generateDomains(number)
     ips = generateIPs(number)
     trans = [ generateRecordTransaction( domains[i], ips[i] ) for i in range(number)]
-    CONTENT = [ f"{tran['domain']} {tran['type']}  {tran['ip']} {tran['port']} {tran['ttl']}\n" for tran in trans]
+    CONTENTS = [ f"{tran['domain']} {tran['type']}  {tran['ip']} {tran['port']} {tran['ttl']}\n" for tran in trans]
     
     f = open("sample.txt", "w")
     f.write(HEADER)
-    for content in CONTENT:
+    for content in CONTENTS:
         f.write(content)
     f.close()
     

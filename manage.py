@@ -3,18 +3,28 @@ from business import *
 
 '''
   Run file 
-  TODO: Làm Blockchain ở file business DOING 
-        * Làm add 2/2 OK
-        * Làm resolve conflict OK
-        * Show chain OK 
+  # TODO: Làm Blockchain ở file business DOING 
+        * Làm add 2/2                     OK
+        * Làm resolve conflict            OK
+        * Show chain                      OK 
         * Test bằng route 
-            # 1. Turn 2 nodes on OK
-            # 2. Back route: new block OK
-            # 3. Show chain all node OK
-  TODO: Check duplicate Transaction khi thêm nhiều từ file, ghép xử lý add Block khi POST vào 1/2 ! BUG ngay chỗ dòng 181 Business OK
-  TODO: Xử lý lấy wallet và ledger ở Blockchain  
-  TODO: Tạo form style để chụp hình vào Word
-  TODO: Làm Proof of work chạy trên mọi node bằng Thread -> rồi xét thời gian nhỏ nhất   
+            # 1. Turn 2 nodes on          OK
+            # 2. Back route: new block    OK
+            # 3. Show chain all node      OK
+  # TODO: Check duplicate Transaction khi thêm nhiều từ file, ghép xử lý add transactions khi POST       OK
+  # TODO: Làm Proof of work chạy trên mọi node bằng Thread -> rồi xét thời gian nhỏ nhất             1/2 OK    
+  # TODO: Làm xử lý chia transaction khi add Block 
+        Số transactions 
+        # 1 : Nhỏ hơn LEN -> Không đủ nên không làm 
+        # 2 : Bằng LEN    -> Làm và gắn reward cho ai nhanh nhất 
+        # 3 : Lớn hơn LEN -> Cắt ra và giữ lại phần dư
+            Số transactions dư :
+            # 1 : Nhỏ hơn LEN -> Không đủ nên không làm 
+            # 2 : Bằng LEN    -> Đợi thời gian 10p 
+            # 3 : Lớn hơn LEN -> Đợi thời gian 10p
+            
+  # TODO: Xử lý lấy wallet và ledger ở Blockchain  
+  # TODO: Tạo form style để chụp hình vào Word
 '''
 # Declare -------------------------------------------------
 dns = DNSResolver()
@@ -22,7 +32,7 @@ dns = DNSResolver()
 # FRONT --------------------------------------------------
 @app.route('/')
 def index():
-    return 'hi'
+    return redirect('/dns/form')
 
 @app.route('/dns/form', methods=['POST','GET'])
 def form():
@@ -51,7 +61,7 @@ def form():
     def handleMultipleRecordsForm(file): 
         filename, status = checkFileNameFormat(file.filename)
         if status != 200:
-            return checkFileNameFormat(file.filename)
+            return status
 
         # Check uploads folder
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
@@ -60,19 +70,22 @@ def form():
         #Open file and add the content to TRANSACTION
         with open(file_path, "r", encoding="utf-8") as f :
             for line in f:
-                if not any(c in SPECIAL_CHARS for c in line):
+                if line != '' and line != '\n' and line != '\r' and not any(c in SPECIAL_CHARS for c in line):
                     dns.blockchain.addTransaction( line )
             return 200
 
     # 2. Insert record từ form ( một hoặc nhiều ), xử lý cho ra dữ liệu khi nhận route 
     if request.method == 'POST':
+        status = 0
         if 'file' not in request.files:
-            handleOneRecordForm(request.form)
-            
+            status = handleOneRecordForm(request.form)
         else :
-            handleMultipleRecordsForm(request.files['file'])
-            
-        return jsonify(Transaction.TRANSACTIONS) 
+            status = handleMultipleRecordsForm(request.files['file'])
+        
+        if status == 200: 
+            return redirect('/blockchain/transactions')
+        else :
+            return 'Status code '
     
     return render_template('index.html', domainFormat = RECORD_FORMAT['domain'], ipFormat = RECORD_FORMAT['ip'])
 
@@ -81,8 +94,21 @@ def showBlockchain():
     return dns.blockchain.showChainDict()
 
 @app.route('/blockchain/transactions')
-def showTransactions():
-    return jsonify( dns.blockchain.current_transaction )
+def showTransactionsBuffer():
+    tranList = dns.blockchain.current_transaction
+    return jsonify({ 
+        'len' : len(tranList),
+        'trans' : tranList,
+    })
+
+@app.route('/blockchain/transactions/clear')
+def clearTransactionsBuffer():
+    dns.blockchain.transactions.clearTransaction()
+    tranList = dns.blockchain.current_transaction
+    return jsonify({ 
+        'len' : len(tranList),
+        'trans' : tranList,
+    })
 
 # BACK ------------------------------------------------
 @app.route('/dns/resolve', methods=['GET', 'POST'])
@@ -95,57 +121,85 @@ def resolve():
                 return tran
     return "Hi"
 
-@app.route('/blockchain/solving_conflict')
-def solvingConflict():
+@app.route('/blockchain/overide')
+def overideBlockchain():
     return dns.blockchain.overrideTheLongestChain()
 
 @app.route('/blockchain/add_block')
 def addNewBlock():
-    dns.blockchain.current_transactions = ['1','1','2','2']
     block, status = dns.blockchain.addBlock()
-    return jsonify({'status': status})
+    return jsonify({
+        'status': status,
+        'block' : block,
+    })
 
+@app.route('/blockchain/pow')
+def proofOfWork():
+    # TODO: 
+    # Put block into request param 
+    # Gain node_id
+    # Call function proofOfWork
+    # Return block and exec_time    
+    pass
 # Run --------------------------------------------------
 if __name__ == "__main__":
     from argparse import ArgumentParser
     import socket
     import atexit
     
-    print( 'Data is processing please wait ... ')
     def onClosingNode():
-        node = dns.blockchain.nodes.getNode()
-        if node:
-            dns.blockchain.nodes.inActiveNode(node)
-            print (f"\n-------- NODE {node.id} IS INACTIVE ------")
-            print ("-------- GOODBYE !! ------")
+        try :
+            node = dns.blockchain.nodes.getNode()
+            if node:
+                dns.blockchain.nodes.inActiveNode(node)
+                print (f"\n-------- NODE {node.id[:-20] + '..xxx'} IS INACTIVE ------")
+                dns.blockchain.nodes.setNode(None)
+        finally:
+                print ("\n-------- GOODBYE !! ------")
     
     atexit.register(onClosingNode)
     # INIT CMD PARAM------------------------------- 
     parser = ArgumentParser()
-    parser.add_argument('-host', '--host', default='', type=str, help='IPv4 string in your network or blank in default')
-    parser.add_argument('-p', '--port', default=5000, type=int, help='Port Number to listen on or auto-handle in default')
+    parser.add_argument('-host', '--host', type=str, help='Any IPv4 string in your network or your local IP in default ')
+    parser.add_argument('-p', '--port', nargs="?", const= 5000 , type=int, help='Port number must be from 5000 - 5999 to access or 5000 in default')
+    parser.add_argument('-gp', '--genport', action="store_true", help='Generating random port flag, True : port will be random')
     args = parser.parse_args()
     
+    generatePort = args.genport
+
     # GET CMD PARAM ------------------------------- 
-    port = args.port 
+    port = args.port if generatePort == False else NodesBusiness.getRandomPort()
     host = args.host or socket.gethostbyname(socket.gethostname())
-    
+    print ("Config Node Information : " )
+    print (f" 1) [Host] : [{host or '_'}]" )
+    print (f" 2) [Port] : [{port or '_'}] \n" )
+
     # SET NODE ------------------------------- 
     node, code = dns.blockchain.nodes.handleNodeInformation(host, port)
-    dns.initBlockchain( node )
-    
+    print( 'Data is processing please wait ... \n')
+
     # RETURN CODE MESSAGE ------------------------------- 
     if code == 200 : 
         print( '//----------------------------------------//' )
-        print( ' WELCOME NODE ', node.id )
+        print( '  WELCOME NODE ', node.id[:-25] + '..xxx' )
         print( '//----------------------------------------//' )
-        app.run(host=node.ip, port = node.port,  debug=True, use_reloader=False)
+        try :
+            dns.initBlockchain( node )
+            app.run(host=node.ip, port = node.port,  debug=True, use_reloader=False)
+        except:
+            print('\n !!: Program is suddenly paused -> Turning off...') 
     elif code == 201 :
         print( '//----------------------------------------//' )
-        print( ' WELCOME BACK NODE ', node.id )
+        print( '  WELCOME BACK NODE ', node.id[:-20] + '..xxx' )
         print( '//----------------------------------------//' )
-        app.run(host=node.ip, port = node.port,  debug=True, use_reloader=False)
+        try :
+            dns.initBlockchain( node )
+            app.run(host=node.ip, port = node.port,  debug=True, use_reloader=False)
+        except:
+            print(' Program is suddenly paused ! Turning off... ') 
     else :
-        print( 'WRONG INFORMATION !! PLEASE TRY AGAIN WITH OTHER VALID HOSTNAME OR PORT' )
-        print( 'Port must be from [ 5000, 5999] ' )
-        print( 'Hostname must have right format of IPv4 ' )
+        print( f"Return code #{code}: WRONG INFORMATION OR NOT FOUND ARGUMENT \n")
+        print( "Please try again with 2 options bellow :" )
+        print( "1. Append '-p' option to access program \n")
+        print( "2. -p (port) must be from [ 5000, 5999 ]")
+        print( "   -h (host) must be same as IPv4 format" )

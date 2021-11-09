@@ -11,32 +11,24 @@ from time import time
 '''
 
 # One DNSResolver is a System -----------------------------------
-
-
 class DNSResolver:
     def __init__(self):
         '''
-        Each node only has one DNSResolver
-        also manage 2 props 
-            NodesBusiness nodes : Control of node in network
-            Blockchain : Control of node in blockchain
+            Each node only has one DNSResolver
+            also manage 2 props 
+            > Blockchain controls all related process to blockchain
+            | > NodeBusiness controls all nodes ( machines ) in the Network 
+            | > TransactionBusiness controls transactions flow in transaction buffer 
         '''
-
         self.blockchain = Blockchain()
         pass
 
     def initBlockchain(self, node):
         self.blockchain.nodes.setNode(node)
-        self.blockchain.loadChainFromDB()
+        self.blockchain.loadChain()
 
 # All systems will have only one Blockchain -----------------------------------
-
-
 class Blockchain:
-    MINE_REWARD = 10
-    BUFFER_MAX_LEN = 20
-    DIFFICULTY = 1
-
     def __init__(self):
         '''
         Blockchain first get blocks by loading from DB 
@@ -44,13 +36,16 @@ class Blockchain:
         self.nodes = NodesBusiness()
         self.transactions = TransactionBusiness()
         self.chain = []
+        self.MINE_REWARD = 10
+        self.BUFFER_MAX_LEN = 20
+        self.DIFFICULTY = 1
 
     def showChainDict(self):
+        
         return {
-            'chain': [get_model_dict(block) for block in self.chain],
+            'chain': [getModelDict(block) for block in self.chain],
             'len': len(self.chain)
         }
-        pass
 
     def getGenesisBlock(self):
         return Blocks(
@@ -62,12 +57,18 @@ class Blockchain:
             transactions=None
         ) if self.node_id else None
 
-    def loadChainFromDB(self):
+    def loadChain(self):
+        '''
+            Both init and reload blockchain by loading blocks from DB 
+        '''
         genesisBlock = self.getGenesisBlock()
+
         if not genesisBlock:
             return 404
+
         self.chain = [genesisBlock]
         blocks_list = Blocks.query.order_by(Blocks.id).all()
+
         if len(blocks_list) > 0:
             for block in blocks_list:
                 self.chain.append(block)
@@ -76,18 +77,21 @@ class Blockchain:
     def proofOfWork(self, block):
         '''
             Proof of work will generate Nonce number until match condition 
-
+            Hash x nonce = Hash ['0x + 63chars']
         '''
-        # Base on self.Difficulty
+    
         hash = self.hash(block)
         block.nonce = 0
         while not hash.startswith('0' * self.DIFFICULTY):
             block.nonce += 1
             hash = self.hash(block)
+
         return block
 
     def newBlock(self, transactions, node_id):
-        # For adding purpose, so there is nothing on it
+        '''
+            Return new block when provide informations
+        '''
         return Blocks(
             id=len(self.chain) + 1,
             timestamp=time(),
@@ -98,13 +102,17 @@ class Blockchain:
             node_id=node_id,
         )
 
-    def addBlock(self):  # Mining new Block
-        # Launch Proof of Work -> return block
+    def addBlock(self):  
+        '''
+            Adding block steps : 
+                1) Declare new Block
+                2) Call Proof of Work -> Hashed Block
+                3) Broadcast hashed Block
+            + : New Block and status 200 
+            - : New Block and status 404 
+        '''
         block = self.newBlock(self.current_transactions, self.node_id)
         block = self.proofOfWork(block)
-
-        # Broadcast new Block -> Overide the longest chain
-
         try:
             db.session.add(block)
             db.session.commit()
@@ -114,24 +122,28 @@ class Blockchain:
             return block, 404
 
     def addTransaction(self, tran):
-        self.transactions.addTransaction(tran)
+        return self.transactions.addTransaction(tran)
 
     def broadcastNewBlock(self):
+        '''
+            Send request to each machine in active network
+        '''
         neighbors = self.nodes.getActiveNetwork()
-        # 1. Send request to check database of every nodes
         for node in neighbors:
             requests.get(
-                f'http://{node.ip}:{node.port}/blockchain/solving_conflict')
+                f'http://{node.ip}:{node.port}/blockchain/overide')
 
     def overrideTheLongestChain(self):
-        # 2. Override the longest chain - with this pj is the one in the Database
-        return self.loadChainFromDB()
+        '''
+            Override the longest chain by reload the blockchain saved in DB 
+        '''
+        return self.loadChain()
         # ! Is there any time 2 block is sending to database ?
 
     @staticmethod
     def hash(block):
         block_string = json.dumps(
-            get_model_dict(block), sort_keys=True).encode()
+            getModelDict(block), sort_keys=True).encode()
         return hashlib.sha256(block_string).hexdigest()
 
     @property
@@ -147,8 +159,6 @@ class Blockchain:
         return self.nodes.getNode().id
 
 # TransactionBusiness  -----------------------------------
-
-
 class TransactionBusiness:
     def __init__(self):
         self.current_transactions = []
@@ -159,51 +169,60 @@ class TransactionBusiness:
         except:
             return False
 
-    def formatRecord(self, str):
+    def formatRecord(self, str, final = True):
         props = str.split()
         return {
             'domain': props[0],
             'type': props[1],
             'ip': props[2],
-            'port': int(props[3]),
-            'ttl': int(props[4])
+            'port': props[3] if final == False else int(props[3]),
+            'ttl': props[4] if final == False else int(props[4])
         }
 
     def checkRecordFormat(self, tran):
         checked = copy(RECORD_FORMAT)
         if type(tran) == str:
             tran = tran.strip()
-            tran = self.formatRecord(tran)
-        # Check if tran has the same key and ammount of keys as checked
+            tran = self.formatRecord(tran, False)
+    # Check if tran has the same key and ammount of keys as checked
         if tran.keys() == checked.keys():
             for key in checked.keys():
-                checked[key] = True if re.match(
-                    # TODO : FIX BUG
-                    RECORD_FORMAT[key], tran[key]) else False
-                if checked[key] == False : break      
-        return False
+                checked[str(key)] = True if re.match(
+                    checked[str(key)], tran[str(key)]) else False
+                if checked[str(key)] == False : return False      
+        return True
+    
+    def clearTransaction(self):
+        self.current_transactions = []
 
     def addTransaction(self, tran):
         if self.checkRecordFormat(tran) == False:
             return 500  # wrong format
+
         if type(tran) == str:
             tran = self.formatRecord(tran)
+            
         if self.isExisted(tran) == False:
             self.current_transactions.append(tran)
         else:
             return 501  # duplicate
+            
         return 200
-
 
 # NodeBusiness  -----------------------------------
 class NodesBusiness:
-    PORT_START = 5000
-    PORT_END = 5999
-
     def __init__(self):
         self.node = None
+        self.PORT_START = 5000   
+        self.PORT_END = 5999
         pass
-
+    
+    @staticmethod
+    def getRandomPort():
+        PORT_START = 5000
+        PORT_END = 5999
+        return random.randint(PORT_START, PORT_END)
+    
     def setNode(self, node):
         self.node = node
 
@@ -244,12 +263,14 @@ class NodesBusiness:
         return node
 
     def handleNodeInformation(self, ip: str, port: int, nodename=''):
-        # 5 Cases :
-        #   - Empty network  : Create OK
-        #   - New IP : Create OK
-        #   - New port : Create OK
-        #   - Already been active : Search in nodeIP
-        #   - Not been active yet : Active node OK
+        """
+            Handle 5 Cases :
+                - Empty network  : Create OK
+                - Node with new IP : Create OK
+                - Node with new port : Create OK
+                - Node has already been active : Search another node inactive in nodeIP
+                - Node han't been active yet : Active node OK
+        """
         network = self.getNetwork()  # Found all node ( not-working status )
         id = str(uuid4()).replace('-', '')
         if not network:  # Empty network, create new
@@ -271,11 +292,11 @@ class NodesBusiness:
                     True
                 )
             nodeIPPort = self.getNodeWithIPAndPort(ip, port)
-            if not nodeIPPort:  # Have this IP but wrong port, create new with random port
+            if not nodeIPPort:  # Have this IP but don't have this port, create new
                 return self.registerNode(
                     id,
                     ip,
-                    random.randint(self.PORT_START, self.PORT_END),
+                    port,
                     nodename,
                     True
                 )
@@ -301,13 +322,16 @@ class NodesBusiness:
 
     def validateNode(self, node, noCheckDuplicate=False):
         checked = True
-        if not node:  # check node ( not null )
+        # Check node ( not null )
+        if not node:  
             checked = False
-        if not node.id or len(node.id) > 40:  # check id ( not null, < 40 chars)
+        # Check id ( not null, < 40 chars)
+        if not node.id or len(node.id) > 40:  
             checked = False
-        if len(node.nodename) > 64:  # check nodename ( null, 64 chars)
+        # Check nodename ( null, 64 chars)
+        if len(node.nodename) > 64:  
             checked = False
-        # check IP ( not null, 16 chars, match regex )
+        # Check IP ( not null, 16 chars, match regex )
         if not node.ip or len(node.ip) > 16:
             checked = False
         else:
@@ -315,7 +339,7 @@ class NodesBusiness:
                 RECORD_FORMAT['ip'], node.ip) else True
         if not node.port or node.port < self.PORT_START or node.port > self.PORT_END:
             checked = False
-        # check duplicate
+        # Check duplicate
         if noCheckDuplicate and self.getNodeWithIPAndPort(node.ip, node.port):
             checked = False
         return checked
@@ -329,6 +353,7 @@ class NodesBusiness:
             is_deleted=False,
             is_active=is_active
         )
+
         if not self.validateNode(node, True):
             return node, 403
 
@@ -363,6 +388,7 @@ class NodesBusiness:
 
         if not self.validateNode(node):
             return node, 403
+
         try:
             node.is_delete = True
             db.session.commit()

@@ -9,7 +9,7 @@ def recreate():
     db.create_all()
 
 
-def get_model_dict(model):
+def getModelDict(model):
     return dict((column.name, getattr(model, column.name))
                 for column in model.__table__.columns)
 
