@@ -4,8 +4,7 @@ from constant import *
 from database import *
 from uuid import uuid4
 import random
-from time import time
-
+import threading, time
 '''
     This file includes main Business for App
 '''
@@ -50,7 +49,7 @@ class Blockchain:
     def getGenesisBlock(self):
         return Blocks(
             id='1',
-            timestamp=time(),
+            timestamp=time.time(),
             nonce=1,
             hash='0'*64,
             node_id=self.node_id,
@@ -73,33 +72,182 @@ class Blockchain:
             for block in blocks_list:
                 self.chain.append(block)
         return 200
+    
+    def launchProofOfWork(self):
+        # TODO :
+        def add_obj(obj, add_obj):
+            for property in add_obj:
+                obj[property] = add_obj[property]
+            return obj
+            
+        block = self.newBlock([
+            {
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },
+        ])
+        
+        trans = [ self.transactions.toString(tran) for tran in block.transactions]
+        neighbours = self.nodes.getActiveNetwork()
+        responses = []
+        
+        block.transactions = len(block.transactions)
+        print(getModelDict(block))
+        print ('BEFORE SEND 1: ', dict({ str(i) : item for i, item in enumerate(trans) }) )
+        trans2 = add_obj(dict({ str(i) : item for i, item in enumerate(trans) }),(getModelDict(block)))
+        print ('BEFORE SEND 2: ', trans2 )
+        
+        # Loop to any nodes that active in network
+        for node in neighbours:  
+            request_url = f'http://{node.ip}:{node.port}/blockchain/pow'
+            
+            rep = requests.post(
+                url  = request_url,
+                data = trans2,
+            )
+            
+            responses.append(rep.json())
 
+        return responses
+            
+        # Send request to any nodes active in network by thread
+        
+        # Collect (block, time) in every threads 
+        
+        pass
+    
     def proofOfWork(self, block):
         '''
+            Each time, proof of work will be called by many request, so must gain its prop 'node_id' 
             Proof of work will generate Nonce number until match condition 
             Hash x nonce = Hash ['0x + 63chars']
         '''
-    
-        hash = self.hash(block)
+
+        block.hash = self.hash(block)
         block.nonce = 0
-        while not hash.startswith('0' * self.DIFFICULTY):
+        while not block.hash.startswith('0' * self.DIFFICULTY):
             block.nonce += 1
-            hash = self.hash(block)
+            block.hash = self.hash(block)
 
         return block
 
-    def newBlock(self, transactions, node_id):
+    def newBlock(self, transactions):
         '''
             Return new block when provide informations
         '''
         return Blocks(
             id=len(self.chain) + 1,
-            timestamp=time(),
+            timestamp=time.time(),
             nonce=0,
             transactions=transactions,
             previous_hash=self.hash(self.last_block) if len(
                 self.chain) > 1 else '0'*64,  # genesis.hash
-            node_id=node_id,
+            node_id='',
         )
 
     def addBlock(self):  
@@ -111,7 +259,7 @@ class Blockchain:
             + : New Block and status 200 
             - : New Block and status 404 
         '''
-        block = self.newBlock(self.current_transactions, self.node_id)
+        block = self.newBlock(self.current_transactions)
         block = self.proofOfWork(block)
         try:
             db.session.add(block)
@@ -137,8 +285,8 @@ class Blockchain:
         '''
             Override the longest chain by reload the blockchain saved in DB 
         '''
-        return self.loadChain()
         # ! Is there any time 2 block is sending to database ?
+        return self.loadChain()
 
     @staticmethod
     def hash(block):
@@ -168,7 +316,10 @@ class TransactionBusiness:
             return self.current_transactions.index(tran)
         except:
             return False
-
+    
+    def toString(self, tran):
+        return f"{tran['domain']} {tran['type']} {tran['ip']} {tran['port']} {tran['ttl']}"    
+        
     def formatRecord(self, str, final = True):
         props = str.split()
         return {

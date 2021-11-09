@@ -66,5 +66,5 @@ for (index, item) in enumerate(list):
 
 print(threading.active_count())
 print(threading.enumerate())
-print(time.perf_counter())
+print(time.(perf_counter)())
 

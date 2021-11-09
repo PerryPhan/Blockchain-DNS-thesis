@@ -1,6 +1,6 @@
+from werkzeug.wrappers import response
 from include import *
 from business import *
-
 '''
   Run file 
   # TODO: Làm Blockchain ở file business DOING 
@@ -132,15 +132,29 @@ def addNewBlock():
         'status': status,
         'block' : block,
     })
-
-@app.route('/blockchain/pow')
+@app.route('/blockchain/launchpow')
+def broadcastPOW():
+    responses = dns.blockchain.launchProofOfWork()
+    print( 'Response: ',responses )
+    return jsonify({
+        'len' : len(responses),
+        'responses': responses
+    })
+    
+@app.route('/blockchain/pow', methods=["POST"])
 def proofOfWork():
     # TODO: 
-    # Put block into request param 
-    # Gain node_id
-    # Call function proofOfWork
-    # Return block and exec_time    
-    pass
+    # Take block from request param 
+    block = request.form.to_dict(flat=True)
+    # print( "RECEIVING : " ,block )
+    # block = dns.blockchain.proofOfWork(block)
+    # Return block and exec_time 
+    return {
+        'block' : block,
+        'time': time.perf_counter(),    
+    }
+       
+    
 # Run --------------------------------------------------
 if __name__ == "__main__":
     from argparse import ArgumentParser
@@ -170,13 +184,14 @@ if __name__ == "__main__":
     # GET CMD PARAM ------------------------------- 
     port = args.port if generatePort == False else NodesBusiness.getRandomPort()
     host = args.host or socket.gethostbyname(socket.gethostname())
-    print ("Config Node Information : " )
-    print (f" 1) [Host] : [{host or '_'}]" )
-    print (f" 2) [Port] : [{port or '_'}] \n" )
-
+    
     # SET NODE ------------------------------- 
     node, code = dns.blockchain.nodes.handleNodeInformation(host, port)
-    print( 'Data is processing please wait ... \n')
+    print('___________ BLOCKCHAIN DNS CLI ______________ \n')
+    print("Config Node Information : " )
+    print(f" 1) [Host] : [{node.ip or '_'}]" )
+    print(f" 2) [Port] : [{node.port or '_'}] \n" )
+    print('Data is processing please wait ... \n')
 
     # RETURN CODE MESSAGE ------------------------------- 
     if code == 200 : 
