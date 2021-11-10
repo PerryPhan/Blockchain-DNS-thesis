@@ -145,14 +145,23 @@ def broadcastPOW():
 def proofOfWork():
     # TODO: 
     # Take block from request param 
-    block = request.form.to_dict(flat=True)
-    # print( "RECEIVING : " ,block )
-    # block = dns.blockchain.proofOfWork(block)
+    
+    block_request = request.form.to_dict(flat=True)
+    print( 'Reiceive: ',block_request )
+    
+    # Convert that block into table Model
+    block = dns.blockchain.convertBlockFromBlockRequest(block_request)
     # Return block and exec_time 
-    return {
-        'block' : block,
+    # response = dns.blockchain.proofOfWork(block)
+    return block_request
+    '''
+    {
+        'node_id': 1,
+        'nonce': 0,
+        'hash': '',
         'time': time.perf_counter(),    
     }
+    '''
        
     
 # Run --------------------------------------------------

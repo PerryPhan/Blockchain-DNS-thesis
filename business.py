@@ -74,13 +74,15 @@ class Blockchain:
         return 200
     
     def launchProofOfWork(self):
-        # TODO :
-        def add_obj(obj, add_obj):
-            for property in add_obj:
-                obj[property] = add_obj[property]
+        # TODO : This is the part before converting into model Block
+        def merge_obj(obj, merge_obj):
+            for property in merge_obj:
+                obj[property] = merge_obj[property]
             return obj
-            
-        block = self.newBlock([
+
+        neighbours = self.nodes.getActiveNetwork()
+        # Building request with current transaction
+        transactions = [
             {
                 'domain' : 'a',
                 'type' : 'A',
@@ -190,37 +192,41 @@ class Blockchain:
                 'port' : 80,
                 'ttl' : 14400
             },
-        ])
+        ]
+
+        # Compress Transaction to list( str ) 
+        compress_trans = [ self.transactions.toString(tran) for tran in transactions]
         
-        trans = [ self.transactions.toString(tran) for tran in block.transactions]
-        neighbours = self.nodes.getActiveNetwork()
+        # Adding information of this block
+        request_block = merge_obj(
+            dict(
+                { str(i) : item for i, item in enumerate(compress_trans) }
+            ),
+            getModelDict( self.newBlock( len(compress_trans) ) )
+        )
+        print ('BEFORE SEND : ', request_block )
         responses = []
         
-        block.transactions = len(block.transactions)
-        print(getModelDict(block))
-        print ('BEFORE SEND 1: ', dict({ str(i) : item for i, item in enumerate(trans) }) )
-        trans2 = add_obj(dict({ str(i) : item for i, item in enumerate(trans) }),(getModelDict(block)))
-        print ('BEFORE SEND 2: ', trans2 )
-        
-        # Loop to any nodes that active in network
+        # Loop to any nodes that active in network -> Send request to any nodes active in network by thread
         for node in neighbours:  
             request_url = f'http://{node.ip}:{node.port}/blockchain/pow'
             
             rep = requests.post(
                 url  = request_url,
-                data = trans2,
+                data = request_block,
             )
-            
-            responses.append(rep.json())
 
-        return responses
-            
-        # Send request to any nodes active in network by thread
+        # Collect (block, time) in every threads             
+        responses.append(rep.json())
         
-        # Collect (block, time) in every threads 
+        return responses
+    
+    def convertBlockFromBlockRequest(self, block_request ):
+        #   convert array of transactions
+        #   new block   
         
         pass
-    
+
     def proofOfWork(self, block):
         '''
             Each time, proof of work will be called by many request, so must gain its prop 'node_id' 
@@ -247,19 +253,18 @@ class Blockchain:
             transactions=transactions,
             previous_hash=self.hash(self.last_block) if len(
                 self.chain) > 1 else '0'*64,  # genesis.hash
-            node_id='',
+            node_id=self.node_id,
         )
 
     def addBlock(self):  
         '''
             Adding block steps : 
-                1) Declare new Block
                 2) Call Proof of Work -> Hashed Block
                 3) Broadcast hashed Block
             + : New Block and status 200 
             - : New Block and status 404 
         '''
-        block = self.newBlock(self.current_transactions)
+        # block = self.newBlock(self.current_transactions)
         block = self.proofOfWork(block)
         try:
             db.session.add(block)
@@ -317,6 +322,9 @@ class TransactionBusiness:
         except:
             return False
     
+    def convertRecordsFromBlockRequest(self, obj):
+        pass
+
     def toString(self, tran):
         return f"{tran['domain']} {tran['type']} {tran['ip']} {tran['port']} {tran['ttl']}"    
         
