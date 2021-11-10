@@ -75,10 +75,6 @@ class Blockchain:
     
     def launchProofOfWork(self):
         # TODO : This is the part before converting into model Block
-        def merge_obj(obj, merge_obj):
-            for property in merge_obj:
-                obj[property] = merge_obj[property]
-            return obj
 
         neighbours = self.nodes.getActiveNetwork()
         # Building request with current transaction
@@ -204,7 +200,7 @@ class Blockchain:
             ),
             getModelDict( self.newBlock( len(compress_trans) ) )
         )
-        print ('BEFORE SEND : ', request_block )
+
         responses = []
         
         # Loop to any nodes that active in network -> Send request to any nodes active in network by thread
@@ -215,21 +211,26 @@ class Blockchain:
                 url  = request_url,
                 data = request_block,
             )
-
-        # Collect (block, time) in every threads             
-        responses.append(rep.json())
+            
+            responses.append(rep.json())
+        
         
         return responses
     
-    def convertBlockFromBlockRequest(self, block_request ):
+    def returnProofOfWorkOutput(self, block_request ):
         #   convert array of transactions
-        #   new block   
-        
-        pass
+        transactions = [ self.transactions.formatRecord(block_request[prop]) if re.match('^\d+$',prop) else None for prop in block_request.keys()]
+        transactions = transactions[0: int(block_request['transactions'])]
+        #   new block , add node_id 
+        block_request['transactions'] = transactions
+        block_request['add_by_node_id'] = self.node_id
+        #   proof of work 
+        block = Blocks().from_dict(block_request)
+        return self.proofOfWork(block), time.perf_counter()
 
     def proofOfWork(self, block):
         '''
-            Each time, proof of work will be called by many request, so must gain its prop 'node_id' 
+            Each time, proof of work will be called by many request, so must gain its prop 'add_by_node_id' 
             Proof of work will generate Nonce number until match condition 
             Hash x nonce = Hash ['0x + 63chars']
         '''
@@ -254,9 +255,10 @@ class Blockchain:
             previous_hash=self.hash(self.last_block) if len(
                 self.chain) > 1 else '0'*64,  # genesis.hash
             node_id=self.node_id,
+            add_by_node_id = None
         )
 
-    def addBlock(self):  
+    def addBlock(self, block):  
         '''
             Adding block steps : 
                 2) Call Proof of Work -> Hashed Block
@@ -265,7 +267,7 @@ class Blockchain:
             - : New Block and status 404 
         '''
         # block = self.newBlock(self.current_transactions)
-        block = self.proofOfWork(block)
+        # block = self.proofOfWork(block)
         try:
             db.session.add(block)
             db.session.commit()

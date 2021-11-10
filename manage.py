@@ -12,7 +12,7 @@ from business import *
             # 2. Back route: new block    OK
             # 3. Show chain all node      OK
   # TODO: Check duplicate Transaction khi thêm nhiều từ file, ghép xử lý add transactions khi POST       OK
-  # TODO: Làm Proof of work chạy trên mọi node bằng Thread -> rồi xét thời gian nhỏ nhất             1/2 OK    
+  # TODO: Làm Proof of work chạy trên mọi node bằng Thread -> rồi xét thời gian nhỏ nhất             3/4 OK    
   # TODO: Làm xử lý chia transaction khi add Block 
         Số transactions 
         # 1 : Nhỏ hơn LEN -> Không đủ nên không làm 
@@ -135,7 +135,8 @@ def addNewBlock():
 @app.route('/blockchain/launchpow')
 def broadcastPOW():
     responses = dns.blockchain.launchProofOfWork()
-    print( 'Response: ',responses )
+    print( Blockchain.hash(Blocks().from_dict(responses[0]['block'])) == responses[0]['hash'] )
+    
     return jsonify({
         'len' : len(responses),
         'responses': responses
@@ -145,23 +146,15 @@ def broadcastPOW():
 def proofOfWork():
     # TODO: 
     # Take block from request param 
-    
     block_request = request.form.to_dict(flat=True)
-    print( 'Reiceive: ',block_request )
-    
     # Convert that block into table Model
-    block = dns.blockchain.convertBlockFromBlockRequest(block_request)
+    block, speedtime = dns.blockchain.returnProofOfWorkOutput(block_request)
     # Return block and exec_time 
-    # response = dns.blockchain.proofOfWork(block)
-    return block_request
-    '''
-    {
-        'node_id': 1,
-        'nonce': 0,
-        'hash': '',
-        'time': time.perf_counter(),    
+    return {
+        'hash': Blockchain.hash(block),
+        'block' : block.as_dict(),
+        'speedtime': speedtime,    
     }
-    '''
        
     
 # Run --------------------------------------------------

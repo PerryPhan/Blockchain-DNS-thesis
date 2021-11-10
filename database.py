@@ -1,13 +1,158 @@
-from include import db
+from include import db, json
 ''' 
     This file stores what is necessary in Database PgSQL 
 '''
-
 
 def recreate():
     db.drop_all()
     db.create_all()
 
+def set():
+    block = Blocks(
+        id = 1,
+        timestamp = 1.1,
+        nonce = 1,
+        transactions = [
+            {
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },{
+                'domain' : 'a',
+                'type' : 'A',
+                'ip' : '1.1.1.1',
+                'port' : 80,
+                'ttl' : 14400
+            },
+        ],
+        previous_hash = '00',
+        node_id = None,
+        add_by_node_id = None
+    )
+    try :
+        db.session.add(block)
+        db.session.commit()
+    except:
+        print('Can not add block')
+
+def merge_obj(obj, merge_obj):
+    for property in merge_obj:
+        obj[property] = merge_obj[property]
+    return obj
+# def get():
+    return Blocks.query.filter(
+            Blocks.id == 1,
+    ).first()
 
 def getModelDict(model):
     return dict((column.name, getattr(model, column.name))
@@ -26,6 +171,9 @@ class Accounts(db.Model):
     # transactions = db.relationship('Transactions',backref="owner")
     # To String 
 
+    def as_dict(self):
+       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
 
 class Nodes(db.Model):
     __tablename__ = 'nodes'
@@ -38,6 +186,9 @@ class Nodes(db.Model):
     is_active = db.Column(db.Boolean, nullable=False)
     # ==============
     blocks = db.relationship('Blocks', backref="node")
+    
+    def as_dict(self):
+       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 
 class Blocks(db.Model):
@@ -50,12 +201,27 @@ class Blocks(db.Model):
     previous_hash = db.Column(db.String(255), nullable=False)
     # ===============
     node_id = db.Column(db.String(64), db.ForeignKey('nodes.id'))
+    add_by_node_id = db.Column(db.String(64), nullable=True)
     hash = None
     
-    
+    def as_dict(self):
+       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+    def from_dict(self, json):
+        self.id                 = json['id']
+        self.timestamp          = float(json['timestamp'])
+        self.nonce              = int(json['nonce']) 
+        self.transactions       = json['transactions']
+        self.previous_hash      = json['previous_hash'] 
+        self.node_id            = json['node_id'] 
+        self.add_by_node_id     = json['add_by_node_id'] if 'add_by_node_id' in json else None
+        return self
+        
 class Transaction:
     TRANSACTIONS = []
 
 
 class Record:  # main content of transaction and Others
     pass
+
+
