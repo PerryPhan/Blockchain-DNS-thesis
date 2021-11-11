@@ -117,18 +117,48 @@ block_request = {
     "transactions": "18"
 }
 tb = TransactionBusiness()
-def convertBlockFromBlockRequest( block_request ):
-    #   convert array of transactions
-    transactions = [ tb.formatRecord(block_request[prop]) if re.match('^\d+$',prop) else None for prop in block_request.keys()]
-    transactions = transactions[0: int(block_request['transactions'])]
-    #   new block , add node_id 
-    block_request['transactions'] = transactions
-    block_request['add_by_node_id'] = '1'
-    block = Blocks().from_dict(block_request)
-    #   proof of work 
-    proofOfWork(block)
-    # print(block.as_dict())
-    print(block.hash, block.nonce)
-    print(time.perf_counter())
+# def convertBlockFromBlockRequest( block_request ):
+#     #   convert array of transactions
+#     transactions = [ tb.formatRecord(block_request[prop]) if re.match('^\d+$',prop) else None for prop in block_request.keys()]
+#     transactions = transactions[0: int(block_request['transactions'])]
+#     #   new block , add node_id 
+#     block_request['transactions'] = transactions
+#     block_request['add_by_node_id'] = '1'
+#     block = Blocks().from_dict(block_request)
+#     #   proof of work 
+#     proofOfWork(block)
+#     # print(block.as_dict())
+#     print(block.hash, block.nonce)
+#     print(time.perf_counter())
 
-convertBlockFromBlockRequest(block_request)
+# convertBlockFromBlockRequest(block_request)
+max_len = 20 
+transactions = [
+    {
+       'domain': 'a.com',
+        'type': 'A',
+        'ip': f'{i}.{i}.{i}.{i}',
+        'port': 80,
+        'ttl': '14400'
+    } for i in range(20)
+]
+def subTransaction(arr, index, length):
+    # if not length :
+    #     return arr[index: ]
+    # else: 
+        return arr[index: length]
+    
+def prepareMiningBlockTransactions(transactions):
+    trans_len = len(transactions) 
+    if trans_len >= max_len: # and create_block_countdown end
+        return subTransaction(transactions, 0, max_len), subTransaction(transactions, max_len, None)
+    else: 
+        return transactions, 500 # not enough transactions 
+used, left = prepareMiningBlockTransactions(transactions)
+print("Used transactions :")
+for i in used : 
+    print(json.dumps(i))
+print("Left transactions :")
+for i in left : 
+    print(json.dumps(i))
+# print( subTransaction(transactions, 10, 1) )

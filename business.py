@@ -87,128 +87,13 @@ class Blockchain:
 
         return fastestBlockResponse
     
-    def launchNetworkProofOfWork(self):
+    def launchNetworkProofOfWork(self, transactions):
         '''
             Process step : 
             
         '''
-        
-        # TODO : This is the part before converting into model Block
-
         neighbours = self.nodes.getActiveNetwork()
         # Building request with current transaction
-        transactions = [
-            {
-                'domain' : 'a',
-                'type' : 'A',
-                'ip' : '1.1.1.1',
-                'port' : 80,
-                'ttl' : 14400
-            },{
-                'domain' : 'a',
-                'type' : 'A',
-                'ip' : '1.1.1.1',
-                'port' : 80,
-                'ttl' : 14400
-            },{
-                'domain' : 'a',
-                'type' : 'A',
-                'ip' : '1.1.1.1',
-                'port' : 80,
-                'ttl' : 14400
-            },{
-                'domain' : 'a',
-                'type' : 'A',
-                'ip' : '1.1.1.1',
-                'port' : 80,
-                'ttl' : 14400
-            },{
-                'domain' : 'a',
-                'type' : 'A',
-                'ip' : '1.1.1.1',
-                'port' : 80,
-                'ttl' : 14400
-            },{
-                'domain' : 'a',
-                'type' : 'A',
-                'ip' : '1.1.1.1',
-                'port' : 80,
-                'ttl' : 14400
-            },{
-                'domain' : 'a',
-                'type' : 'A',
-                'ip' : '1.1.1.1',
-                'port' : 80,
-                'ttl' : 14400
-            },{
-                'domain' : 'a',
-                'type' : 'A',
-                'ip' : '1.1.1.1',
-                'port' : 80,
-                'ttl' : 14400
-            },{
-                'domain' : 'a',
-                'type' : 'A',
-                'ip' : '1.1.1.1',
-                'port' : 80,
-                'ttl' : 14400
-            },{
-                'domain' : 'a',
-                'type' : 'A',
-                'ip' : '1.1.1.1',
-                'port' : 80,
-                'ttl' : 14400
-            },{
-                'domain' : 'a',
-                'type' : 'A',
-                'ip' : '1.1.1.1',
-                'port' : 80,
-                'ttl' : 14400
-            },{
-                'domain' : 'a',
-                'type' : 'A',
-                'ip' : '1.1.1.1',
-                'port' : 80,
-                'ttl' : 14400
-            },{
-                'domain' : 'a',
-                'type' : 'A',
-                'ip' : '1.1.1.1',
-                'port' : 80,
-                'ttl' : 14400
-            },{
-                'domain' : 'a',
-                'type' : 'A',
-                'ip' : '1.1.1.1',
-                'port' : 80,
-                'ttl' : 14400
-            },{
-                'domain' : 'a',
-                'type' : 'A',
-                'ip' : '1.1.1.1',
-                'port' : 80,
-                'ttl' : 14400
-            },{
-                'domain' : 'a',
-                'type' : 'A',
-                'ip' : '1.1.1.1',
-                'port' : 80,
-                'ttl' : 14400
-            },{
-                'domain' : 'a',
-                'type' : 'A',
-                'ip' : '1.1.1.1',
-                'port' : 80,
-                'ttl' : 14400
-            },{
-                'domain' : 'a',
-                'type' : 'A',
-                'ip' : '1.1.1.1',
-                'port' : 80,
-                'ttl' : 14400
-            },
-        ]
-
         responses = []
         
         def sendRequestAndReturn( url, data ):
@@ -299,18 +184,50 @@ class Blockchain:
             + : New Block and status 200 
             - : New Block and status 404 
         '''
-        print('Block after : ',block)
-        # block = self.proofOfWork(block)
         try:
             db.session.add(block)
             db.session.commit()
-        #     self.broadcastNewBlock()
-            db.session.expunge_all()
-            db.session.close()
             return block, 200
         except:
             return block, 404
 
+    def prepareMiningBlockTransactions(self):
+        trans = self.current_transaction
+        trans_len = len(trans) 
+        
+        if trans_len >= self.BUFFER_MAX_LEN: # and create_block_countdown end
+            return self.transactions.subTransaction( start = 0, length = self.BUFFER_MAX_LEN ), 200
+        else: 
+            return trans, 500 # not enough transactions 
+        
+    def mineBlock(self ):
+        '''
+            This function will use current_transaction
+        '''
+        # Init and check transactions status  
+        transactions, status = self.prepareMiningBlockTransactions()
+        message = 'Mining block successfully' if status == 200 else f'Not enough {self.BUFFER_MAX_LEN} transaction to process'
+        if status != 200:
+            return {
+                'status': status,
+                'message': message,
+            }
+        # Mining with Proof of work 
+        responses = self.launchNetworkProofOfWork(transactions)
+        fastestBlockResponse = self.findFastestBlockResponse(responses)
+        block = Blocks().from_dict(fastestBlockResponse)
+        
+        # Adding the block to all network
+        block, status = self.addBlock(block)
+        self.broadcastNewBlock()
+
+        # Getting message 
+        return {
+            'status' : status,
+            'message': message,
+            'block'  : block.id
+        }
+    
     def addTransaction(self, tran):
         return self.transactions.addTransaction(tran)
 
@@ -398,7 +315,7 @@ class TransactionBusiness:
         if type(tran) == str:
             tran = tran.strip()
             tran = self.formatRecord(tran, False)
-    # Check if tran has the same key and ammount of keys as checked
+        # Check if tran has the same key and ammount of keys as checked
         if tran.keys() == checked.keys():
             for key in checked.keys():
                 checked[str(key)] = True if re.match(
@@ -406,8 +323,14 @@ class TransactionBusiness:
                 if checked[str(key)] == False : return False      
         return True
     
-    def clearTransaction(self):
+    def subTransaction(self,  start = None, length = None ):
+        used_block_transactions = self.current_transactions[ start : length ]
+        self.current_transactions = self.current_transactions[ length : ]
+        return used_block_transactions
+    
+    def clearTransaction(self,):
         self.current_transactions = []
+        return self.current_transactions
 
     def addTransaction(self, tran):
         if self.checkRecordFormat(tran) == False:

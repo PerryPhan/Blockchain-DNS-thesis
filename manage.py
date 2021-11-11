@@ -13,18 +13,18 @@ from business import *
             # 3. Show chain all node      OK
   # TODO: Check duplicate Transaction khi thêm nhiều từ file, ghép xử lý add transactions khi POST       OK
   # TODO: Làm Proof of work chạy trên mọi node bằng Thread -> rồi xét thời gian nhỏ nhất                 OK    
-  # TODO: Xử lý lấy wallet và ledger ở Blockchain                                                        P 
-  # TODO: Làm xử lý chia transaction khi add Block                                                       P
-        Số transactions 
+  # TODO: Xử lý lấy wallet và ledger ở Blockchain                                                        OK 
+  # TODO: Làm xử lý chia transaction khi add Block                                                       OK
+        Số transactions cho UI
         # 1 : Nhỏ hơn LEN -> Không đủ nên không làm 
         # 2 : Bằng LEN    -> Làm như bình thường 
         # 3 : Lớn hơn LEN -> Làm như bình thường và cắt giữ lại phần dư
-            Số transactions dư :
+            Số transactions dư : cho UI 
             # 1 : Nhỏ hơn LEN -> Không đủ nên không làm 
             # 2 : Bằng LEN    -> Đợi thời gian 10p 
             # 3 : Lớn hơn LEN -> Đợi thời gian 10p
-            
-  # TODO: Tạo form style để chụp hình vào Word                                                              
+  # TODO: Cleaning code và stress test                                                                   P
+  # TODO: Tạo form style để chụp hình vào Word  - UI                                                             
 '''
 # Declare -------------------------------------------------
 dns = DNSResolver()
@@ -82,6 +82,7 @@ def form():
         else :
             status = handleMultipleRecordsForm(request.files['file'])
         
+                
         if status == 200: 
             return redirect('/blockchain/transactions')
         else :
@@ -89,10 +90,7 @@ def form():
     
     return render_template('index.html', domainFormat = RECORD_FORMAT['domain'], ipFormat = RECORD_FORMAT['ip'])
 
-@app.route('/blockchain/show')
-def showBlockchain():
-    return dns.blockchain.showChainDict()
-
+# BACK ------------------------------------------------
 @app.route('/blockchain/transactions')
 def showTransactionsBuffer():
     tranList = dns.blockchain.current_transaction
@@ -110,7 +108,10 @@ def clearTransactionsBuffer():
         'trans' : tranList,
     })
 
-# BACK ------------------------------------------------
+@app.route('/blockchain/show')
+def showBlockchain():
+    return dns.blockchain.showChainDict()
+
 @app.route('/dns/resolve', methods=['GET', 'POST'])
 def resolve():
     # 1. Tạo route để phân giải
@@ -132,22 +133,16 @@ def addNewBlock():
         'status': status,
         'block' : block,
     })
-@app.route('/blockchain/launchpow')
-def broadcastPOW():
-    responses = dns.blockchain.launchNetworkProofOfWork()
-    fastestBlockResponse = dns.blockchain.findFastestBlockResponse(responses)
-    block = Blocks().from_dict(fastestBlockResponse)
-    dns.blockchain.addBlock(block)
-    dns.blockchain.broadcastNewBlock()
-    return jsonify({
-        'len' : len(responses),
-        'responses': responses
-    })
+
+@app.route('/blockchain/mine')
+def mineBlock():
+    return dns.blockchain.mineBlock()
     
 @app.route('/blockchain/pow', methods=["POST"])
 def proofOfWork():
     block_request = request.form.to_dict(flat=True)
     block, speedtime = dns.blockchain.returnProofOfWorkOutput(block_request)
+    
     return {
         'hash': Blockchain.hash(block),
         'block' : block.as_dict(),
@@ -157,6 +152,7 @@ def proofOfWork():
 @app.route('/blockchain/ledger')
 def getLedger():
     ledger = dns.blockchain.ledger
+    
     return {
         'len': len(ledger),
         'ledger': ledger
@@ -168,6 +164,7 @@ def getWallet():
     return {
         'wallet': wallet
 }
+
 # Run --------------------------------------------------
 if __name__ == "__main__":
     from argparse import ArgumentParser
