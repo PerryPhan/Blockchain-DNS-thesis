@@ -3,7 +3,7 @@ from requests.models import Response
 from constant import *
 from database import *
 from uuid import uuid4
-import random
+import random, sys
 import threading, time
 '''
     This file includes main Business for App
@@ -38,17 +38,18 @@ class Blockchain:
         self.MINE_REWARD = 10
         self.BUFFER_MAX_LEN = 20
         self.DIFFICULTY = 1
+    
 
     def showChainDict(self):
-        
+        self.loadChain()
         return {
-            'chain': [getModelDict(block) for block in self.chain],
-            'len': len(self.chain)
+            'len': len(self.chain),
+            'chain': [block.as_dict() for block in self.chain],
         }
 
     def getGenesisBlock(self):
         return Blocks(
-            id='1',
+            id=1,
             timestamp=time.time(),
             nonce=1,
             hash='0'*64,
@@ -67,13 +68,31 @@ class Blockchain:
 
         self.chain = [genesisBlock]
         blocks_list = Blocks.query.order_by(Blocks.id).all()
-
         if len(blocks_list) > 0:
             for block in blocks_list:
                 self.chain.append(block)
+        
+        db.session.expunge_all()
+        db.session.close()
+
         return 200
     
-    def launchProofOfWork(self):
+    def findFastestBlockResponse(self, responses):
+        minSpeedtime = sys.float_info.max 
+        fastestBlockResponse = None
+        for response in responses:
+            if response['speedtime'] < minSpeedtime:
+                minSpeedtime = response['speedtime']
+                fastestBlockResponse = response['block']
+
+        return fastestBlockResponse
+    
+    def launchNetworkProofOfWork(self):
+        '''
+            Process step : 
+            
+        '''
+        
         # TODO : This is the part before converting into model Block
 
         neighbours = self.nodes.getActiveNetwork()
@@ -190,6 +209,15 @@ class Blockchain:
             },
         ]
 
+        responses = []
+        
+        def sendRequestAndReturn( url, data ):
+            rep = requests.post(
+                url  = url,
+                data = data,
+            )
+            responses.append(rep.json())
+
         # Compress Transaction to list( str ) 
         compress_trans = [ self.transactions.toString(tran) for tran in transactions]
         
@@ -201,32 +229,34 @@ class Blockchain:
             getModelDict( self.newBlock( len(compress_trans) ) )
         )
 
-        responses = []
-        
         # Loop to any nodes that active in network -> Send request to any nodes active in network by thread
         for node in neighbours:  
             request_url = f'http://{node.ip}:{node.port}/blockchain/pow'
+            # Add Thread here 
+            x = threading.Thread(target=sendRequestAndReturn, args=[request_url, request_block])
+            x.start()
             
-            rep = requests.post(
-                url  = request_url,
-                data = request_block,
-            )
-            
-            responses.append(rep.json())
-        
-        
+        for node in neighbours:    
+            x.join()
+
         return responses
     
     def returnProofOfWorkOutput(self, block_request ):
-        #   convert array of transactions
+        '''
+            Process step : 
+                1. From request ,convert array of transactions
+                2. Create new Block, add field ['add_by_node_id'] 
+                3. Run Proof of work -> return block, speedtest 
+        '''
+        #   1.
         transactions = [ self.transactions.formatRecord(block_request[prop]) if re.match('^\d+$',prop) else None for prop in block_request.keys()]
         transactions = transactions[0: int(block_request['transactions'])]
-        #   new block , add node_id 
+        #   2.
         block_request['transactions'] = transactions
         block_request['add_by_node_id'] = self.node_id
-        #   proof of work 
+        #   3.
         block = Blocks().from_dict(block_request)
-        return self.proofOfWork(block), time.perf_counter()
+        return self.proofOfWork(block)
 
     def proofOfWork(self, block):
         '''
@@ -234,21 +264,23 @@ class Blockchain:
             Proof of work will generate Nonce number until match condition 
             Hash x nonce = Hash ['0x + 63chars']
         '''
-
+        start = time.perf_counter()
+        # ----------------------------
         block.hash = self.hash(block)
         block.nonce = 0
         while not block.hash.startswith('0' * self.DIFFICULTY):
             block.nonce += 1
             block.hash = self.hash(block)
-
-        return block
+        # ----------------------------
+        end = time.perf_counter()
+        return block, float(end-start)
 
     def newBlock(self, transactions):
         '''
             Return new block when provide informations
         '''
         return Blocks(
-            id=len(self.chain) + 1,
+            id=len(self.chain) +1,
             timestamp=time.time(),
             nonce=0,
             transactions=transactions,
@@ -260,18 +292,21 @@ class Blockchain:
 
     def addBlock(self, block):  
         '''
-            Adding block steps : 
-                2) Call Proof of Work -> Hashed Block
-                3) Broadcast hashed Block
+            Adding block steps : [ /blockchain/launchpow as preparation ]
+                1) Launch Proof of Work in Network
+                2) Find the fastest hashing block 
+                3) Add that block 
             + : New Block and status 200 
             - : New Block and status 404 
         '''
-        # block = self.newBlock(self.current_transactions)
+        print('Block after : ',block)
         # block = self.proofOfWork(block)
         try:
             db.session.add(block)
             db.session.commit()
-            self.broadcastNewBlock()
+        #     self.broadcastNewBlock()
+            db.session.expunge_all()
+            db.session.close()
             return block, 200
         except:
             return block, 404
@@ -293,7 +328,7 @@ class Blockchain:
             Override the longest chain by reload the blockchain saved in DB 
         '''
         # ! Is there any time 2 block is sending to database ?
-        return self.loadChain()
+        return self.showChainDict()
 
     @staticmethod
     def hash(block):
@@ -312,6 +347,24 @@ class Blockchain:
     @property
     def node_id(self):
         return self.nodes.getNode().id
+
+    @property
+    def ledger(self):
+        trans = []
+        for block in self.chain: 
+                if block.transactions :
+                    for tran in block.transactions:
+                        trans.append(tran) 
+        return trans
+
+    @property 
+    def wallet(self):
+        totalRewards = 0
+        for block in self.chain: 
+            if block.id != 0 and block.add_by_node_id:
+                if block.add_by_node_id == self.node_id: 
+                    totalRewards += self.MINE_REWARD
+        return totalRewards
 
 # TransactionBusiness  -----------------------------------
 class TransactionBusiness:

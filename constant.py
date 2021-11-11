@@ -15,5 +15,7 @@ RECORD_FORMAT = {
     'port'   : '^[1-9][0-9]{1,3}$',   # Giao thức cổng , ex: 80 ( HTTP )
     'ttl'    : '^[0-9]{1,5}$' # Thời gian tồn tại, ex : 14400 ( 4h )
 }
+
+
 COMMENT_CHAR  = '#' 
 SPECIAL_CHARS = "''!@#$%^&*()-+?_=,<>/"""

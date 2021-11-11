@@ -149,7 +149,8 @@ def merge_obj(obj, merge_obj):
     for property in merge_obj:
         obj[property] = merge_obj[property]
     return obj
-# def get():
+
+def get():
     return Blocks.query.filter(
             Blocks.id == 1,
     ).first()
@@ -225,3 +226,4 @@ class Record:  # main content of transaction and Others
     pass
 
 
+# recreate()

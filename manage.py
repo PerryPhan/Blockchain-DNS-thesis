@@ -12,19 +12,19 @@ from business import *
             # 2. Back route: new block    OK
             # 3. Show chain all node      OK
   # TODO: Check duplicate Transaction khi thêm nhiều từ file, ghép xử lý add transactions khi POST       OK
-  # TODO: Làm Proof of work chạy trên mọi node bằng Thread -> rồi xét thời gian nhỏ nhất             3/4 OK    
-  # TODO: Làm xử lý chia transaction khi add Block 
+  # TODO: Làm Proof of work chạy trên mọi node bằng Thread -> rồi xét thời gian nhỏ nhất                 OK    
+  # TODO: Xử lý lấy wallet và ledger ở Blockchain                                                        P 
+  # TODO: Làm xử lý chia transaction khi add Block                                                       P
         Số transactions 
         # 1 : Nhỏ hơn LEN -> Không đủ nên không làm 
-        # 2 : Bằng LEN    -> Làm và gắn reward cho ai nhanh nhất 
-        # 3 : Lớn hơn LEN -> Cắt ra và giữ lại phần dư
+        # 2 : Bằng LEN    -> Làm như bình thường 
+        # 3 : Lớn hơn LEN -> Làm như bình thường và cắt giữ lại phần dư
             Số transactions dư :
             # 1 : Nhỏ hơn LEN -> Không đủ nên không làm 
             # 2 : Bằng LEN    -> Đợi thời gian 10p 
             # 3 : Lớn hơn LEN -> Đợi thời gian 10p
             
-  # TODO: Xử lý lấy wallet và ledger ở Blockchain  
-  # TODO: Tạo form style để chụp hình vào Word
+  # TODO: Tạo form style để chụp hình vào Word                                                              
 '''
 # Declare -------------------------------------------------
 dns = DNSResolver()
@@ -123,7 +123,7 @@ def resolve():
 
 @app.route('/blockchain/overide')
 def overideBlockchain():
-    return dns.blockchain.overrideTheLongestChain()
+    return str(dns.blockchain.overrideTheLongestChain())
 
 @app.route('/blockchain/add_block')
 def addNewBlock():
@@ -134,9 +134,11 @@ def addNewBlock():
     })
 @app.route('/blockchain/launchpow')
 def broadcastPOW():
-    responses = dns.blockchain.launchProofOfWork()
-    print( Blockchain.hash(Blocks().from_dict(responses[0]['block'])) == responses[0]['hash'] )
-    
+    responses = dns.blockchain.launchNetworkProofOfWork()
+    fastestBlockResponse = dns.blockchain.findFastestBlockResponse(responses)
+    block = Blocks().from_dict(fastestBlockResponse)
+    dns.blockchain.addBlock(block)
+    dns.blockchain.broadcastNewBlock()
     return jsonify({
         'len' : len(responses),
         'responses': responses
@@ -144,19 +146,28 @@ def broadcastPOW():
     
 @app.route('/blockchain/pow', methods=["POST"])
 def proofOfWork():
-    # TODO: 
-    # Take block from request param 
     block_request = request.form.to_dict(flat=True)
-    # Convert that block into table Model
     block, speedtime = dns.blockchain.returnProofOfWorkOutput(block_request)
-    # Return block and exec_time 
     return {
         'hash': Blockchain.hash(block),
         'block' : block.as_dict(),
         'speedtime': speedtime,    
     }
-       
-    
+
+@app.route('/blockchain/ledger')
+def getLedger():
+    ledger = dns.blockchain.ledger
+    return {
+        'len': len(ledger),
+        'ledger': ledger
+}
+
+@app.route('/blockchain/wallet')
+def getWallet():
+    wallet = dns.blockchain.wallet
+    return {
+        'wallet': wallet
+}
 # Run --------------------------------------------------
 if __name__ == "__main__":
     from argparse import ArgumentParser
