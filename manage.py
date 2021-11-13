@@ -23,8 +23,14 @@ from business import *
             # 1 : Nhỏ hơn LEN -> Không đủ nên không làm 
             # 2 : Bằng LEN    -> Đợi thời gian 10p 
             # 3 : Lớn hơn LEN -> Đợi thời gian 10p
-  # TODO: Cleaning code và stress test                                                                   P
-  # TODO: Tạo form style để chụp hình vào Word  - UI                                                             
+  # TODO: Cleaning code và stress test                                                                   OK
+  # TODO: Tạo form style để chụp hình vào Word  - UI                                                     P  
+        Làm 3 trang : 
+            1. Node manager  : Quản lý node 
+            2. Block manager : Quản lý block và tình trạng blockchain 
+            3. Transaction Viewer : Xem các transaction đã tồn tại trong block hoặc transaction nằm trong buffer 
+               / Transaction Maker: Thêm transaction bằng input hoặc nhận file
+
 '''
 # Declare -------------------------------------------------
 dns = DNSResolver()
@@ -94,9 +100,11 @@ def form():
 @app.route('/blockchain/transactions')
 def showTransactionsBuffer():
     tranList = dns.blockchain.current_transaction
-    return jsonify({ 
-        'len' : len(tranList),
-        'trans' : tranList,
+    return jsonify({
+        'status'  : 200,
+        'message' : 'Show transaction successfully', 
+        'len'     : len(tranList),
+        'trans'   : tranList,
     })
 
 @app.route('/blockchain/transactions/clear')
@@ -104,66 +112,131 @@ def clearTransactionsBuffer():
     dns.blockchain.transactions.clearTransaction()
     tranList = dns.blockchain.current_transaction
     return jsonify({ 
-        'len' : len(tranList),
-        'trans' : tranList,
+        'status'  : 200,
+        'message' : 'Clearing transaction successfully',
+        'len'     : len(tranList),
+        'trans'   : tranList,
     })
 
-@app.route('/blockchain/show')
-def showBlockchain():
-    return dns.blockchain.showChainDict()
+@app.route('/blockchain/dump')
+def dumpChain():
+    chain = dns.blockchain.dumpChain()
+    
+    return jsonify({
+        'status'   : 200,
+        'message'  : 'Getting chain successfully',
+        'chain'    : 
+        {
+            'len'    : len(chain),
+            'blocks' : chain,
+        }
+    })
 
 @app.route('/dns/resolve', methods=['GET', 'POST'])
 def resolve():
     # 1. Tạo route để phân giải
     if request.method == 'POST':
-        domain = request.form['domain']
-        for tran in Transaction.TRANSACTIONS:
-            if 'domain' in tran and tran['domain'] == domain: 
-                return tran
-    return "Hi"
+        tran, status = dns.lookup(request.form)
+        message = 'Resolving successfully with inputed domain' if status == 200 else 'Not found record with inputed domain'
+        return jsonify({
+            'status' : status,
+            'method' : 'POST',
+            'message': message,
+            'record' : tran,
+        })
+        
+    return jsonify({
+        'status' : 200,
+        'method' : 'GET',
+        'message': 'Resolver webpage'
+    })
 
 @app.route('/blockchain/overide')
 def overideBlockchain():
-    return str(dns.blockchain.overrideTheLongestChain())
+    status  = dns.blockchain.overrideTheLongestChain()
+    if status == 200: 
+        message = 'Overiding and getting chain successfully'
+    elif status == 500:
+        message = 'Don\'t have genesis block in chain'
+    else : 
+        message = 'Something go wrong with getting blocks in database'
+    chain   = dns.blockchain.dumpChain()
+    
+    return jsonify({
+        'status'   : status,
+        'message'  : message,
+        'chain'    : 
+        {
+            'len'    : len(chain),
+            'blocks' : chain,
+        }
+    })
 
 @app.route('/blockchain/add_block')
 def addNewBlock():
     block, status = dns.blockchain.addBlock()
+    message = 'Adding block successfully' if status == 200 else 'Something goes wrong with adding progress'
     return jsonify({
-        'status': status,
-        'block' : block,
+        'status' : status,
+        'message': message,
+        'block'  : block,
     })
 
 @app.route('/blockchain/mine')
 def mineBlock():
-    return dns.blockchain.mineBlock()
+    block, status = dns.blockchain.mineBlock()
+    if status == 200 :
+        # 1. here . Don't work 
+        block, status = dns.blockchain.addBlock(block)
+        dns.blockchain.broadcastNewBlock()
+        # 2. here . Don't work 
+    elif status == 500 :
+        message = f'Don\'t have enough {dns.blockchain.BUFFER_MAX_LEN} transactions to start mining'
+    
+    if status == 200 :
+        message = 'Mine block successfully'
+    else :
+        message = 'Something goes wrong with adding progress in mining' 
+    
+    return jsonify({
+        'status'  : status,
+        'message' : message,
+        'block_id': block.id if block else None
+    })
     
 @app.route('/blockchain/pow', methods=["POST"])
 def proofOfWork():
     block_request = request.form.to_dict(flat=True)
     block, speedtime = dns.blockchain.returnProofOfWorkOutput(block_request)
     
-    return {
-        'hash': Blockchain.hash(block),
-        'block' : block.as_dict(),
+    return jsonify({
+        'status'   : 200,
+        'message'  : 'Processing proof of work successfully',
+        'hash'     : block.hash(),
+        'block'    : block.as_dict(),
         'speedtime': speedtime,    
-    }
+    })
 
 @app.route('/blockchain/ledger')
 def getLedger():
     ledger = dns.blockchain.ledger
-    
-    return {
-        'len': len(ledger),
-        'ledger': ledger
-}
+    message = 'Getting ledger successfully'
+    return jsonify({
+        'status'  : 200,
+        'message' : message,
+        'len'     : len(ledger),
+        'ledger'  : ledger
+    })
 
 @app.route('/blockchain/wallet')
 def getWallet():
     wallet = dns.blockchain.wallet
-    return {
-        'wallet': wallet
-}
+    message = 'Getting wallet successfully'
+    return jsonify({
+        'status'  : 200,
+        'message' : message,
+        'wallet'  : wallet
+    })
 
 # Run --------------------------------------------------
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-from include import db, json
+from include import db, json, hashlib
 ''' 
     This file stores what is necessary in Database PgSQL 
 '''
@@ -104,6 +104,12 @@ class Blocks(db.Model):
         self.add_by_node_id     = json['add_by_node_id'] if 'add_by_node_id' in json else None
         return self
         
+    def hash(self):
+        block_string = json.dumps(
+            self.as_dict(), sort_keys=True).encode()
+        hash = hashlib.sha256(block_string).hexdigest()
+        return hash
+     
 class Transaction:
     TRANSACTIONS = []
 

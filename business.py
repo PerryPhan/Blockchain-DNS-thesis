@@ -3,13 +3,17 @@ from requests.models import Response
 from constant import *
 from database import *
 from uuid import uuid4
-import random, sys
-import threading, time
+import random
+import sys
+import threading
+import time
 '''
     This file includes main Business for App
 '''
 
 # One DNSResolver is a System -----------------------------------
+
+
 class DNSResolver:
     def __init__(self):
         '''
@@ -26,7 +30,12 @@ class DNSResolver:
         self.blockchain.nodes.setNode(node)
         self.blockchain.loadChain()
 
+    def lookup(self, request_form):
+        return self.blockchain.searchTransactionMatchObj(request_form)
+
 # All systems will have only one Blockchain -----------------------------------
+
+
 class Blockchain:
     def __init__(self):
         '''
@@ -38,18 +47,52 @@ class Blockchain:
         self.MINE_REWARD = 10
         self.BUFFER_MAX_LEN = 20
         self.DIFFICULTY = 1
-    
 
-    def showChainDict(self):
-        self.loadChain()
-        return {
-            'len': len(self.chain),
-            'chain': [block.as_dict() for block in self.chain],
-        }
+    @property
+    def last_block(self):
+        return self.chain[-1]
+
+    @property
+    def current_transactions(self):
+        return self.transactions.current_transactions
+
+    @property
+    def all_transactions(self):
+        all = []
+        for block in self.chain:
+            if block.transactions:
+                all.extend(block.transactions)
+        all.extend(self.current_transactions)
+        return all
+
+    @property
+    def node_id(self):
+        return self.nodes.getNode().id
+
+    @property
+    def ledger(self):
+        trans = []
+        for block in self.chain:
+            if block.transactions:
+                for tran in block.transactions:
+                    trans.append(tran)
+        return trans
+
+    @property
+    def wallet(self):
+        totalRewards = 0
+        for block in self.chain:
+            if block.id != 0 and block.add_by_node_id:
+                if block.add_by_node_id == self.node_id:
+                    totalRewards += self.MINE_REWARD
+        return totalRewards
+
+    def dumpChain(self):
+        return [block.as_dict() for block in self.chain]
 
     def getGenesisBlock(self):
         return Blocks(
-            id=1,
+            id='0',
             timestamp=time.time(),
             nonce=1,
             hash='0'*64,
@@ -64,69 +107,85 @@ class Blockchain:
         genesisBlock = self.getGenesisBlock()
 
         if not genesisBlock:
-            return 404
+            return 500
 
         self.chain = [genesisBlock]
-        blocks_list = Blocks.query.order_by(Blocks.id).all()
-        if len(blocks_list) > 0:
-            for block in blocks_list:
-                self.chain.append(block)
-        
-        db.session.expunge_all()
-        db.session.close()
+        # self.chain = []
+        try:
 
-        return 200
-    
+            blocks_list = db.session.query(Blocks).all()
+            if len(blocks_list) > 0:
+                for block in blocks_list:
+                    self.chain.append(block)
+
+            return 200
+
+        except:
+            print(' Error : something go wrong with Query')
+            return 404
+
     def findFastestBlockResponse(self, responses):
-        minSpeedtime = sys.float_info.max 
+        minSpeedtime = sys.float_info.max
         fastestBlockResponse = None
-        for response in responses:
-            if response['speedtime'] < minSpeedtime:
-                minSpeedtime = response['speedtime']
-                fastestBlockResponse = response['block']
+
+        if len(responses) == 1:
+            minSpeedtime = responses[0]['speedtime']
+            fastestBlockResponse = responses[0]['block']
+            return fastestBlockResponse
+        else:
+            for response in responses:
+                if response['speedtime'] < minSpeedtime:
+                    minSpeedtime = response['speedtime']
+                    fastestBlockResponse = response['block']
 
         return fastestBlockResponse
-    
+
     def launchNetworkProofOfWork(self, transactions):
-        '''
-            Process step : 
-            
-        '''
-        neighbours = self.nodes.getActiveNetwork()
-        # Building request with current transaction
-        responses = []
-        
-        def sendRequestAndReturn( url, data ):
+        def sendRequestAndReturn(url, data):
             rep = requests.post(
-                url  = url,
-                data = data,
+                url=url,
+                data=data,
             )
             responses.append(rep.json())
+        '''
+            Process step : 
+            1. Building request with current transaction
+            2. Compress Transaction to list( str ) 
+            3. Adding information of this block
+            4. Loop to any nodes that active in network -> Send request to any nodes active in network by thread
+                4.1. Add Thread here 
+        '''
+        neighbours = self.nodes.getActiveNetwork()
 
-        # Compress Transaction to list( str ) 
-        compress_trans = [ self.transactions.toString(tran) for tran in transactions]
-        
-        # Adding information of this block
+        # 1
+        responses = []
+
+        # 2
+        compress_trans = [self.transactions.toString(
+            tran) for tran in transactions]
+
+        # 3
         request_block = merge_obj(
             dict(
-                { str(i) : item for i, item in enumerate(compress_trans) }
+                {str(i): item for i, item in enumerate(compress_trans)}
             ),
-            getModelDict( self.newBlock( len(compress_trans) ) )
+            getModelDict(self.newBlock(len(compress_trans)))
         )
-
-        # Loop to any nodes that active in network -> Send request to any nodes active in network by thread
-        for node in neighbours:  
+        # print('Neighbours length: ', len(neighbours), " : Neighbours ",neighbours )
+        # 4
+        for node in neighbours:
             request_url = f'http://{node.ip}:{node.port}/blockchain/pow'
-            # Add Thread here 
-            x = threading.Thread(target=sendRequestAndReturn, args=[request_url, request_block])
+            # 4.1
+            x = threading.Thread(target=sendRequestAndReturn, args=[
+                                 request_url, request_block])
             x.start()
-            
-        for node in neighbours:    
+
+        for node in neighbours:
             x.join()
 
         return responses
-    
-    def returnProofOfWorkOutput(self, block_request ):
+
+    def returnProofOfWorkOutput(self, block_request):
         '''
             Process step : 
                 1. From request ,convert array of transactions
@@ -134,13 +193,26 @@ class Blockchain:
                 3. Run Proof of work -> return block, speedtest 
         '''
         #   1.
-        transactions = [ self.transactions.formatRecord(block_request[prop]) if re.match('^\d+$',prop) else None for prop in block_request.keys()]
-        transactions = transactions[0: int(block_request['transactions'])]
+        numbered_transactions = [self.transactions.formatRecord(block_request[prop]) if re.match(
+            '^\d+$', prop) else None for prop in block_request.keys()]
+        transactions = []
+        for transaction in numbered_transactions:
+            if transaction:
+                transactions.append(transaction)    
+        
         #   2.
         block_request['transactions'] = transactions
         block_request['add_by_node_id'] = self.node_id
         #   3.
-        block = Blocks().from_dict(block_request)
+        block = Blocks(
+            id=block_request['id'],
+            timestamp=float(block_request['timestamp']),
+            nonce=int(block_request['nonce']),
+            transactions=block_request['transactions'],
+            previous_hash=block_request['previous_hash'],
+            node_id=block_request['node_id'],
+            add_by_node_id=block_request['add_by_node_id'] if 'add_by_node_id' in block_request else None
+        )
         return self.proofOfWork(block)
 
     def proofOfWork(self, block):
@@ -151,11 +223,9 @@ class Blockchain:
         '''
         start = time.perf_counter()
         # ----------------------------
-        block.hash = self.hash(block)
         block.nonce = 0
-        while not block.hash.startswith('0' * self.DIFFICULTY):
+        while not block.hash().startswith('0' * self.DIFFICULTY):
             block.nonce += 1
-            block.hash = self.hash(block)
         # ----------------------------
         end = time.perf_counter()
         return block, float(end-start)
@@ -164,70 +234,61 @@ class Blockchain:
         '''
             Return new block when provide informations
         '''
+        previous_hash = self.last_block.hash() if len(
+            self.chain) > 1 else '0'*64,  # genesis.hash
         return Blocks(
-            id=len(self.chain) +1,
+            id=len(self.chain),
             timestamp=time.time(),
             nonce=0,
             transactions=transactions,
-            previous_hash=self.hash(self.last_block) if len(
-                self.chain) > 1 else '0'*64,  # genesis.hash
+            previous_hash=previous_hash,
             node_id=self.node_id,
-            add_by_node_id = None
+            add_by_node_id=None
         )
 
-    def addBlock(self, block):  
-        '''
-            Adding block steps : [ /blockchain/launchpow as preparation ]
-                1) Launch Proof of Work in Network
-                2) Find the fastest hashing block 
-                3) Add that block 
-            + : New Block and status 200 
-            - : New Block and status 404 
-        '''
+    def addBlock(self, block):
         try:
             db.session.add(block)
             db.session.commit()
             return block, 200
         except:
+            db.session.rollback()
             return block, 404
 
     def prepareMiningBlockTransactions(self):
-        trans = self.current_transaction
-        trans_len = len(trans) 
-        
-        if trans_len >= self.BUFFER_MAX_LEN: # and create_block_countdown end
-            return self.transactions.subTransaction( start = 0, length = self.BUFFER_MAX_LEN ), 200
-        else: 
-            return trans, 500 # not enough transactions 
-        
-    def mineBlock(self ):
+        trans = self.current_transactions
+        trans_len = len(trans)
+
+        if trans_len >= self.BUFFER_MAX_LEN:  # and create_block_countdown end
+            return self.transactions.subTransaction(start=0, length=self.BUFFER_MAX_LEN), 200
+        else:
+            return trans, 500  # not enough transactions
+
+    def mineBlock(self):
         '''
             This function will use current_transaction
         '''
-        # Init and check transactions status  
+        self.transactions.createSampleTransactions(20)
+
+        # Init and check transactions status
         transactions, status = self.prepareMiningBlockTransactions()
-        message = 'Mining block successfully' if status == 200 else f'Not enough {self.BUFFER_MAX_LEN} transaction to process'
         if status != 200:
-            return {
-                'status': status,
-                'message': message,
-            }
-        # Mining with Proof of work 
+            return None, status
+
+        # Mining with Proof of work
         responses = self.launchNetworkProofOfWork(transactions)
         fastestBlockResponse = self.findFastestBlockResponse(responses)
-        block = Blocks().from_dict(fastestBlockResponse)
-        
-        # Adding the block to all network
-        block, status = self.addBlock(block)
-        self.broadcastNewBlock()
+        block = Blocks(
+            id=fastestBlockResponse['id'],
+            timestamp=float(fastestBlockResponse['timestamp']),
+            nonce=int(fastestBlockResponse['nonce']),
+            transactions=fastestBlockResponse['transactions'],
+            previous_hash=fastestBlockResponse['previous_hash'],
+            node_id=fastestBlockResponse['node_id'],
+            add_by_node_id=fastestBlockResponse['add_by_node_id'] if 'add_by_node_id' in fastestBlockResponse else None)
 
-        # Getting message 
-        return {
-            'status' : status,
-            'message': message,
-            'block'  : block.id
-        }
-    
+        return block, status
+
     def addTransaction(self, tran):
         return self.transactions.addTransaction(tran)
 
@@ -244,63 +305,49 @@ class Blockchain:
         '''
             Override the longest chain by reload the blockchain saved in DB 
         '''
-        # ! Is there any time 2 block is sending to database ?
-        return self.showChainDict()
+        return self.loadChain()
 
-    @staticmethod
-    def hash(block):
-        block_string = json.dumps(
-            getModelDict(block), sort_keys=True).encode()
-        return hashlib.sha256(block_string).hexdigest()
-
-    @property
-    def last_block(self):
-        return self.chain[-1]
-
-    @property
-    def current_transaction(self):
-        return self.transactions.current_transactions
-
-    @property
-    def node_id(self):
-        return self.nodes.getNode().id
-
-    @property
-    def ledger(self):
-        trans = []
-        for block in self.chain: 
-                if block.transactions :
-                    for tran in block.transactions:
-                        trans.append(tran) 
-        return trans
-
-    @property 
-    def wallet(self):
-        totalRewards = 0
-        for block in self.chain: 
-            if block.id != 0 and block.add_by_node_id:
-                if block.add_by_node_id == self.node_id: 
-                    totalRewards += self.MINE_REWARD
-        return totalRewards
+    def searchTransactionMatchObj(self, obj):
+        for transaction in self.all_transactions:
+            for key, value in transaction.items():
+                if key in obj.keys():
+                    if value == obj[key]:
+                        return transaction, 200
+        return None, 404
 
 # TransactionBusiness  -----------------------------------
+
+
 class TransactionBusiness:
     def __init__(self):
         self.current_transactions = []
+
+    def createSampleTransactions(self, number):
+        chain = []
+        for i in range(number):
+            chain.append({
+                'domain': f'sample{i}.com',
+                'type': 'A',
+                'ip': f'{i}.{i}.{i}.{i}',
+                'port': 80,
+                'ttl': '14400'
+            })
+
+        self.current_transactions = chain
 
     def isExisted(self, tran):
         try:
             return self.current_transactions.index(tran)
         except:
             return False
-    
+
     def convertRecordsFromBlockRequest(self, obj):
         pass
 
     def toString(self, tran):
-        return f"{tran['domain']} {tran['type']} {tran['ip']} {tran['port']} {tran['ttl']}"    
-        
-    def formatRecord(self, str, final = True):
+        return f"{tran['domain']} {tran['type']} {tran['ip']} {tran['port']} {tran['ttl']}"
+
+    def formatRecord(self, str, final=True):
         props = str.split()
         return {
             'domain': props[0],
@@ -320,14 +367,15 @@ class TransactionBusiness:
             for key in checked.keys():
                 checked[str(key)] = True if re.match(
                     checked[str(key)], tran[str(key)]) else False
-                if checked[str(key)] == False : return False      
+                if checked[str(key)] == False:
+                    return False
         return True
-    
-    def subTransaction(self,  start = None, length = None ):
-        used_block_transactions = self.current_transactions[ start : length ]
-        self.current_transactions = self.current_transactions[ length : ]
+
+    def subTransaction(self,  start=None, length=None):
+        used_block_transactions = self.current_transactions[start: length]
+        self.current_transactions = self.current_transactions[length:]
         return used_block_transactions
-    
+
     def clearTransaction(self,):
         self.current_transactions = []
         return self.current_transactions
@@ -338,28 +386,33 @@ class TransactionBusiness:
 
         if type(tran) == str:
             tran = self.formatRecord(tran)
-            
+
         if self.isExisted(tran) == False:
             self.current_transactions.append(tran)
         else:
             return 501  # duplicate
-            
+
         return 200
 
+    def setTransaction(self, trans):
+        self.current_transactions = trans
+
 # NodeBusiness  -----------------------------------
+
+
 class NodesBusiness:
     def __init__(self):
         self.node = None
-        self.PORT_START = 5000   
+        self.PORT_START = 5000
         self.PORT_END = 5999
         pass
-    
+
     @staticmethod
     def getRandomPort():
         PORT_START = 5000
         PORT_END = 5999
         return random.randint(PORT_START, PORT_END)
-    
+
     def setNode(self, node):
         self.node = node
 
@@ -367,19 +420,19 @@ class NodesBusiness:
         return self.node
 
     def getNetwork(self):
-        return Nodes.query.filter(Nodes.is_deleted == False).all()
+        return db.session.query(Nodes).filter(Nodes.is_deleted == False).all()
 
     def getActiveNetwork(self):
-        return Nodes.query.filter(Nodes.is_active == True, Nodes.is_deleted == False).all()
+        return db.session.query(Nodes).filter(Nodes.is_active == True, Nodes.is_deleted == False).all()
 
     def getNodeWithIP(self, ip):
-        return Nodes.query.filter(
+        return db.session.query(Nodes).filter(
             Nodes.ip == ip,
             Nodes.is_deleted == False
         ).all()
 
     def getNodeWithIPAndPort(self, ip, port):
-        return Nodes.query.filter(
+        return db.session.query(Nodes).filter(
             Nodes.ip == ip,
             Nodes.port == port,
             Nodes.is_deleted == False
@@ -460,13 +513,13 @@ class NodesBusiness:
     def validateNode(self, node, noCheckDuplicate=False):
         checked = True
         # Check node ( not null )
-        if not node:  
+        if not node:
             checked = False
         # Check id ( not null, < 40 chars)
-        if not node.id or len(node.id) > 40:  
+        if not node.id or len(node.id) > 40:
             checked = False
         # Check nodename ( null, 64 chars)
-        if len(node.nodename) > 64:  
+        if len(node.nodename) > 64:
             checked = False
         # Check IP ( not null, 16 chars, match regex )
         if not node.ip or len(node.ip) > 16:
@@ -518,7 +571,7 @@ class NodesBusiness:
             return oldNode, 404
 
     def deleteNode(self, node):
-        node = Nodes.query.filter(
+        node = db.session.query(Nodes).filter(
             Nodes.id == node.id,
             Nodes.is_deleted == False
         ).first()

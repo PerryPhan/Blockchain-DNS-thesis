@@ -23,12 +23,17 @@ app.permanent_session_lifetime = timedelta(minutes=30)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:1234@localhost/dnschain'
 app.config['SESSION_TYPE'] = 'sqlalchemy'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
+db = SQLAlchemy(app, session_options = {
+    'expire_on_commit': False
+})
+
 app.config['SESSION_SQLALCHEMY'] = db
 
 # Setting SESSION P2
 app.secret_key = 'super secret key'
 Session(app)
+
+
 
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
