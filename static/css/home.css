@@ -1,0 +1,241 @@
+.home.container{
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
+    color: black;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    --home-tab-bgcolor: #A982DB;
+    --home-main-bgcolor: #F2EFFF;
+    --home-main-heading-text-color: #9F38A7;
+    --home-main-sub-heading-text-color: #9B889C;
+    --home-main-disabled-text-color: #9B889C;
+    --home-notificator-bgcolor: white;
+    --home-notificator-input-bgcolor: #F6F6F6;
+    --home-notificator-about-h4-text: #999999;
+    --home-notificator-noti-bgcolor: #110529;
+    --home-notificator-noti-text-color: #D3D3D3;
+
+    --home-padding-top: 30px;
+}
+.home .heading-text-color{
+    color: var(--home-main-heading-text-color);
+}
+.home .sub-heading-text-color{
+    color: var(--home-main-sub-heading-text-color);
+}
+.home .disabled-text-color{
+    color: var(--home-main-disabled-text-color);
+}
+.home > div {
+    padding-top: var(--home-padding-top);
+}
+.home .tab-navigator{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    width: 15%;
+    height: 100%;
+    background-color: var(--home-tab-bgcolor);
+}
+.home .tab-navigator .logo-side{
+    width: 150px;
+    height: 150px;
+}
+.home .tab-navigator .logo-side img{
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+/* 2. Main --------------- */
+.home .main{
+    background-color: var(--home-main-bgcolor);
+    flex: 1 0 auto;
+    height: 100%;
+    padding-left: 100px;
+    padding-right: 100px;
+}
+.home .main .top-side{
+    margin-bottom: 50px;
+}
+.home .main .top-side *{
+    font-family: Roboto Slab;
+    font-weight: 600;
+}
+.home .main .center-side{
+    width: 100%;
+}
+.home .main .center-side .part{
+    width: 100%;
+    margin-bottom: 30px;
+}
+.home .main .center-side .calendar{
+    margin-top: 10px;
+    width: 100%;
+    height: 120px;
+    background-color: white;
+    border-radius: 30px;
+}
+.home .main .center-side .report-part{
+
+}
+
+.home .main .center-side .report-part .report-title{
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.home .main .center-side .report-part .report-title h3{
+    flex: 1 0 auto;
+}
+.home .main .center-side .report-part .report-title .report-type{
+    display: flex;
+    align-items: center;
+}
+.home .main .center-side .report-part .report-title .report-type > div{
+    margin-left: 40px;
+    font-weight: 600;
+}   
+.home .main .center-side .report-part .reports{
+    width: 100%;
+    height: 200px;
+    display: flex;
+}
+.home .main .center-side .report-part .reports .report{
+    width: 32%;
+    height: 200px;
+    background-color: white;
+    margin-right: 40px;
+    border-radius: 30px;
+}
+.home .main .center-side .report-part .reports .report:last-child{
+    margin-right: 0;
+}
+/* 3. Notificator --------------- */
+.home .notificator{
+    background-color: white;
+    width: 25%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.home .top{
+    width: 100%;
+    height: 50%;
+    padding: 0 30px;
+}
+.home .notificator .search-side{
+    width: 100%;
+    position: relative;
+    margin-bottom: 70px;
+    display: flex;
+    justify-content: center;
+}
+.home .search-side input{
+    width: calc(100% - 30px);
+    padding: 18px 0;
+    padding-left: 60px; 
+    border-radius: 15px;
+    outline: none;
+    border: 0;
+    font-size: 16px;
+    background-color: var(--home-notificator-input-bgcolor);
+}
+.home .search-side img{
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    top: 15px;
+    left: 35px;
+}
+
+.home .about-side{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 40px;
+}
+.home .about-side > div{
+    margin-bottom: 5px;
+}
+.home .about-side .ava-box{
+    width: 140px;  
+    height: 140px;
+    border-radius: 50%;  
+    overflow: hidden;
+}
+
+.home .about-side .ava-box img{
+    width: 100%;
+    object-fit: cover;    
+}
+
+.home h4.grey-h4{
+    font-weight: 550;
+    color: var(--home-notificator-about-h4-text);
+}
+
+.home .more-infomation-box{
+    display: flex;
+    margin: 0 30px;
+    margin-bottom: 50px;
+}
+
+.home .more-infomation-box .guider-box{
+    flex: 1 0 auto;
+    text-align: center;
+}
+
+.home .bottom{
+    color: white;
+    width: 100%;
+    height: 100%;
+    background-color: var(--home-notificator-noti-bgcolor);
+    padding: 30px 40px;
+}
+.home .notification-side{
+    height: 500px;
+    overflow: hidden;
+}
+
+.home .notification-side .notification-title{
+    display: flex;
+    align-items: center;
+    margin-bottom: 25px;
+}
+.home .notification-side .notification-title h1{
+    flex: 1 0 auto;
+}
+.home .notification-side .notification-title a{
+    color: orange;
+    text-decoration: none;
+}
+.home .notification-side .notification{
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.home .notification-side .notification .icon{
+    margin-right: 10px;
+    width: 40px;
+    height: 40px;
+    overflow: hidden;
+}
+
+.home .notification-side .notification .icon img{
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.home .notification-side .notification .text{
+    width: 100%;
+}
+.home .notification-side .notification .text h4{
+    margin-bottom: 5px;
+}
+.home .notification-side .notification .text h5{
+    font-weight: 400;
+    color: var(--home-notificator-noti-text-color);
+}

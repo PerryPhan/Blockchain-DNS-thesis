@@ -36,9 +36,19 @@ from business import *
 dns = DNSResolver()
 
 # FRONT --------------------------------------------------
+
 @app.route('/')
 def index():
     return redirect('/dns/form')
+
+@app.route('/ui')
+def index2():
+    return render_template('index2.html')
+
+@app.route('/dashboard')
+def dashboard():
+    return render_template('dashboard.html')
+
 
 @app.route('/dns/form', methods=['POST','GET'])
 def form():

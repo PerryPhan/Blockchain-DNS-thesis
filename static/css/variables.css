@@ -1,0 +1,15 @@
+/* Login & Register ---------------- */
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: Roboto;
+    --input-color: #BABABA ;
+    --input-hover-color: #8165FF ; 
+    --success-color: rgb(44, 206, 84) ;
+    --error-color: rgb(235, 56, 39);
+    --light-grey: #CECECE;
+    --panel-text-color: rgba(0,0,0,.5);
+}
+
+
