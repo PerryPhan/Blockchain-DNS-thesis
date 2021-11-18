@@ -1,4 +1,10 @@
-from include import *
+# For Configuration purpose ---------------
+SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:1234@localhost/dnschain'
+SESSION_TYPE = 'sqlalchemy'
+TEMPLATE_FOLDER = './UI'
+UPLOAD_FOLDER = 'uploads'
+
+# For Managing purpose --------------------
 ''' 
     This file stores declaration of Global Constant 
 '''
