@@ -97,8 +97,7 @@ def form():
             status = handleOneRecordForm(request.form)
         else :
             status = handleMultipleRecordsForm(request.files['file'])
-        
-                
+            
         if status == 200: 
             return redirect('/blockchain/transactions')
         else :
@@ -109,7 +108,7 @@ def form():
 # BACK ------------------------------------------------
 @app.route('/blockchain/transactions')
 def showTransactionsBuffer():
-    tranList = dns.blockchain.current_transaction
+    tranList = dns.blockchain.current_transactions
     return jsonify({
         'status'  : 200,
         'message' : 'Show transaction successfully', 

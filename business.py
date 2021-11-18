@@ -198,8 +198,8 @@ class Blockchain:
         transactions = []
         for transaction in numbered_transactions:
             if transaction:
-                transactions.append(transaction)    
-        
+                transactions.append(transaction)
+
         #   2.
         block_request['transactions'] = transactions
         block_request['add_by_node_id'] = self.node_id
@@ -268,7 +268,7 @@ class Blockchain:
         '''
             This function will use current_transaction
         '''
-        self.transactions.createSampleTransactions(20)
+        # self.transactions.createSampleTransactions(20)
 
         # Init and check transactions status
         transactions, status = self.prepareMiningBlockTransactions()
@@ -455,15 +455,15 @@ class NodesBusiness:
     def handleNodeInformation(self, ip: str, port: int, nodename=''):
         """
             Handle 5 Cases :
-                - Empty network  : Create OK
-                - Node with new IP : Create OK
-                - Node with new port : Create OK
-                - Node has already been active : Search another node inactive in nodeIP
-                - Node han't been active yet : Active node OK
+                Empty network  : Create OK
+                Node with new IP : Create OK
+                Node with new port : Create OK
+                Node has already been active : Search another node inactive in nodeIP
+                Node han't been active yet : Active node OK
         """
         network = self.getNetwork()  # Found all node ( not-working status )
         id = str(uuid4()).replace('-', '')
-        if not network:  # Empty network, create new
+        if not network:  # 1. Empty network, create new
             return self.registerNode(
                 id,
                 ip,
@@ -473,7 +473,7 @@ class NodesBusiness:
             )
         else:
             nodeIP = self.getNodeWithIP(ip)
-            if not nodeIP:  # Don't have this IP in DB, create new
+            if not nodeIP:  # 2. Don't have this IP in DB, create new
                 return self.registerNode(
                     id,
                     ip,
@@ -482,7 +482,7 @@ class NodesBusiness:
                     True
                 )
             nodeIPPort = self.getNodeWithIPAndPort(ip, port)
-            if not nodeIPPort:  # Have this IP but don't have this port, create new
+            if not nodeIPPort: # 3. Have this IP but don't have this port, create new
                 return self.registerNode(
                     id,
                     ip,
@@ -490,7 +490,7 @@ class NodesBusiness:
                     nodename,
                     True
                 )
-            elif nodeIPPort.is_active == True:  # This node already active
+            elif nodeIPPort.is_active == True:  #4. This node already active
                 anotherNode = [
                     node for node in nodeIP if node.is_active == False and node.ip == nodeIPPort.ip]
                 if len(anotherNode) <= 0:  # No node same IP spared
@@ -505,7 +505,8 @@ class NodesBusiness:
                     self.activeNode(anotherNode[0])
                     anotherNode[0].is_active = True
                     return anotherNode[0], 201
-            else:  # This node is not used by anyone
+                
+            else:  #5. This node is not used by anyone
                 self.activeNode(nodeIPPort)
                 nodeIPPort.is_active = True
                 return nodeIPPort, 201
