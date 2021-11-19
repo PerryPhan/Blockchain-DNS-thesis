@@ -37,13 +37,43 @@ dns = DNSResolver()
 
 # FRONT --------------------------------------------------
 
-@app.route('/')
+@app.route('/form')
 def index():
     return redirect('/dns/form')
 
-@app.route('/ui')
-def index2():
-    return render_template('index2.html')
+@app.route('/')
+def login():
+    panel_options = {
+        'panel_p_text': 'Haven\'t had an account?',
+        'panel_a_link': '/register',
+        'panel_a_text': 'Sign up',
+    }
+    html_options = {
+        'type'  : 'Sign In',
+        'message': 'ABC',
+        'form_header_title': 'Welcome to DNSChain',
+        'form_header_action': 'Take advantage of your accessibility',
+        'hero_image': 'img/hero-image.png',
+        **panel_options
+    }
+    return render_template('_login_template.html', **html_options )
+
+@app.route('/register')
+def register():
+    panel_options = {
+        'panel_p_text': 'Already have had an account?',
+        'panel_a_link': '/',
+        'panel_a_text': 'Sign in',
+    }
+    html_options = {
+        'type'  : 'Sign Up',
+        'message': 'ABC',
+        'form_header_title': 'Become one with DNSChain',
+        'form_header_action': 'Be with us, joy with us',
+        'hero_image': 'img/hero-image3.png',
+        **panel_options
+    }
+    return render_template('_login_template.html', **html_options)
 
 @app.route('/dashboard')
 def dashboard():

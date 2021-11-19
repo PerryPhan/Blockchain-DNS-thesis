@@ -1,0 +1,150 @@
+{% extends 'template.html' %} {% block title %} {{ type or '' }} {% endblock %}
+{% block body %}
+<div class="container login">
+  <div class="section" id="left">
+    <div class="absolute branding animation popup">
+      <img
+        src="{{url_for('static',filename='img/dnschain-logo-last.png')}}"
+        alt="Branding"
+      />
+      <span>DNSChain</span>
+    </div>
+    <div class="imgbox hero-imgbox animation slidetoRight">
+      <img src="{{url_for('static',filename=hero_image)}}" alt="Hero" />
+    </div>
+  </div>
+  <div class="section" id="right">
+    <div class="panel content-right animation popup">
+      <p>{{ panel_p_text or '' }}</p>
+      <a href="{{ panel_a_link or ''}}" class="btn btn-link"
+        >{{panel_a_text or ''}}</a
+      >
+    </div>
+    <div class="form-container">
+      <div class="form-header animation popup">
+        <div class="text-box">
+          <h1>{{ form_header_title or '' }}</h1>
+          <h4>{{ form_header_action or '' }}</h4>
+        </div>
+        {% if type == 'Sign Up' %}
+        <div class="type-img-box animation popup">
+          <label class="img-box checked" id="type-box-2">
+            <input type="radio" name="type_cd" value="3" id="3" checked />
+            <img
+              src="{{url_for('static',filename='img/client-type.jpg')}}"
+              alt="Client"
+            />
+            <p>Client</p>
+          </label>
+          <label class="img-box" id="type-box-3">
+            <input type="radio" name="type_cd" value="2" id="2" />
+            <img
+              src="{{url_for('static',filename='img/hoster-type.jpg')}}"
+              alt="Hoster"
+            />
+            <p>Hoster</p>
+          </label>
+        </div>
+        {% endif %}
+      </div>
+      <form class="form" method="POST">
+        {% if message %} {% if isSuccess == True %}
+        <div class="form-alert success animation popup longest">
+          {{ message }}
+        </div>
+        {% else %} {% if isSuccess == False %}
+        <div class="form-alert error animation popup longest">
+          {{ message or ''}}
+        </div>
+        {% endif %} {% endif %} {% endif %} 
+        {% if type == 'Sign In' %} 
+        <div class="form-section animation slidetoLeft">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            name="email"
+            id="input-email"
+            placeholder="daiphan@gmail.com"
+            required
+            value="{{ email or '' }}"
+          />
+        </div>
+        <div class="form-section animation slidetoLeft">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            name="password"
+            id="input-password"
+            placeholder="8+ characters, 1 lowercase, 1 uppercase and 1 special character"
+            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$@!%&*?])[A-Za-z\d#$@!%&*?]{8,30}$"
+            required
+          />
+        </div>
+        <div class="form-section submit animation popup">
+          <input type="submit" value="{{type}}" />
+        </div>
+        {% else %}
+        <div class="form-section animation slidetoLeft">
+          <label for="name">Name</label>
+          <input
+            type="text"
+            name="fullname"
+            id="input-name"
+            placeholder="At least 2 words seperate with space"
+            pattern="^[a-zA-Z]+[ a-zA-Z]*$"
+            required
+            value="{{ fullname or '' }}"
+          />
+        </div>
+        <div class="form-section animation slidetoLeft">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            name="email"
+            id="input-email"
+            placeholder="daiphan308@gmail.com"
+            required
+            value="{{ email or '' }}"
+          />
+        </div>
+        <div class="form-section animation slidetoLeft">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            name="password"
+            id="input-password"
+            placeholder="8+ characters, 1 lowercase, 1 uppercase and 1 special character"
+            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$@!%&*?])[A-Za-z\d#$@!%&*?]{8,30}$"
+            required
+          />
+        </div>
+        <div class="form-section animation slidetoLeft">
+          <label for="password">RePassword</label>
+          <input
+            type="password"
+            name="repassword"
+            id="input-repassword"
+            placeholder="Must be same as password"
+            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$@!%&*?])[A-Za-z\d#$@!%&*?]{8,30}$"
+            required
+          />
+        </div>
+        <div class="form-section submit animation popup longer">
+          <input type="submit" value="Sign Up" />
+        </div>
+        {% endif %}
+      </form>
+    </div>
+    <div class="panel content-left">
+      <p class="createdby">
+        This project is made by Phan Dai
+        <img
+          src="{{url_for('static',filename='img/dai-brand-icon.png')}}"
+          alt="pd-icon"
+        />
+      </p>
+    </div>
+  </div>
+</div>
+<script src="{{url_for('static',filename='js/register-helper.js')}}"></script>
+{% endblock %}

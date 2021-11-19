@@ -2,6 +2,8 @@
 CHECKED_CLASS = 'checked'
 BORDER_ERROR_CLASS ='border-error'
 DISABLED_CLASS = 'disabled'
+
+
 // - Error 
 function disableError(){
   if($("#input-password").hasClass(BORDER_ERROR_CLASS)) $("#input-password").removeClass(BORDER_ERROR_CLASS)
