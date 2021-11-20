@@ -482,7 +482,7 @@ class NodesBusiness:
                     True
                 )
             nodeIPPort = self.getNodeWithIPAndPort(ip, port)
-            if not nodeIPPort: # 3. Have this IP but don't have this port, create new
+            if not nodeIPPort:  # 3. Have this IP but don't have this port, create new
                 return self.registerNode(
                     id,
                     ip,
@@ -490,7 +490,7 @@ class NodesBusiness:
                     nodename,
                     True
                 )
-            elif nodeIPPort.is_active == True:  #4. This node already active
+            elif nodeIPPort.is_active == True:  # 4. This node already active
                 anotherNode = [
                     node for node in nodeIP if node.is_active == False and node.ip == nodeIPPort.ip]
                 if len(anotherNode) <= 0:  # No node same IP spared
@@ -505,8 +505,8 @@ class NodesBusiness:
                     self.activeNode(anotherNode[0])
                     anotherNode[0].is_active = True
                     return anotherNode[0], 201
-                
-            else:  #5. This node is not used by anyone
+
+            else:  # 5. This node is not used by anyone
                 self.activeNode(nodeIPPort)
                 nodeIPPort.is_active = True
                 return nodeIPPort, 201
@@ -586,3 +586,95 @@ class NodesBusiness:
             return node, 200
         except:
             return node, 404
+
+# AccountBusiness  -----------------------------------
+
+
+class AccountBusiness:
+    # Login
+    def getAccountByEmail(self, email, password = None):
+        account = Accounts.query.filter(Accounts.email == email, Accounts.is_deleted == False).first() or None
+        if password:
+            return account if account and check_password_hash( account.password, password ) else None
+        return account 
+        
+    def getAccountById(self, id=0):
+        return Accounts.query.filter(Accounts.id == id, Accounts.is_deleted == False).first()
+
+    def getListAccounts(self):
+        return Accounts.query.order_by(Accounts.id).all()
+
+    def authenticateAccount(self, email, password):
+        status = 405
+        if not email:
+            return None, status
+        if not password:
+            return None, status
+
+        account = self.getAccountByEmail(email, password)
+        if not account:
+            status = 404
+            if self.getAccountByEmail(email):
+                status = 403
+        else:
+            status = 200
+
+        return account, status
+
+
+    # Register
+    def checkAccountInformation(self, fullname, email, password, repassword, type_cd):
+        check = copy(ACCOUNT_FORMAT)
+        
+        check['fullname'] = True if fullname and re.match(
+            check['fullname'], fullname) else False
+
+        check['email'] = True if  email and re.match(
+            check['email'], email) else False
+
+        check['password'] = True if  password and re.match(
+            check['password'], password) else False
+
+        check['repassword'] = True if  repassword and re.match(
+            check['repassword'], repassword) else False
+
+        check['type_cd'] = True if  type_cd and re.match(
+            check['type_cd'], str(type_cd)) else False
+
+        return all([check[key] for key in check.keys()])
+
+    def newAccount(self, fullname, email, password, repassword, type_cd):
+        # Check format
+        if self.checkAccountInformation(fullname, email, password, repassword, type_cd) == False:
+            return None, 500
+        
+        #Check duplicate 
+        if self.getAccountByEmail(email, None):
+            return None, 501
+        
+        #Encrypt
+        password = generate_password_hash(password)
+        
+        return Accounts(
+            fullname = fullname,
+            email = email, 
+            password = password, 
+            type_cd = type_cd,
+            is_deleted = False
+        ), 200
+
+    def addAccount(self, newAccount):
+        try:
+            db.session.add(newAccount)
+            db.session.commit()
+            return 200
+        except:
+            db.session.rollback()
+            return 401
+
+    def updateAccount(self):
+        pass
+
+    def deleteAccount(self):
+        pass
+

@@ -61,7 +61,6 @@ class Accounts(db.Model):
     def as_dict(self):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
-
 class Nodes(db.Model):
     __tablename__ = 'nodes'
     __table_args__ = {'extend_existing': True}
@@ -76,7 +75,6 @@ class Nodes(db.Model):
     
     def as_dict(self):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
-
 
 class Blocks(db.Model):
     __tablename__ = 'blocks'
@@ -113,9 +111,25 @@ class Blocks(db.Model):
 class Transaction:
     TRANSACTIONS = []
 
-
 class Record:  # main content of transaction and Others
     pass
 
-
+class Message:
+    @staticmethod
+    def getMessage( action, status ):
+        messages = {
+            'AccountLogin' : {
+                '403': 'Wrong email or password',
+                '404': 'This account haven\'t registered yet',
+                '200': 'Sign in successfully',
+            },
+            'AccountRegister' : {
+                '501': 'Please choose another email. This one is taken',
+                '500': 'Wrong format input',
+                '404': 'Already have had this email',
+                '401': 'Sorry ! There is error in database',
+                '200': 'Sign up successfully',
+            }
+        }
+        return messages[action][status] if messages[action].get(status) else 'Unexpected problem'
 # recreate()

@@ -27,6 +27,11 @@ $(".img-box").click(function () {
   $(this).addClass(CHECKED_CLASS);
 });
 
+
+$("#input-email").on('click',function(){
+  if($(this).hasClass(BORDER_ERROR_CLASS)) $(this).removeClass(BORDER_ERROR_CLASS)
+})
+
 $("#input-repassword").on('click',function(){
   let password = $("#input-password").val()
   if(password && $(this).val() !== password){

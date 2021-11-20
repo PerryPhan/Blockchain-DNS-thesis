@@ -1,0 +1,1 @@
+sass --watch static/scss/index.scss static/css/index.css 

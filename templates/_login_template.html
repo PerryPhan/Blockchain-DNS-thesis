@@ -7,7 +7,7 @@
         src="{{url_for('static',filename='img/dnschain-logo-last.png')}}"
         alt="Branding"
       />
-      <span>DNSChain</span>
+      <span>DNSChain </span>
     </div>
     <div class="imgbox hero-imgbox animation slidetoRight">
       <img src="{{url_for('static',filename=hero_image)}}" alt="Hero" />
@@ -21,43 +21,35 @@
       >
     </div>
     <div class="form-container">
-      <div class="form-header animation popup">
-        <div class="text-box">
-          <h1>{{ form_header_title or '' }}</h1>
-          <h4>{{ form_header_action or '' }}</h4>
-        </div>
-        {% if type == 'Sign Up' %}
-        <div class="type-img-box animation popup">
-          <label class="img-box checked" id="type-box-2">
-            <input type="radio" name="type_cd" value="3" id="3" checked />
-            <img
-              src="{{url_for('static',filename='img/client-type.jpg')}}"
-              alt="Client"
-            />
-            <p>Client</p>
-          </label>
-          <label class="img-box" id="type-box-3">
-            <input type="radio" name="type_cd" value="2" id="2" />
-            <img
-              src="{{url_for('static',filename='img/hoster-type.jpg')}}"
-              alt="Hoster"
-            />
-            <p>Hoster</p>
-          </label>
-        </div>
-        {% endif %}
-      </div>
       <form class="form" method="POST">
-        {% if message %} {% if isSuccess == True %}
+        <div class="form-header animation popup">
+          <div class="text-box">
+            <h1>{{ form_header_title or '' }}</h1>
+            <h4>{{ form_header_action or '' }}</h4>
+          </div>
+          {% if type == 'Sign Up' %}
+          <div class="type-img-box animation popup">
+            <label class="img-box checked" id="type-box-2">
+              <input type="radio" name="type_cd" value="2" id="2" checked />
+              <img
+                src="{{url_for('static',filename='img/hoster-type.jpg')}}"
+                alt="Hoster"
+              />
+              <p>Hoster</p>
+            </label>
+          </div>
+          {% endif %}
+        </div>
+        {% if message %} {% if status == 200 %}
         <div class="form-alert success animation popup longest">
           {{ message }}
         </div>
-        {% else %} {% if isSuccess == False %}
+        {% else %} {% if status != 200 %}
         <div class="form-alert error animation popup longest">
           {{ message or ''}}
         </div>
-        {% endif %} {% endif %} {% endif %} 
-        {% if type == 'Sign In' %} 
+        {% endif %} {% endif %} {% endif %} {% if type == 'Sign In' %}
+        <!-- Login Input -->
         <div class="form-section animation slidetoLeft">
           <label for="email">Email</label>
           <input
@@ -66,7 +58,7 @@
             id="input-email"
             placeholder="daiphan@gmail.com"
             required
-            value="{{ email or '' }}"
+            value="{{ regis_email or '' }}"
           />
         </div>
         <div class="form-section animation slidetoLeft">
@@ -74,7 +66,7 @@
           <input
             type="password"
             name="password"
-            id="input-password"
+            id="input-password-login"
             placeholder="8+ characters, 1 lowercase, 1 uppercase and 1 special character"
             pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$@!%&*?])[A-Za-z\d#$@!%&*?]{8,30}$"
             required
@@ -84,6 +76,7 @@
           <input type="submit" value="{{type}}" />
         </div>
         {% else %}
+        <!-- Register Input -->
         <div class="form-section animation slidetoLeft">
           <label for="name">Name</label>
           <input
@@ -93,12 +86,13 @@
             placeholder="At least 2 words seperate with space"
             pattern="^[a-zA-Z]+[ a-zA-Z]*$"
             required
-            value="{{ fullname or '' }}"
+            value="{{ fullname or ''}}"
           />
         </div>
         <div class="form-section animation slidetoLeft">
           <label for="email">Email</label>
           <input
+            class="{% if status == 501 %} border-error {% endif %}"
             type="email"
             name="email"
             id="input-email"

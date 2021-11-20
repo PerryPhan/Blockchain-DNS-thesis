@@ -9,6 +9,10 @@ body {
   height: 100vh;
 }
 
+.d-none {
+  display: none !important;
+}
+
 .animation {
   transition: 0.2s;
 }
@@ -192,10 +196,11 @@ body {
       &.content-left
       &.content-right 
   .form-container
-      .form-header
-          &>div
-          .text-box
       .form
+          .form-header
+              &>div
+              .text-box
+
           .form-alert
           .form-section
 
@@ -243,32 +248,36 @@ body {
   flex: 1 0 auto;
   width: 100%;
 }
-.login.container .section#right .form-container .form-header {
+.login.container .section#right .form-container .border-error {
+  border: 2px solid #eb3827 !important;
+}
+.login.container .section#right .form-container .form .form-header {
   padding: 1rem 0;
   margin-bottom: 0;
   display: flex;
 }
-.login.container .section#right .form-container .form-header > div {
+.login.container .section#right .form-container .form .form-header > div {
   display: flex;
   width: 50%;
 }
-.login.container .section#right .form-container .form-header .text-box {
+.login.container .section#right .form-container .form .form-header .text-box {
   flex-direction: column;
   justify-content: center;
 }
-.login.container .section#right .form-container .form-header .text-box h4 {
+.login.container .section#right .form-container .form .form-header .text-box h4 {
   display: block;
   color: rgba(0, 0, 0, 0.5);
   font-weight: 500;
   margin-top: 0.5rem;
 }
-.login.container .section#right .form-container .form-header .type-img-box {
+.login.container .section#right .form-container .form .form-header .type-img-box {
   width: 50%;
   align-items: center;
   justify-content: center;
   transition: 1s;
+  cursor: pointer;
 }
-.login.container .section#right .form-container .form-header .type-img-box .img-box {
+.login.container .section#right .form-container .form .form-header .type-img-box .img-box {
   width: 120px;
   overflow: hidden;
   text-align: center;
@@ -277,16 +286,16 @@ body {
   transition: 0.3s;
   padding: 0.8rem 1rem 0rem;
 }
-.login.container .section#right .form-container .form-header .type-img-box .img-box input[type=radio] {
+.login.container .section#right .form-container .form .form-header .type-img-box .img-box input[type=radio] {
   position: absolute;
   opacity: 0;
   width: 0;
   height: 0;
 }
-.login.container .section#right .form-container .form-header .type-img-box .img-box input[type=radio]:checked + img {
+.login.container .section#right .form-container .form .form-header .type-img-box .img-box input[type=radio]:checked + img {
   outline: 2px solid #690fbd;
 }
-.login.container .section#right .form-container .form-header .type-img-box .img-box p {
+.login.container .section#right .form-container .form .form-header .type-img-box .img-box p {
   transition: 0.3s;
   transform: translateY(100%);
   letter-spacing: 0.5px;
@@ -297,17 +306,17 @@ body {
   padding: 0.3rem;
   margin: 0.1rem;
 }
-.login.container .section#right .form-container .form-header .type-img-box .img-box img {
+.login.container .section#right .form-container .form .form-header .type-img-box .img-box img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   border-radius: 10px;
 }
-.login.container .section#right .form-container .form-header .type-img-box .img-box:hover, .login.container .section#right .form-container .form-header .type-img-box .img-box:checked {
+.login.container .section#right .form-container .form .form-header .type-img-box .img-box:hover, .login.container .section#right .form-container .form .form-header .type-img-box .img-box:checked, .login.container .section#right .form-container .form .form-header .type-img-box .img-box.checked {
   transform: scale(1.1);
   background-color: #8165FF;
 }
-.login.container .section#right .form-container .form-header .type-img-box .img-box:hover p, .login.container .section#right .form-container .form-header .type-img-box .img-box:checked p {
+.login.container .section#right .form-container .form .form-header .type-img-box .img-box:hover p, .login.container .section#right .form-container .form .form-header .type-img-box .img-box:checked p, .login.container .section#right .form-container .form .form-header .type-img-box .img-box.checked p {
   color: white;
   transform: translateY(0%);
 }

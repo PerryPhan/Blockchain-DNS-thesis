@@ -23,7 +23,7 @@
         position: relative;
 
         &#left {
-        /*
+            /*
             .branding
                 &.absolute
                 img
@@ -69,17 +69,18 @@
         }
 
         &#right {
-        /*
+            /*
         .panel
             p
             a
             &.content-left
             &.content-right 
         .form-container
-            .form-header
-                &>div
-                .text-box
             .form
+                .form-header
+                    &>div
+                    .text-box
+                
                 .form-alert
                 .form-section
 
@@ -134,91 +135,98 @@
                 flex: 1 0 auto;
                 width: 100%;
 
-                .form-header {
-                    padding: 1rem 0;
-                    margin-bottom: 0;
-                    display: flex;
-
-                    &>div {
-                        display: flex;
-                        width: 50%;
-                    }
-
-                    .text-box {
-                        flex-direction: column;
-                        justify-content: center;
-
-                        h4 {
-                            display: block;
-                            color: rgba(0, 0, 0, 0.5);
-                            font-weight: 500;
-                            margin-top: 0.5rem;
-                        }
-
-                    }
-                    .type-img-box {
-                        width: 50%;
-                        align-items: center;
-                        justify-content: center;
-                        transition: 1s;
-                        cursor: pointer;
-
-                        .img-box {
-                            width: 120px;
-                            overflow: hidden;
-                            text-align: center;
-                            margin-right: 20px;
-                            border-radius: 10px;
-                            transition: 0.3s;
-                            padding: 0.8rem 1rem 0rem;
-
-                            input[type=radio] {
-                                position: absolute;
-                                opacity: 0;
-                                width: 0;
-                                height: 0;
-
-                                &:checked+img {
-                                    outline: 2px solid rgb(105, 15, 189);
-                                }
-                            }
-
-                            p {
-                                transition: 0.3s;
-                                transform: translateY(100%);
-                                letter-spacing: 0.5px;
-                                vertical-align: middle;
-                                font-weight: bold;
-                                font-size: 12px;
-                                line-height: 12px;
-                                padding: 0.3rem;
-                                margin: 0.1rem;
-                            }
-
-                            img {
-                                width: 100%;
-                                height: 100%;
-                                object-fit: cover;
-                                border-radius: 10px;
-                            }
-
-                            &:hover,
-                            &:checked {
-                                transform: scale(1.1);
-                                background-color: $login-input-hover-color;
-                            }
-
-                            &:hover p,
-                            &:checked p {
-                                color: white;
-                                transform: translateY(0%);
-                            }
-                        }
-
-                    }
+                .border-error{
+                    border: 2px solid $login-error-color !important;
                 }
 
                 .form {
+                    .form-header {
+                        padding: 1rem 0;
+                        margin-bottom: 0;
+                        display: flex;
+
+                        &>div {
+                            display: flex;
+                            width: 50%;
+                        }
+
+                        .text-box {
+                            flex-direction: column;
+                            justify-content: center;
+
+                            h4 {
+                                display: block;
+                                color: rgba(0, 0, 0, 0.5);
+                                font-weight: 500;
+                                margin-top: 0.5rem;
+                            }
+
+                        }
+
+                        .type-img-box {
+                            width: 50%;
+                            align-items: center;
+                            justify-content: center;
+                            transition: 1s;
+                            cursor: pointer;
+
+                            .img-box {
+                                width: 120px;
+                                overflow: hidden;
+                                text-align: center;
+                                margin-right: 20px;
+                                border-radius: 10px;
+                                transition: 0.3s;
+                                padding: 0.8rem 1rem 0rem;
+
+                                input[type=radio] {
+                                    position: absolute;
+                                    opacity: 0;
+                                    width: 0;
+                                    height: 0;
+
+                                    &:checked+img {
+                                        outline: 2px solid rgb(105, 15, 189);
+                                    }
+                                }
+
+                                p {
+                                    transition: 0.3s;
+                                    transform: translateY(100%);
+                                    letter-spacing: 0.5px;
+                                    vertical-align: middle;
+                                    font-weight: bold;
+                                    font-size: 12px;
+                                    line-height: 12px;
+                                    padding: 0.3rem;
+                                    margin: 0.1rem;
+                                }
+
+                                img {
+                                    width: 100%;
+                                    height: 100%;
+                                    object-fit: cover;
+                                    border-radius: 10px;
+                                }
+
+                                &:hover,
+                                &:checked,
+                                &.checked {
+                                    transform: scale(1.1);
+                                    background-color: $login-input-hover-color;
+                                }
+
+                                &:hover p,
+                                &:checked p,
+                                &.checked p {
+                                    color: white;
+                                    transform: translateY(0%);
+                                }
+                            }
+
+                        }
+                    }
+
                     .form-alert {
                         width: 100%;
                         display: flex;
@@ -259,7 +267,7 @@
                             &:focus {
                                 border: 2px solid $login-input-hover-color;
                             }
-
+                            
                             &[type=submit] {
                                 background: $login-input-hover-color;
                                 font-size: 18px;
@@ -280,7 +288,9 @@
                             }
                         }
                     }
+
                 }
+
             }
 
         }
