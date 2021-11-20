@@ -31,19 +31,25 @@ from business import *
 # Declare -------------------------------------------------
 dns = DNSResolver()
 accountBusiness = AccountBusiness()
+
 # FRONT --------------------------------------------------
+
+
 @app.route('/')
 def home():
     if session and session.get("account"):
         # type_cd = session.get("account")['type_cd']
-        return redirect('/dns/form') # 
+        # return redirect('/dns/form')
+        return redirect('/dashboard')
     else:
         return redirect('/login')
+
 
 @app.route('/logout')
 def logout():
     session.pop('account', None)
     return 'Log out successfully'
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -69,19 +75,23 @@ def login():
         message = Message.getMessage('AccountLogin', str(status))
         if account:
             account = account.as_dict()
-            account['password'] = ''   
-            
+            # TODO : create safe as_dict function
+            if account.pop('password', None):
+                del account['password']
+            if account.pop('id', None):
+                del account['id']
+
             session['account'] = account
-            
+
         response = {'status': status, 'message': message}
         return render_template('_login_template.html', **html_options, **response)
-    
+
     regis_email = ''
-    if session and session.get('regis_email') :
+    if session and session.get('regis_email'):
         regis_email = session.get('regis_email')
-        session.pop('regis_email',None)
-        
-    return render_template('_login_template.html', **html_options, regis_email = regis_email)
+        session.pop('regis_email', None)
+
+    return render_template('_login_template.html', **html_options, regis_email=regis_email)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -108,28 +118,32 @@ def register():
 
         account, status = accountBusiness.newAccount(
             fullname, email, password, repassword, type_cd)
-        
+
         if account:
             status = accountBusiness.addAccount(account)
 
         # Return message
         message = Message.getMessage('AccountRegister', str(status))
-        response = {'status': status ,'message': message}
-        
-        if status == 200 : 
+        response = {'status': status, 'message': message}
+
+        if status == 200:
             session['regis_email'] = email
-        else: 
+        else:
             response['fullname'] = fullname
             response['email'] = email
-        print('status: ',status, type(status))
-        return render_template('_login_template.html', **html_options, **response )
+
+        return render_template('_login_template.html', **html_options, **response)
 
     return render_template('_login_template.html', **html_options)
 
 
 @app.route('/dashboard')
 def dashboard():
-    return render_template('dashboard.html')
+    html_options = {
+        'type': 'Dashboard',
+        **session.get('account')
+    }
+    return render_template('_dashboard_template.html', **html_options)
 
 
 @app.route('/dns/form', methods=['POST', 'GET'])

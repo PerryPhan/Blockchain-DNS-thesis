@@ -1,6 +1,6 @@
 // Aside
 $("#menu-toggler").click(function () {
-  let aside = $(".client .aside");
+  let aside = $(".dashboard .aside");
   if (aside.hasClass("asideSlidetoRight")) {
     aside.removeClass("asideSlidetoRight");
     aside.addClass("asideSlidetoLeft");
