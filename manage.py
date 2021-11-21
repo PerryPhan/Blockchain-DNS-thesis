@@ -45,7 +45,7 @@ def admin():
     # How to know that is his first time => This onl IP was his computer and don't have this email in DB
     # If he try to log again will be email and password empty
     html_options = {
-        'type': 'Admin',
+        'title': 'Admin',
     }
     if request.method == 'POST':
         # If the first time login in
@@ -68,13 +68,31 @@ def admin():
 
 
 @app.route('/dashboard')
-def dashboard():
-    # TODO : Get Transactions List here
+def dashboard_transactions():
+    list = dns.blockchain.transactions.getTransactionsPool()
     html_options = {
-        'type': 'Dashboard',
+        'type' : 1,
+        'title': 'Transaction Dashboard ',
+        'count': len(list),
+        'unit' : 'tx',
+        'list' : list
     }
+    
     return render_template('_dashboard_template.html', **html_options)
 
+@app.route('/dashboard/domains')
+def dashboard_domains():
+    list = dns.blockchain.transactions.getDomainList()
+    html_options = {
+        'type' : 2,
+        'title': 'Domains Dashboard ',
+        'count': len(list),
+        'unit' : 'domains',
+        'list' : list
+    }
+    
+    return render_template('_dashboard_template.html', **html_options)
+    pass
 
 @app.route('/dns/form', methods=['POST', 'GET'])
 def form():
@@ -146,7 +164,7 @@ def login():
         'panel_a_text': 'Sign up',
     }
     html_options = {
-        'type': 'Sign In',
+        'title': 'Sign In',
         'form_header_title': 'Welcome to DNSChain',
         'form_header_action': 'Take advantage of your accessibility',
         'hero_image': 'img/hero-image.png',
@@ -189,7 +207,7 @@ def register():
         'panel_a_text': 'Sign in',
     }
     html_options = {
-        'type': 'Sign Up',
+        'title': 'Sign Up',
         'form_header_title': 'Become one with DNSChain',
         'form_header_action': 'Be with us, joy with us',
         'hero_image': 'img/hero-image3.png',

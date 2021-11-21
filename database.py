@@ -160,7 +160,7 @@ class Blocks(db.Model):
 class Transactions(db.Model):
     __tablename__ = 'transactions'
     __table_args__ = {'extend_existing': True}
-    id = db.Column(db.String(64), primary_key=True)
+    id = db.Column(db.String(70), primary_key=True)
     action = db.Column(db.String(64), nullable=False)
     domain = db.Column(db.String(64), nullable=False)
     soa = db.Column(db.JSON, nullable=True)
@@ -173,11 +173,37 @@ class Transactions(db.Model):
     block_id  = db.Column(db.Integer(), nullable=True)
     hash = None
     
+    def as_dict(self):
+       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+    
     def hash(self):
         block_string = json.dumps(
             self.as_dict(), sort_keys=True).encode()
         hash = hashlib.sha256(block_string).hexdigest()
         return hash
+
+class Records :
+    def __init__(self, transaction = None) :
+        self.domain = ''
+        self.soa = None 
+        self.ns  = None
+        self.a   = None
+        self.ns_count = None
+        self.a_count  = None
+        self.ttl = 3600,
+        self.account_id = 0
+        if transaction :
+            return self.fromTransaction(transaction)
+    
+    def fromTransaction(self, transaction):
+        self.domain     = transaction.domain
+        self.soa        = transaction.soa
+        self.ns         = transaction.ns
+        self.ns_count   = len(transaction.ns)
+        self.a          = transaction.a
+        self.a_count    = len(transaction.a)
+        self.ttl        = transaction.ttl
+        self.account_id = transaction.account_id
 
 class Message:
     @staticmethod

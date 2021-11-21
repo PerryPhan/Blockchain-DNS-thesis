@@ -39,11 +39,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
   z-index: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 .modal .card {
   width: 500px;
@@ -695,6 +691,42 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
+  position: relative;
+}
+.dashboard.container .add-tx-button-group {
+  top: 90% !important;
+  left: 91% !important;
+}
+.dashboard.container .add-tx-button-group a {
+  text-decoration: none;
+  color: black;
+}
+.dashboard.container .add-tx-button-group a .call-to-action {
+  width: 160px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+}
+.dashboard.container .add-tx-button-group a .call-to-action .img-box {
+  width: 60px;
+  height: 50px;
+  line-height: 10px;
+  border-radius: 20px;
+  border: 3px solid #036135;
+  background-color: #13aa61;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.dashboard.container .add-tx-button-group a .call-to-action .img-box img {
+  object-fit: contain;
+  width: 30px;
+  height: 30px;
+}
+.dashboard.container .add-tx-button-group a .call-to-action .text {
+  color: #036135;
+  margin-left: 4px;
+  font-weight: 600;
 }
 .dashboard.container .header {
   width: 100%;
@@ -968,6 +1000,48 @@ body {
 .dashboard.container .main .table-side .table-box table .to-field {
   width: 14%;
   max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dashboard.container .main .table-side .table-box table .domain-field {
+  width: 16%;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dashboard.container .main .table-side .table-box table .a-field {
+  width: 16%;
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dashboard.container .main .table-side .table-box table .soa-field {
+  width: 16%;
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dashboard.container .main .table-side .table-box table .ns-field {
+  width: 16%;
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dashboard.container .main .table-side .table-box table .account-field {
+  width: 16%;
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dashboard.container .main .table-side .table-box table .ttl-field {
+  width: 16%;
+  max-width: 250px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

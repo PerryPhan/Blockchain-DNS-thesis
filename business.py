@@ -322,8 +322,20 @@ class TransactionBusiness:
     def __init__(self):
         self.current_transactions = []
 
-    def getTransactionsPool():
+    def getTransactionsPool(self):
         return Transactions.query.all()
+
+    def getDomainList(self):
+        # TODO : Pool + Blockchain
+        
+        records = []
+        for transaction in self.getTransactionsPool():
+            # TODO : Add + Update Tx
+            if transaction.action == 'Add':
+                records.append( Records(transaction)) 
+            elif transaction.action == 'Update':
+                pass 
+        return records
 
     def createSampleTransactions(self, number):
         chain = []
