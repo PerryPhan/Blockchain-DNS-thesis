@@ -52,12 +52,12 @@ endblock %} {% block body %}
     </div>
   </div>
   <div class="main">
-    <div class="aside animation">
+    <div class="aside animation asideSlidetoRight">
       <div class="tab-title active">
-        <h3>Table</h3>
+        <h3>Transaction List</h3>
       </div>
       <div class="tab-title">
-        <a href="/storage"><h3>Storage</h3></a>
+        <a href="#"><h3>Domain List</h3></a>
       </div>
     </div>
     <div class="table-side">
@@ -83,28 +83,30 @@ endblock %} {% block body %}
           <thead>
             <tr>
               <th class="index-field">No.</th>
-              <th class="domain-name-field">Domain Name</th>
-              <th class="ip-address-field">IP Address</th>
-              <th class="hoster-field">Hoster</th>
+              <th class="transaction-hash-field">Transaction Hash</th>
+              <th class="action-field">Action</th>
+              <th class="block-field">Block</th>
+              <th class="time-field">Datetime</th>
               <th class="status-field">Status</th>
-              <th class="created-date-field">Created Date</th>
-              <th class="operations">Operations</th>
+              <th class="from-field">From field</th>
+              <th class="to-field">To field</th>
             </tr>
           </thead>
           <tbody>
             <!-- #Once -->
             <tr>
               <td class="index-field">001</td>
-              <td class="domain-name-field">domainname.com</td>
-              <td class="ip-address-field">127.0.0.1</td>
-              <td class="hoster-field">Dai Hoster</td>
+              <td class="transaction-hash-field">
+                1234567894984xx553asdsadsadasdadaasdasdsadasdadasdsadasd
+              </td>
+              <td class="action-field">Adddasdsdsadsadasdadaasdasdsadasdadasdsadasd</td>
+              <td class="block-field">000001</td>
+              <td class="time-field">23-10-2021</td>
               <td class="status-field">
-                <div class="status on">On</div>
+                <div class="status success">Success</div>
               </td>
-              <td class="created-date-field">23-10-2021</td>
-              <td class="operations">
-                <a href="#" class="save-btn">Resolve</a>
-              </td>
+              <td class="from-field">From fieldsdsadsadasdadaasdasdsadasdadasdsadasd</td>
+              <td class="to-field">To fieldsdsadsadasdadaasdasdsadasdadasdsadasd</td>
             </tr>
             <!-- <tr>
                 <td class="index-field">002</td>

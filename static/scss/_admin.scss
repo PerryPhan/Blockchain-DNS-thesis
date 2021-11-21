@@ -1,3 +1,265 @@
-.admin.container{  // 19.11.2021
-     
+.admin.container {
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
+    color: black;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    position: relative;
+
+    .heading-text-color {
+        color: ($admin-main-heading-text-color);
+    }
+
+    .sub-heading-text-color {
+        color: ($admin-main-sub-heading-text-color);
+    }
+
+    .disabled-text-color {
+        color: ($admin-main-disabled-text-color);
+    }
+
+    &>div {
+        padding-top: ($admin-padding-top);
+    }
+
+    .tab-navigator {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        width: 15%;
+        height: 100%;
+        background-color: ($admin-tab-bgcolor);
+
+        .logo-side {
+            width: 150px;
+            height: 150px;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+            }
+        }
+    }
+
+    .main {
+        background-color: ($admin-main-bgcolor);
+        flex: 1 0 auto;
+        height: 100%;
+        padding-left: 100px;
+        padding-right: 100px;
+
+        .top-side {
+            margin-bottom: 50px;
+
+            * {
+                font-family: Roboto Slab;
+                font-weight: 600;
+            }
+        }
+
+        .center-side {
+            width: 100%;
+
+            .part {
+                width: 100%;
+                margin-bottom: 30px;
+            }
+
+            .calendar {
+                margin-top: 10px;
+                width: 100%;
+                height: 120px;
+                background-color: white;
+                border-radius: 30px;
+            }
+
+            .report-part {
+                .report-title {
+                    display: flex;
+                    align-items: center;
+                    margin-bottom: 20px;
+
+                    h3 {
+                        flex: 1 0 auto;
+                    }
+
+                    .report-type {
+                        display: flex;
+                        align-items: center;
+
+                        &>div {
+                            margin-left: 40px;
+                            font-weight: 600;
+                        }
+                    }
+                }
+
+                .reports {
+                    width: 100%;
+                    height: 200px;
+                    display: flex;
+
+                    .report {
+                        width: 32%;
+                        height: 200px;
+                        background-color: white;
+                        margin-right: 40px;
+                        border-radius: 30px;
+
+                        &:last-child {
+                            margin-right: 0;
+                        }
+                    }
+                }
+            }
+        }
+
+        h4.grey-h4 {
+            font-weight: 550;
+            color: ($admin-notificator-about-h4-text);
+        }
+
+    }
+
+    .notificator {
+        background-color: white;
+        width: 25%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        .top {
+            width: 100%;
+            height: 50%;
+            padding: 0 30px;
+
+            .search-side {
+                width: 100%;
+                position: relative;
+                margin-bottom: 70px;
+                display: flex;
+                justify-content: center;
+
+                input {
+                    width: calc(100% - 30px);
+                    padding: 18px 0;
+                    padding-left: 60px;
+                    border-radius: 15px;
+                    outline: none;
+                    border: 0;
+                    font-size: 16px;
+                    background-color: ($admin-notificator-input-bgcolor);
+                }
+
+                img {
+                    position: absolute;
+                    width: 24px;
+                    height: 24px;
+                    top: 15px;
+                    left: 35px;
+                }
+            }
+
+            .about-side {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin-bottom: 40px;
+
+                &>div {
+                    margin-bottom: 5px;
+                }
+
+                .ava-box {
+                    width: 140px;
+                    height: 140px;
+                    border-radius: 50%;
+                    overflow: hidden;
+
+                    img {
+                        width: 100%;
+                        object-fit: cover;
+                    }
+                }
+            }
+
+            .more-infomation-box {
+                display: flex;
+                margin: 0 30px;
+                margin-bottom: 50px;
+
+                .guider-box {
+                    flex: 1 0 auto;
+                    text-align: center;
+                }
+            }
+        }
+
+        .bottom {
+            color: white;
+            width: 100%;
+            height: 100%;
+            background-color: ($admin-notificator-noti-bgcolor);
+            padding: 30px 40px;
+
+            .notification-side {
+                height: 500px;
+                overflow: hidden;
+
+                .notification-title {
+                    display: flex;
+                    align-items: center;
+                    margin-bottom: 25px;
+
+                    h1 {
+                        flex: 1 0 auto;
+                    }
+
+                    a {
+                        color: orange;
+                        text-decoration: none;
+                    }
+                }
+
+                .notification-content {
+                    .notification {
+                        display: flex;
+                        align-items: center;
+                        margin-bottom: 20px;
+
+                        .icon {
+                            margin-right: 10px;
+                            width: 40px;
+                            height: 40px;
+                            overflow: hidden;
+
+                            img {
+                                width: 100%;
+                                height: 100%;
+                                object-fit: contain;
+                            }
+                        }
+
+                        .text {
+                            width: 100%;
+
+                            h4 {
+                                margin-bottom: 5px;
+                            }
+
+                            h5 {
+                                font-weight: 400;
+                                color: ($admin-notificator-noti-text-color);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }

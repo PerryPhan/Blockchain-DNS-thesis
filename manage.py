@@ -37,12 +37,99 @@ accountBusiness = AccountBusiness()
 
 @app.route('/')
 def home():
-    if session and session.get("account"):
-        # type_cd = session.get("account")['type_cd']
-        # return redirect('/dns/form')
-        return redirect('/dashboard')
-    else:
-        return redirect('/login')
+    return redirect('/dashboard')
+
+
+@app.route('/admin', methods=['GET', 'POST'])
+def admin():
+    # How to know that is his first time => This onl IP was his computer and don't have this email in DB
+    # If he try to log again will be email and password empty
+    html_options = {
+        'type': 'Admin',
+    }
+    if request.method == 'POST':
+        # If the first time login in
+        fullname = request.form.get('fullname')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        repassword = request.form.get('repassword')
+        type_cd = 1
+
+        # else show login form
+        account, status = accountBusiness.newAccount(
+            fullname, email, password, repassword, type_cd)
+
+        return {
+            'status': status,
+            'account': account.as_dict() if account else None,
+        }
+
+    return render_template('_admin_template.html', **html_options)
+
+
+@app.route('/dashboard')
+def dashboard():
+    # TODO : Get Transactions List here
+    html_options = {
+        'type': 'Dashboard',
+    }
+    return render_template('_dashboard_template.html', **html_options)
+
+
+@app.route('/dns/form', methods=['POST', 'GET'])
+def form():
+    ALLOWED_EXTS = {"txt"}
+
+    def checkFileExtension(file):
+        return '.' in file and len(file.rsplit('.')) == 2 and file.rsplit('.', 1)[1].lower() in ALLOWED_EXTS
+
+    def checkFileNameFormat(filename):
+        # Check file name
+        if filename == '':
+            return render_template('index.html', error_message=MESSAGE['FileError02']), 404
+
+        # Check file extension
+        if checkFileExtension(filename) == False:
+            return render_template('index.html', error_message=MESSAGE['FileError03']), 404
+
+        # Format that filename can store any where
+        filename = secure_filename(filename)
+        return filename, 200
+
+    def handleOneRecordForm(form):
+        dns.blockchain.addTransaction(form)
+        return 200
+
+    def handleMultipleRecordsForm(file):
+        filename, status = checkFileNameFormat(file.filename)
+        if status != 200:
+            return status
+
+        # Check uploads folder
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+        # Open file and add the content to TRANSACTION
+        with open(file_path, "r", encoding="utf-8") as f:
+            for line in f:
+                if line != '' and line != '\n' and line != '\r' and not any(c in SPECIAL_CHARS for c in line):
+                    dns.blockchain.addTransaction(line)
+            return 200
+
+    # 2. Insert record từ form ( một hoặc nhiều ), xử lý cho ra dữ liệu khi nhận route
+    if request.method == 'POST':
+        status = 0
+        if 'file' not in request.files:
+            status = handleOneRecordForm(request.form)
+        else:
+            status = handleMultipleRecordsForm(request.files['file'])
+
+        if status == 200:
+            return redirect('/blockchain/transactions')
+        else:
+            return 'Status code '
+
+    return render_template('index.html', domainFormat=RECORD_FORMAT['domain'], ipFormat=RECORD_FORMAT['ip'])
 
 
 @app.route('/logout')
@@ -136,70 +223,6 @@ def register():
 
     return render_template('_login_template.html', **html_options)
 
-
-@app.route('/dashboard')
-def dashboard():
-    html_options = {
-        'type': 'Dashboard',
-        **session.get('account')
-    }
-    return render_template('_dashboard_template.html', **html_options)
-
-
-@app.route('/dns/form', methods=['POST', 'GET'])
-def form():
-    ALLOWED_EXTS = {"txt"}
-
-    def checkFileExtension(file):
-        return '.' in file and len(file.rsplit('.')) == 2 and file.rsplit('.', 1)[1].lower() in ALLOWED_EXTS
-
-    def checkFileNameFormat(filename):
-        # Check file name
-        if filename == '':
-            return render_template('index.html', error_message=MESSAGE['FileError02']), 404
-
-        # Check file extension
-        if checkFileExtension(filename) == False:
-            return render_template('index.html', error_message=MESSAGE['FileError03']), 404
-
-        # Format that filename can store any where
-        filename = secure_filename(filename)
-        return filename, 200
-
-    def handleOneRecordForm(form):
-        dns.blockchain.addTransaction(form)
-        return 200
-
-    def handleMultipleRecordsForm(file):
-        filename, status = checkFileNameFormat(file.filename)
-        if status != 200:
-            return status
-
-        # Check uploads folder
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-
-        # Open file and add the content to TRANSACTION
-        with open(file_path, "r", encoding="utf-8") as f:
-            for line in f:
-                if line != '' and line != '\n' and line != '\r' and not any(c in SPECIAL_CHARS for c in line):
-                    dns.blockchain.addTransaction(line)
-            return 200
-
-    # 2. Insert record từ form ( một hoặc nhiều ), xử lý cho ra dữ liệu khi nhận route
-    if request.method == 'POST':
-        status = 0
-        if 'file' not in request.files:
-            status = handleOneRecordForm(request.form)
-        else:
-            status = handleMultipleRecordsForm(request.files['file'])
-
-        if status == 200:
-            return redirect('/blockchain/transactions')
-        else:
-            return 'Status code '
-
-    return render_template('index.html', domainFormat=RECORD_FORMAT['domain'], ipFormat=RECORD_FORMAT['ip'])
 
 # BACK ------------------------------------------------
 

@@ -2,7 +2,27 @@
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-  font-family: Roboto;
+  font-family: Roboto !important;
+}
+
+h1 {
+  font-size: 30px;
+}
+
+h2 {
+  font-size: 24px;
+}
+
+h3 {
+  font-size: 20px;
+}
+
+h4 {
+  font-size: 16px;
+}
+
+h5 {
+  font-size: 14px;
 }
 
 body {
@@ -11,6 +31,86 @@ body {
 
 .d-none {
   display: none !important;
+}
+
+.modal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.modal .card {
+  width: 500px;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: white;
+}
+.modal .card h3 {
+  font-size: 20px;
+  font-weight: 450;
+  color: rgba(123, 48, 199, 0.637);
+}
+.modal .card .form {
+  padding: 10px 0;
+}
+.modal .card .form .form-section {
+  padding: 10px 0;
+}
+.modal .card .form .form-section label {
+  font-weight: 600;
+  padding-bottom: 15px;
+}
+.modal .card .form .form-section .email {
+  width: 100%;
+  font-weight: 500;
+  font-size: 16px;
+  padding: 10px 0;
+  padding-left: 10px;
+  color: rebeccapurple;
+  border-bottom: 2px solid rebeccapurple;
+}
+.modal .card .form .form-section input {
+  width: 100%;
+  font-size: 14px;
+  padding: 10px 0;
+  padding-left: 10px;
+  border: none;
+  outline: none;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.5);
+}
+.modal .card .form .form-section input:hover .modal .card .form .form-section input.active {
+  border-bottom: 2px solid rebeccapurple;
+}
+.modal .card .form .form-submit {
+  padding-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+}
+.modal .card .form .form-submit button {
+  padding: 10px;
+  border: 0;
+  outline: none;
+  margin: 0 5px;
+  font-size: 14px;
+  background-color: none;
+  border-radius: 10px;
+  width: 100px;
+  cursor: pointer;
+}
+.modal .card .form .form-submit button[type=submit] {
+  background-color: rebeccapurple;
+  color: white;
+}
+.modal .card .form .form-submit button[type=reset] {
+  border: 2px solid rebeccapurple;
+  color: rebeccapurple;
+  background-color: white;
 }
 
 .animation {
@@ -131,6 +231,223 @@ body {
     opacity: 1;
   }
 }
+.admin.container {
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  color: black;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.admin.container .heading-text-color {
+  color: #9F38A7;
+}
+.admin.container .sub-heading-text-color {
+  color: #9B889C;
+}
+.admin.container .disabled-text-color {
+  color: #9B889C;
+}
+.admin.container > div {
+  padding-top: 30px;
+}
+.admin.container .tab-navigator {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  width: 15%;
+  height: 100%;
+  background-color: #A982DB;
+}
+.admin.container .tab-navigator .logo-side {
+  width: 150px;
+  height: 150px;
+}
+.admin.container .tab-navigator .logo-side img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.admin.container .main {
+  background-color: #F2EFFF;
+  flex: 1 0 auto;
+  height: 100%;
+  padding-left: 100px;
+  padding-right: 100px;
+}
+.admin.container .main .top-side {
+  margin-bottom: 50px;
+}
+.admin.container .main .top-side * {
+  font-family: Roboto Slab;
+  font-weight: 600;
+}
+.admin.container .main .center-side {
+  width: 100%;
+}
+.admin.container .main .center-side .part {
+  width: 100%;
+  margin-bottom: 30px;
+}
+.admin.container .main .center-side .calendar {
+  margin-top: 10px;
+  width: 100%;
+  height: 120px;
+  background-color: white;
+  border-radius: 30px;
+}
+.admin.container .main .center-side .report-part .report-title {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.admin.container .main .center-side .report-part .report-title h3 {
+  flex: 1 0 auto;
+}
+.admin.container .main .center-side .report-part .report-title .report-type {
+  display: flex;
+  align-items: center;
+}
+.admin.container .main .center-side .report-part .report-title .report-type > div {
+  margin-left: 40px;
+  font-weight: 600;
+}
+.admin.container .main .center-side .report-part .reports {
+  width: 100%;
+  height: 200px;
+  display: flex;
+}
+.admin.container .main .center-side .report-part .reports .report {
+  width: 32%;
+  height: 200px;
+  background-color: white;
+  margin-right: 40px;
+  border-radius: 30px;
+}
+.admin.container .main .center-side .report-part .reports .report:last-child {
+  margin-right: 0;
+}
+.admin.container .main h4.grey-h4 {
+  font-weight: 550;
+  color: #999999;
+}
+.admin.container .notificator {
+  background-color: white;
+  width: 25%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.admin.container .notificator .top {
+  width: 100%;
+  height: 50%;
+  padding: 0 30px;
+}
+.admin.container .notificator .top .search-side {
+  width: 100%;
+  position: relative;
+  margin-bottom: 70px;
+  display: flex;
+  justify-content: center;
+}
+.admin.container .notificator .top .search-side input {
+  width: calc(100% - 30px);
+  padding: 18px 0;
+  padding-left: 60px;
+  border-radius: 15px;
+  outline: none;
+  border: 0;
+  font-size: 16px;
+  background-color: #F6F6F6;
+}
+.admin.container .notificator .top .search-side img {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  top: 15px;
+  left: 35px;
+}
+.admin.container .notificator .top .about-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 40px;
+}
+.admin.container .notificator .top .about-side > div {
+  margin-bottom: 5px;
+}
+.admin.container .notificator .top .about-side .ava-box {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+.admin.container .notificator .top .about-side .ava-box img {
+  width: 100%;
+  object-fit: cover;
+}
+.admin.container .notificator .top .more-infomation-box {
+  display: flex;
+  margin: 0 30px;
+  margin-bottom: 50px;
+}
+.admin.container .notificator .top .more-infomation-box .guider-box {
+  flex: 1 0 auto;
+  text-align: center;
+}
+.admin.container .notificator .bottom {
+  color: white;
+  width: 100%;
+  height: 100%;
+  background-color: #110529;
+  padding: 30px 40px;
+}
+.admin.container .notificator .bottom .notification-side {
+  height: 500px;
+  overflow: hidden;
+}
+.admin.container .notificator .bottom .notification-side .notification-title {
+  display: flex;
+  align-items: center;
+  margin-bottom: 25px;
+}
+.admin.container .notificator .bottom .notification-side .notification-title h1 {
+  flex: 1 0 auto;
+}
+.admin.container .notificator .bottom .notification-side .notification-title a {
+  color: orange;
+  text-decoration: none;
+}
+.admin.container .notificator .bottom .notification-side .notification-content .notification {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.admin.container .notificator .bottom .notification-side .notification-content .notification .icon {
+  margin-right: 10px;
+  width: 40px;
+  height: 40px;
+  overflow: hidden;
+}
+.admin.container .notificator .bottom .notification-side .notification-content .notification .icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.admin.container .notificator .bottom .notification-side .notification-content .notification .text {
+  width: 100%;
+}
+.admin.container .notificator .bottom .notification-side .notification-content .notification .text h4 {
+  margin-bottom: 5px;
+}
+.admin.container .notificator .bottom .notification-side .notification-content .notification .text h5 {
+  font-weight: 400;
+  color: #D3D3D3;
+}
+
 .login.container {
   padding: 2rem;
   display: flex;
@@ -596,48 +913,64 @@ body {
   font-weight: 500;
   padding: 10px;
 }
-.dashboard.container .main .table-side .table-box table tbody tr .index-field {
+.dashboard.container .main .table-side .table-box table .index-field {
   width: 1%;
 }
-.dashboard.container .main .table-side .table-box table tbody tr .domain-name-field {
-  width: 22.5%;
+.dashboard.container .main .table-side .table-box table .transaction-hash-field {
+  width: 14%;
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.dashboard.container .main .table-side .table-box table tbody tr .ip-address-field {
-  width: 22.5%;
+.dashboard.container .main .table-side .table-box table .action-field {
+  width: 14%;
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.dashboard.container .main .table-side .table-box table tbody tr .hoster-field {
-  width: 15%;
+.dashboard.container .main .table-side .table-box table .block-field {
+  width: 14%;
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.dashboard.container .main .table-side .table-box table tbody tr .status-field {
-  width: 5%;
+.dashboard.container .main .table-side .table-box table .status-field {
+  width: 7%;
 }
-.dashboard.container .main .table-side .table-box table tbody tr .status-field .status {
+.dashboard.container .main .table-side .table-box table .status-field .status {
   background-color: #c7c7c7;
   text-align: center;
+  width: 80px;
   padding: 5px 10px;
+  margin-left: -10px;
   border-radius: 15px;
   color: white;
 }
-.dashboard.container .main .table-side .table-box table tbody tr .status-field .status.on {
+.dashboard.container .main .table-side .table-box table .status-field .status.success {
   background-color: #13aa61;
 }
-.dashboard.container .main .table-side .table-box table tbody tr .status-field .status.off {
+.dashboard.container .main .table-side .table-box table .status-field .status.new {
   background-color: #d33f3f;
 }
-.dashboard.container .main .table-side .table-box table tbody tr .created-date-field {
-  width: 15%;
+.dashboard.container .main .table-side .table-box table .time-field {
+  width: 14%;
 }
-.dashboard.container .main .table-side .table-box table tbody tr .operations {
-  width: auto;
+.dashboard.container .main .table-side .table-box table .from-field {
+  width: 14%;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.dashboard.container .main .table-side .table-box table tbody tr .operations .save-btn {
-  padding: 5px 15px;
-  border-radius: 5px;
-  font-size: 16px;
-  color: white;
-  cursor: pointer;
-  text-decoration: none;
-  background-color: #5890D2;
+.dashboard.container .main .table-side .table-box table .to-field {
+  width: 14%;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .dashboard.container .main .table-side .pagination .btn-box {
   display: flex;

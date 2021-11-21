@@ -1,34 +1,46 @@
-
 // Login
-    // applied for > '& .branding'
-    $login-logo-size: 80px;
-    $login-logo-text-size: 24px;
-    $login-logo-text-color: rgba(103, 10, 165, 0.781);
+// applied for > '& .branding'
+$login-logo-size: 80px;
+$login-logo-text-size: 24px;
+$login-logo-text-color: rgba(103, 10, 165, 0.781);
 
-    // applied for > '.section#right .panel'
-    $login-panel-text-color: rgba(0, 0, 0, .5);
-    $login-panel-a-border-color: #CECECE;
+// applied for > '.section#right .panel'
+$login-panel-text-color: rgba(0, 0, 0, .5);
+$login-panel-a-border-color: #CECECE;
 
-    // applied for > '.section#right .form-section .form input'
-    $login-input-color: #BABABA;
-    $login-input-hover-color: #8165FF;
+// applied for > '.section#right .form-section .form input'
+$login-input-color: #BABABA;
+$login-input-hover-color: #8165FF;
 
-    // applied for > '.section#right .form-alert '
-    $login-success-color: rgb(44, 206, 84);
-    $login-error-color: rgb(235, 56, 39);
+// applied for > '.section#right .form-alert '
+$login-success-color: rgb(44, 206, 84);
+$login-error-color: rgb(235, 56, 39);
 
 // Dashboard
-    $dashboard-search-input-bgcolor: #F6F6F6;
-    $dashboard-user-type-dashboard-color: #069550;
-    $dashboard-user-type-hoster-color: #061495;
-    $dashboard-hovered-tab-title-bgcolor: #34424A;
-    $dashboard-hovered-tab-title-after-bgcolor: #1A89C9;
-    $dashboard-table-title-left-h4-color: #9F9F9F;
-    $dashboard-table-head-bgcolor: #f0e5fd;
-    $dashboard-table-head-color: #591590;
-    $dashboard-table-body-bgcolor: #EDEDED;
-    $dashboard-hovered-table-row-bgcolor: #D4D4D4;
-    $dashboard-table-status-on-bgcolor: #13aa61;
-    $dashboard-table-status-off-bgcolor: #d33f3f;
-    $dashboard-table-save-btn-bgcolor: #5890D2;
-    $dashboard-none-bgcolor: rgb(199, 199, 199);
+$dashboard-search-input-bgcolor: #F6F6F6;
+$dashboard-user-type-dashboard-color: #069550;
+$dashboard-user-type-hoster-color: #061495;
+$dashboard-hovered-tab-title-bgcolor: #34424A;
+$dashboard-hovered-tab-title-after-bgcolor: #1A89C9;
+$dashboard-table-title-left-h4-color: #9F9F9F;
+$dashboard-table-head-bgcolor: #f0e5fd;
+$dashboard-table-head-color: #591590;
+$dashboard-table-body-bgcolor: #EDEDED;
+$dashboard-hovered-table-row-bgcolor: #D4D4D4;
+$dashboard-table-status-success-bgcolor: #13aa61;
+$dashboard-table-status-failure-bgcolor: #d33f3f;
+$dashboard-table-save-btn-bgcolor: #5890D2;
+$dashboard-none-bgcolor: rgb(199, 199, 199);
+
+// Admin
+$admin-tab-bgcolor: #A982DB;
+$admin-main-bgcolor: #F2EFFF;
+$admin-main-heading-text-color: #9F38A7;
+$admin-main-sub-heading-text-color: #9B889C;
+$admin-main-disabled-text-color: #9B889C;
+$admin-notificator-bgcolor: white;
+$admin-notificator-input-bgcolor: #F6F6F6;
+$admin-notificator-about-h4-text: #999999;
+$admin-notificator-noti-bgcolor: #110529;
+$admin-notificator-noti-text-color: #D3D3D3;
+$admin-padding-top: 30px;

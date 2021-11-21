@@ -267,60 +267,77 @@
                                 padding: 10px;
                             }
 
-                            .index-field {
-                                width: 1%;
+                            
+                        }
+                    }
+
+                    .index-field {
+                        width: 1%;
+                    }
+
+                    .transaction-hash-field {
+                        width: 14%;
+                        max-width: 250px;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+
+                    .action-field {
+                        width: 14%;
+                        max-width: 250px;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+
+                    .block-field {
+                        width: 14%;
+                        max-width: 250px;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+
+                    .status-field {
+                        width: 7%;
+
+                        .status {
+                            background-color: ($dashboard-none-bgcolor);
+                            text-align: center;
+                            width: 80px;
+                            padding: 5px 10px;
+                            margin-left: -10px;
+                            border-radius: 15px;
+                            color: white;
+
+                            &.success {
+                                background-color: ($dashboard-table-status-success-bgcolor);
                             }
 
-                            .domain-name-field {
-                                width: 22.5%;
-                            }
-
-                            .ip-address-field {
-                                width: 22.5%;
-                            }
-
-                            .hoster-field {
-                                width: 15%;
-                            }
-
-                            .status-field {
-                                width: 5%;
-
-                                .status {
-                                    background-color: ($dashboard-none-bgcolor);
-                                    text-align: center;
-                                    padding: 5px 10px;
-                                    border-radius: 15px;
-                                    color: white;
-
-                                    &.on {
-                                        background-color: ($dashboard-table-status-on-bgcolor);
-                                    }
-
-                                    &.off {
-                                        background-color: ($dashboard-table-status-off-bgcolor);
-                                    }
-                                }
-                            }
-
-                            .created-date-field {
-                                width: 15%;
-                            }
-
-                            .operations {
-                                width: auto;
-
-                                .save-btn {
-                                    padding: 5px 15px;
-                                    border-radius: 5px;
-                                    font-size: 16px;
-                                    color: white;
-                                    cursor: pointer;
-                                    text-decoration: none;
-                                    background-color: ($dashboard-table-save-btn-bgcolor);
-                                }
+                            &.new {
+                                background-color: ($dashboard-table-status-failure-bgcolor);
                             }
                         }
+                    }
+
+                    .time-field {
+                        width: 14%;
+                    }
+
+                    .from-field {
+                        width: 14%;
+                        max-width: 200px;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+                    .to-field{
+                        width: 14%;
+                        max-width: 200px;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
                     }
                 }
             }

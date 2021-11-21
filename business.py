@@ -322,6 +322,9 @@ class TransactionBusiness:
     def __init__(self):
         self.current_transactions = []
 
+    def getTransactionsPool():
+        return Transactions.query.all()
+
     def createSampleTransactions(self, number):
         chain = []
         for i in range(number):

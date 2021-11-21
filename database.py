@@ -1,4 +1,5 @@
 from include import db, json, hashlib
+import time
 ''' 
     This file stores what is necessary in Database PgSQL 
 '''
@@ -7,7 +8,7 @@ def recreate():
     db.drop_all()
     db.create_all()
 
-def set():
+def insertBlock():
     block = Blocks(
         id = 1,
         timestamp = 1.1,
@@ -29,17 +30,65 @@ def set():
         db.session.add(block)
         db.session.commit()
     except:
+        db.session.rollback()
         print('Can not add block')
+
+def getFirstBlock():
+    return Blocks.query.filter(
+            Blocks.id == 1,
+    ).first()
+
+def insertTransaction():
+    timestamp = time.time()
+    tran = Transactions(
+        id = '123456789',
+        action = 'Add',
+        domain = 'example.com',
+        soa = {
+		"mname": "ns1.example.com",
+		"rname": "admin.example.com",
+		"serial": "{time}",
+		"refresh": 3600,
+		"retry": 600,
+		"expire": 30,
+		"minimum": 86400
+        },
+        ns = [
+		{"host": "ns1.example.com"},
+		{"host": "ns2.example.com"}
+	    ],
+        a = [
+		{"name": "@",
+		  "ttl": 400,
+		  "value": "192.168.1.7"
+		},
+		{"name": "@",
+		  "ttl": 400,
+		  "value": "11.0.0.2"
+		},
+		{"name": "@",
+		  "ttl": 400,
+		  "value": "11.0.0.3"
+		}
+	    ],
+        ttl = 3600,
+        timestamp = timestamp
+    )
+    try :
+        db.session.add(tran)
+        db.session.commit()
+    except:
+        db.session.rollback()
+        print('Can not add tran')
+
+def getTransaction():
+    return Transactions.query.all()
 
 def merge_obj(obj, merge_obj):
     for property in merge_obj:
         obj[property] = merge_obj[property]
     return obj
 
-def get():
-    return Blocks.query.filter(
-            Blocks.id == 1,
-    ).first()
 
 def getModelDict(model):
     return dict((column.name, getattr(model, column.name))
@@ -55,7 +104,7 @@ class Accounts(db.Model):
     type_cd = db.Column(db.Integer, nullable=False)
     is_deleted = db.Column(db.Boolean, nullable=False)
     # ==============
-    # transactions = db.relationship('Transactions',backref="owner")
+    transactions = db.relationship('Transactions',backref="owner")
     # To String 
 
     def as_dict(self):
@@ -108,11 +157,27 @@ class Blocks(db.Model):
         hash = hashlib.sha256(block_string).hexdigest()
         return hash
      
-class Transaction:
-    TRANSACTIONS = []
-
-class Record:  # main content of transaction and Others
-    pass
+class Transactions(db.Model):
+    __tablename__ = 'transactions'
+    __table_args__ = {'extend_existing': True}
+    id = db.Column(db.String(64), primary_key=True)
+    action = db.Column(db.String(64), nullable=False)
+    domain = db.Column(db.String(64), nullable=False)
+    soa = db.Column(db.JSON, nullable=True)
+    ns = db.Column(db.JSON, nullable= True)
+    a = db.Column(db.JSON, nullable = False)
+    ttl = db.Column(db.Integer, nullable= False)
+    timestamp = db.Column(db.Float, nullable=False)
+    # ===============
+    account_id = db.Column(db.Integer(), db.ForeignKey('accounts.id'), nullable=True)
+    block_id  = db.Column(db.Integer(), nullable=True)
+    hash = None
+    
+    def hash(self):
+        block_string = json.dumps(
+            self.as_dict(), sort_keys=True).encode()
+        hash = hashlib.sha256(block_string).hexdigest()
+        return hash
 
 class Message:
     @staticmethod
