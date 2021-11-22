@@ -321,13 +321,12 @@ class Blockchain:
 class TransactionBusiness:
     def __init__(self):
         self.current_transactions = []
-
+    # New ---------------------------------
     def getTransactionsPool(self):
         return Transactions.query.all()
 
     def getDomainList(self):
         # TODO : Pool + Blockchain
-        
         records = []
         for transaction in self.getTransactionsPool():
             # TODO : Add + Update Tx
@@ -336,6 +335,103 @@ class TransactionBusiness:
             elif transaction.action == 'Update':
                 pass 
         return records
+
+    def checkTransactionFormat(self, domain, a, soa = None, ns = None, account_id = None , block_id = None):
+        # TODO : check like account
+        checked = copy(RECORD_FORMAT)
+        checked['domain'] = True if domain and re.match(checked['domain'], domain ) else False
+        if 'a' in checked :
+            regex = copy(checked['a'])
+            checked['value'] = []
+            checked['port'] = []
+            checked['ttl'] = []
+            for a_record in a :
+                # Check A IP ----------------------------------------------------------------------
+                print ( regex['value'], a_record['value'] ,re.match(regex['value'], a_record['value']))
+                if 'value' in a_record and a_record['value'] and re.match(regex['value'], a_record['value']):
+                    checked['value'].append(True)
+                else :
+                    checked['value'].append(False)
+
+                # Check A PORT ----------------------------------------------------------------------
+                if 'port' in a_record and a_record['port'] and re.match(regex['port'], a_record['port']):
+                    checked['port'].append(True)
+                else :
+                    checked['port'].append(False)
+
+                # Check A TTL ----------------------------------------------------------------------
+                if 'ttl' in a_record and a_record['ttl'] and re.match(regex['ttl'], a_record['ttl']):
+                    checked['ttl'].append(True)
+                else:
+                    checked['ttl'].append(False)
+
+            checked['value'] = all( checked['value'] )
+            checked['port'] = all( checked['port'] )
+            checked['ttl'] = all( checked['ttl'] )
+            checked['a'] = all([ checked['value'], checked['port'], checked['ttl'] ])
+
+            print(" CHECKED value ", checked['value'])
+            print(" CHECKED port ", checked['port'])
+            print(" CHECKED ttl ", checked['ttl'])
+            print(" CHECKED a ", checked['a'])
+
+        print( "CHECKING : ", [ checked[key] for key in checked.keys() ] )
+        return all( [ checked[key] for key in checked.keys() ] )
+    
+    def newTransaction(self, domain, a , action, ttl = 14400, soa = None, ns = None, account_id = None):
+        if self.checkTransactionFormat( domain, a, soa, ns, account_id) == True :
+            tran =  Transactions(
+                domain = domain,
+                a = a,
+                soa = soa,
+                ns = ns,
+                account_id = account_id,
+                block_id = None,
+                action = action,
+                timestamp = time.time(),
+                ttl = ttl
+            )
+            tran.id = tran.hash()
+            return tran, 200
+        return None, 500
+
+    def addTransactionPool(self, transaction):
+        try:
+            db.session.add(transaction)
+            db.session.commit()
+            return 200
+        except:
+            db.session.rollback()
+            return 401
+
+    def updateTransaction(self, oldtransaction, transaction):
+
+        try:
+            db.session.query(Transactions).filter(
+                Transactions.id == oldtransaction.id,
+            ).update({
+                "id" : transaction.id
+            })
+            db.session.commit()
+            return transaction, 200
+        except:
+            return oldtransaction, 404
+
+    # Old ---------------------------------
+    def addTransaction(self, tran):
+        if self.checkRecordFormat(tran) == False:
+            return 500  # wrong format
+
+        if type(tran) == str:
+            tran = self.formatRecord(tran)
+
+        if self.isExisted(tran) == False:
+            self.current_transactions.append(tran)
+        else:
+            return 501  # duplicate
+
+        return 200
+
 
     def createSampleTransactions(self, number):
         chain = []
@@ -395,20 +491,7 @@ class TransactionBusiness:
         self.current_transactions = []
         return self.current_transactions
 
-    def addTransaction(self, tran):
-        if self.checkRecordFormat(tran) == False:
-            return 500  # wrong format
-
-        if type(tran) == str:
-            tran = self.formatRecord(tran)
-
-        if self.isExisted(tran) == False:
-            self.current_transactions.append(tran)
-        else:
-            return 501  # duplicate
-
-        return 200
-
+   
     def setTransaction(self, trans):
         self.current_transactions = trans
 
@@ -542,7 +625,7 @@ class NodesBusiness:
             checked = False
         else:
             checked = False if not re.search(
-                RECORD_FORMAT['ip'], node.ip) else True
+                IP_FORMAT, node.ip) else True
         if not node.port or node.port < self.PORT_START or node.port > self.PORT_END:
             checked = False
         # Check duplicate

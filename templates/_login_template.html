@@ -27,7 +27,7 @@
             <h1>{{ form_header_title or '' }}</h1>
             <h4>{{ form_header_action or '' }}</h4>
           </div>
-          {% if type == 'Sign Up' %}
+          {% if title == 'Sign Up' %}
           <div class="type-img-box animation popup">
             <label class="img-box checked" id="type-box-2">
               <input type="radio" name="type_cd" value="2" id="2" checked />
@@ -48,7 +48,7 @@
         <div class="form-alert error animation popup longest">
           {{ message or ''}}
         </div>
-        {% endif %} {% endif %} {% endif %} {% if type == 'Sign In' %}
+        {% endif %} {% endif %} {% endif %} {% if title == 'Sign In' %}
         <!-- Login Input -->
         <div class="form-section animation slidetoLeft">
           <label for="email">Email</label>

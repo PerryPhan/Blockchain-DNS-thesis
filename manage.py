@@ -24,14 +24,11 @@ from business import *
             # 2 : Bằng LEN    -> Đợi thời gian 10p 
             # 3 : Lớn hơn LEN -> Đợi thời gian 10p
   # TODO: Cleaning code và stress test                                                                   OK
-  # TODO: Tạo form style để chụp hình vào Word  - UI                                                     P  
-
-
 '''
 # Declare -------------------------------------------------
 dns = DNSResolver()
 accountBusiness = AccountBusiness()
-
+transactionsBusiness = TransactionBusiness()
 # FRONT --------------------------------------------------
 
 
@@ -68,7 +65,7 @@ def admin():
 
 
 @app.route('/dashboard')
-def dashboard_transactions():
+def dashboardTransactions():
     list = dns.blockchain.transactions.getTransactionsPool()
     html_options = {
         'type' : 1,
@@ -81,7 +78,7 @@ def dashboard_transactions():
     return render_template('_dashboard_template.html', **html_options)
 
 @app.route('/dashboard/domains')
-def dashboard_domains():
+def dashboardDomains():
     list = dns.blockchain.transactions.getDomainList()
     html_options = {
         'type' : 2,
@@ -104,19 +101,42 @@ def form():
     def checkFileNameFormat(filename):
         # Check file name
         if filename == '':
-            return render_template('index.html', error_message=MESSAGE['FileError02']), 404
+            return render_template('_dnsform_template.html', error_message=MESSAGE['FileError02']), 404
 
         # Check file extension
         if checkFileExtension(filename) == False:
-            return render_template('index.html', error_message=MESSAGE['FileError03']), 404
+            return render_template('_dnsform_template.html', error_message=MESSAGE['FileError03']), 404
 
         # Format that filename can store any where
         filename = secure_filename(filename)
         return filename, 200
 
     def handleOneRecordForm(form):
-        dns.blockchain.addTransaction(form)
-        return 200
+        # checkTransactionFormat
+        # newTransaction - ADD 
+        domain = form['domain'] if 'domain' in form else None
+        # A record
+        ip = form['ip'] if 'domain' in form else None
+        port = form['port'] if 'port' in form else None
+        ttl = form['ttl'] if 'ttl' in form else None
+        # SOA record 
+        # NS record 
+        tran, status = transactionsBusiness.newTransaction(
+            domain=domain,
+            a = [
+                {
+                "name": "@",
+                'port': str(port),
+                'value': ip,
+                'ttl': str(ttl),
+                }
+            ],
+            action= 'Add'
+        )
+        status = transactionsBusiness.addTransactionPool(tran)
+        # add single Transaction 
+
+        return {'status': status, 'tran': tran.as_dict() if tran else None}
 
     def handleMultipleRecordsForm(file):
         filename, status = checkFileNameFormat(file.filename)
@@ -137,17 +157,17 @@ def form():
     # 2. Insert record từ form ( một hoặc nhiều ), xử lý cho ra dữ liệu khi nhận route
     if request.method == 'POST':
         status = 0
-        if 'file' not in request.files:
-            status = handleOneRecordForm(request.form)
-        else:
-            status = handleMultipleRecordsForm(request.files['file'])
+        # if 'file' not in request.files:
+        obj = handleOneRecordForm(request.form)
+        # else:
+            # status = handleMultipleRecordsForm(request.files['file'])
 
-        if status == 200:
-            return redirect('/blockchain/transactions')
-        else:
-            return 'Status code '
+        # if status == 200:
+        return obj
+        # else:
+            # return status
 
-    return render_template('index.html', domainFormat=RECORD_FORMAT['domain'], ipFormat=RECORD_FORMAT['ip'])
+    return render_template('_dnsform_template.html')
 
 
 @app.route('/logout')

@@ -14,6 +14,7 @@ RECORD_FORMAT = {
 import hashlib, json
 # import threading
 import time, re
+from copy import copy
 from database import Blocks
 from business import TransactionBusiness
 block = {
@@ -22,6 +23,7 @@ block = {
     'id' : 1,
 }
 list = []
+
 # def proofOfWork( block, index ):
 #     '''
 #         Proof of work will generate Nonce number until match condition 
@@ -116,51 +118,96 @@ block_request = {
     "timestamp": "1636553694.7218995",
     "transactions": "18"
 }
-tb = TransactionBusiness()
-# def convertBlockFromBlockRequest( block_request ):
-#     #   convert array of transactions
-#     transactions = [ tb.formatRecord(block_request[prop]) if re.match('^\d+$',prop) else None for prop in block_request.keys()]
-#     transactions = transactions[0: int(block_request['transactions'])]
-#     #   new block , add node_id 
-#     block_request['transactions'] = transactions
-#     block_request['add_by_node_id'] = '1'
-#     block = Blocks().from_dict(block_request)
-#     #   proof of work 
-#     proofOfWork(block)
-#     # print(block.as_dict())
-#     print(block.hash, block.nonce)
-#     print(time.perf_counter())
 
-# convertBlockFromBlockRequest(block_request)
-max_len = 20 
-transactions = [
-    {
-       'domain': 'a.com',
-        'type': 'A',
-        'ip': f'{i}.{i}.{i}.{i}',
-        'port': 80,
-        'ttl': '14400'
-    } for i in range(20)
-]
-def subTransaction(arr, index, length):
-    # if not length :
-    #     return arr[index: ]
-    # else: 
-        return arr[index: length]
+RECORD_FORMAT = {
+    'domain' : '^[a-zA-Z0-9][a-zA-Z0-9-_]{0,61}[a-zA-Z0-9]{0,1}\.([a-zA-Z]{1,6}|[a-zA-Z0-9-]{1,30}\.[a-zA-Z]{2,3})$',   # Tên miền, ex : example.com
+    'a' : {
+        'ip' : '^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$',   # Giá trị IP , ex : 1.1.1.1
+        'port'   : '^[1-9][0-9]{1,3}$',   # Giao thức cổng , ex: 80 ( HTTP )
+        'ttl'    : '^[1-9]{1}[0-9]{1,4}$' # Thời gian tồn tại, ex : 14400 ( 4h )
+    }
+}
+
+def checkTransactionFormat( domain, a, soa = None, ns = None, account_id = None):
+    # TODO : check like account
+    checked = copy(RECORD_FORMAT)
+    checked['domain'] = True if domain and re.match(checked['domain'], domain ) else False
+    if 'a' in checked :
+        regex = copy(checked['a'])
+        checked['a'] = []
+        checked['port'] = []
+        checked['ttl'] = []
+        for a_record in a :
+            
+            # Check A IP ----------------------------------------------------------------------
+            if 'ip' in a_record and a_record['ip'] and re.match(regex['ip'], a_record['ip']):
+                checked['a'].append(True)
+            else :
+                checked['a'].append(False)
+
+            # Check A PORT ----------------------------------------------------------------------
+            if 'port' in a_record and a_record['port'] and re.match(regex['port'], a_record['port']):
+                checked['port'].append(True)
+                print( "CHECKING IP PORT : ",regex['port'], a_record['port'], True if re.match(regex['port'], a_record['port']) else False)
+            else :
+                checked['port'].append(False)
+
+            # Check A TTL ----------------------------------------------------------------------
+            if 'ttl' in a_record :
+                if a_record['ttl'] and re.match(regex['ttl'], a_record['ttl']):
+                    checked['ttl'].append(True)
+                else:
+                    checked['ttl'].append(False)
+            else:
+                checked['ttl'].append(False)
+            
+            print( "CHECKING IP ADDRESS : ", a_record['ip'] or None, True if 'ip' in a_record and a_record['ip'] and re.match(regex['ip'], a_record['ip']) else False)
+            print( "CHECKING IP PORT : ", a_record['port'] or None, True  if 'port' in a_record and a_record['port'] and re.match(regex['port'], a_record['port']) else False)
+            print( "CHECKING IP TTL : ", a_record['ttl'] or None ,True if 'ttl' in a_record and a_record['ttl'] and re.match(regex['ttl'], a_record['ttl']) else False)
+            
+            print()
+
+        checked['a'] = all( checked['a'] )
+        checked['port'] = all( checked['port'] )
+        checked['ttl'] = all( checked['ttl'] )
     
-def prepareMiningBlockTransactions(transactions):
-    trans_len = len(transactions) 
-    if trans_len >= max_len: # and create_block_countdown end
-        return subTransaction(transactions, 0, max_len), subTransaction(transactions, max_len, None)
-    else: 
-        return transactions, 500 # not enough transactions 
-used, left = prepareMiningBlockTransactions(transactions)
-print("Used transactions :")
-for i in used : 
-    print(json.dumps(i))
-print("Left transactions :")
-for i in left : 
-    print(json.dumps(i))
-# print( subTransaction(transactions, 10, 1) )
+    print('A after checking: ',checked['a'] )
+    print('Port after checking: ',checked['port'] )
+    print('Ttl after checking: ',checked['ttl'] )
+    print('After all, checked will be: ',checked)
+    return all( [ checked[key] for key in checked.keys() ] )
 
+record = {
+    'domain': 'example.com',
+    'a' : [{
+        'ip': '1.1.1.a',
+        'port': '80',
+        'ttl': '14400',
+    },{
+        'ip': '1.1.1.2',
+        'port': '80',
+        'ttl': '14400',
+    },
+    # {
+    #     'ip': '1.1.1.3',
+    #     'port': '80',
+    #     'ttl': '0',
+    # }
+    ]
+}
+
+# print ('CHECKED : ', checkTransactionFormat(
+#     **record
+# ))
+
+def testUpdate():
+    tx = TransactionBusiness()
+    tran_list = tx.getTransactionsPool()
+    if tran_list :
+        old_tran = tran_list[0]
+        tran = copy(old_tran) 
+        tran.id = '123123123'
+        tx.updateTransaction( old_tran, tran)
+
+testUpdate()
     
