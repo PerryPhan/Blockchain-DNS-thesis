@@ -1,76 +1,293 @@
-<form action="" method="POST">
-    <h1>Form for A Record</h1>
-    {% if error_message %}
-    <h3 style="color: red">{{ error_message }}</h3>
-    {% endif %}
-    <div>
-      <label for="domain"> Domain </label>
-      <input
-        type="text"
-        name="domain"
-        placeholder=" Type domain ex: dai.com "
-        pattern='^[a-zA-Z0-9][a-zA-Z0-9-_]{0,61}[a-zA-Z0-9]{0,1}\.([a-zA-Z]{1,6}|[a-zA-Z0-9-]{1,30}\.[a-zA-Z]{2,3})$'
-        required
-      />
+{% extends 'template.html' %} {% block title %} {{ title or '' }} {% endblock %}
+{% block body %}
+<div class="dnsform container">
+  <div class="header">
+    <div class="left">
+      <div class="menu-btn">
+        <button id="menu-toggler">
+          <img
+            src="{{url_for('static',filename='img/menu-icon.png')}}"
+            alt="btn-menu-img"
+          />
+        </button>
+      </div>
+      <div class="logo">
+        <a href="#">
+          <div class="logo-link">
+            <div class="img-box">
+              <img
+                src="{{url_for('static',filename='img/dnschain-logo-last.png')}}"
+                alt="logo"
+              />
+            </div>
+            <h1>dnschain</h1>
+          </div>
+        </a>
+      </div>
+      <div class="search">
+        <img
+          src="{{url_for('static',filename='img/search-icon.png')}}"
+          alt="search-icon"
+        />
+        <input type="text" placeholder="Search infromation in profile" />
+      </div>
     </div>
-    <!-- <div>
-      <label for="type"> Type </label>
-      <input type="text" name="type" value="A" readonly required/>
-    </div> -->
-    <div>
-      <label for="ip"> IP </label>
-      <input
-        type="text"
-        name="ip"
-        placeholder="Type domain ip ex: 1.1.1.1"
-        pattern='^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
-        required
-      />
+    <div class="right">
+      <div class="user">
+        <div class="hello">
+          Hi.
+          <div class="name">{{ fullname or ''}}</div>
+          <div class="type hoster">Hoster</div>
+        </div>
+        <a href="/logout">
+          <div class="img-box">
+            Logout
+            <img
+              src="{{url_for('static',filename='img/logout-icon.png')}}"
+              alt="logout-icon"
+            />
+          </div>
+        </a>
+      </div>
     </div>
-    <div>
-      <label for="port"> Port giao thức</label>
-      <input type="number" name="port" value=80 min=80 max=9999 required/>
+  </div>
+  <div class="main">
+    <div class="aside animation asideSlidetoRight">
+      <div class="tab-title {% if type == 1 %} active {% endif %}">
+        <a href="{% if type != 1 %}/{% else %}#{% endif %}"
+          ><h3>Transaction List</h3></a
+        >
+      </div>
+      <div class="tab-title {% if type == 2 %} active {% endif %}">
+        <a href="{% if type != 2 %}./domains{% else %}#{% endif %}"
+          ><h3>Domain List</h3></a
+        >
+      </div>
+      <div class="tab-title {% if type == 3 %} active {% endif %}">
+        <a href="{% if type != 3 %}dashboard/domains{% else %}#{% endif %}"
+          ><h3>Operation</h3></a
+        >
+      </div>
     </div>
-    <div>
-      <label for="ttl"> Time to live </label>
-      <input type="number" name="ttl" value=14400 min=0 max=99999 required/>
+    <div class="table-side">
+      <div class="titles">
+        <div class="title-left">
+          <h1>{{ title or '' }}</h1>
+          <h4>Total <span> {{ count or ''}} </span> {{ unit or ''}}</h4>
+        </div>
+        <div class="title-right">
+          <div class="sort-btn-box">
+            <button>
+              <h3>Sort</h3>
+              <img
+                src="{{url_for('static',filename='img/sort-icon.png')}}"
+                alt="sort-icon"
+              />
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="table-box">
+        <table>
+          <thead>
+            <tr>
+              <th class="index-field"></th>
+              <th class="domain-field">Domain</th>
+              <th class="a-field">A record</th>
+              <th class="soa-field">Soa</th>
+              <th class="ns-field">NS</th>
+              <th class="account-field">Account ID</th>
+              <th class="ttl-field">TTL</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for domain in list %}
+            <tr>
+              <td class="index-field">
+                <svg
+                  style="
+                    fill: rgb(221, 87, 47);
+                    background-color: rgb(211, 211, 211);
+                    border-radius: 10px;
+                    padding: 1px;
+                  "
+                  viewBox="0 0 24 24"
+                  width="20"
+                  height="20"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M3.106 11.553a1 1 0 011.341-.447L12 14.882l7.553-3.776a1 1 0 11.894 1.788l-8 4a1 1 0 01-.894 0l-8-4a1 1 0 01-.447-1.341z"
+                    fill=""
+                  ></path>
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M3.106 15.553a1 1 0 011.341-.447L12 18.882l7.553-3.776a1 1 0 11.894 1.788l-8 4a1 1 0 01-.894 0l-8-4a1 1 0 01-.447-1.341z"
+                    fill=""
+                  ></path>
+                  <path
+                    d="M12 13c-.2 0-.3 0-.4-.1l-8-4C3.2 8.7 3 8.4 3 8s.2-.7.6-.9l8-4c.2-.1.6-.1.8 0l8 4c.4.2.6.5.6.9s-.2.7-.6.9l-8 4c-.1.1-.2.1-.4.1z"
+                    fill=""
+                  ></path>
+                </svg>
+              </td>
+              <td class="domain-field">{{domain.domain or ''}}</td>
+              <td class="a-field">{{ domain.a[0]['value'] or '' }}</td>
+              <td class="soa-field">{{ domain.soa or ''}}</td>
+              <td class="ns-field">{{ domain.ns_count or ''}}</td>
+              <td class="account-field">{{ domain.account_id or ''}}</td>
+              <td class="ttl-field">{{ domain.ttl or '' }}</td>
+            </tr>
+            {% endfor %}
+            <tr>
+              <td class="index-field"></td>
+              <td class="domain-field">Domain</td>
+              <td class="a-field">A record</td>
+              <td class="soa-field">Soa</td>
+              <td class="ns-field">NS</td>
+              <td class="account-field">Account ID</td>
+              <td class="ttl-field">TTL</td>
+            </tr>
+            <tr>
+              <td class="index-field"></td>
+              <td class="domain-field">Domain</td>
+              <td class="a-field">A record</td>
+              <td class="soa-field">Soa</td>
+              <td class="ns-field">NS</td>
+              <td class="account-field">Account ID</td>
+              <td class="ttl-field">TTL</td>
+            </tr>
+            <tr>
+              <td class="index-field"></td>
+              <td class="domain-field">Domain</td>
+              <td class="a-field">A record</td>
+              <td class="soa-field">Soa</td>
+              <td class="ns-field">NS</td>
+              <td class="account-field">Account ID</td>
+              <td class="ttl-field">TTL</td>
+            </tr>
+            <tr>
+              <td class="index-field"></td>
+              <td class="domain-field">Domain</td>
+              <td class="a-field">A record</td>
+              <td class="soa-field">Soa</td>
+              <td class="ns-field">NS</td>
+              <td class="account-field">Account ID</td>
+              <td class="ttl-field">TTL</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="form-box">
+        <form class="typing-form" action="" method="POST">
+          <h1>Typing Form</h1>
+          <h3 style="color: red">error</h3>
+          <div class="field domain-field">
+            <h5 for="domain">Domain</h5>
+            <input
+              type="text"
+              name="domain"
+              placeholder=" Type domain ex: dai.com "
+              pattern="^[a-zA-Z0-9][a-zA-Z0-9-_]{0,61}[a-zA-Z0-9]{0,1}\.([a-zA-Z]{1,6}|[a-zA-Z0-9-]{1,30}\.[a-zA-Z]{2,3})$"
+              required
+            />
+          </div>
+          <div class="field soa-field">
+            <h5 for="soa">SOA Record</h5>
+            <div class="form-oneline-group soa-inputs-group">
+              <div class="group">
+                <div class="label" for="soa_mname">Mname</div>
+                <input type="text" class="error" name="soa_mname" />
+              </div>
+              <div class="group">
+                <div class="label" for="soa_rname">Rname</div>
+                <input type="text" name="soa_rname" />
+              </div>
+              <div class="group">
+                <div class="label" for="soa_refresh">Refresh</div>
+                <input type="number" name="soa_rname" />
+                <div class="label" for="soa_serial">Serial</div>
+                <input type="number" name="soa_rname" />
+              </div>
+              <div class="group">
+                <div class="label" class="label" for="soa_expire">Expire</div>
+                <input type="number" name="soa_expire" />
+                <div class="label" for="soa_minimum">Minimum</div>
+                <input type="number" name="soa_minimum" />
+              </div>
+            </div>
+          </div>
+          <div class="field ns-field">
+            <h5 for="ns">NS Record</h5>
+            <div class="form-oneline-group ns-inputs-group">
+              <div class="group">
+                <div class="label" for="ns_host1">Host 1</div>
+                <input type="text" name="ns_host1" />
+              </div>
+              <div class="group">
+                <div class="label" for="ns_host2">Host 2</div>
+                <input type="text" name="ns_host2" />
+              </div>
+            </div>
+          </div>
+          <div class="field a-field">
+            <h5 for="a">A Record</h5>
+            <div class="form-oneline-group a-inputs-group">
+              <div class="group">
+                <div class="label" for="name"> Name </div>
+                <input type="text" name="a_name_1" />
+                <div class="label" for="ns_host2"> Value </div>
+                <input type="text" name="a_value_1" />
+                <div class="label" for="name"> TTL </div>
+                <input type="number" name="a_ttl_1" />
+              </div>
+              <div class="group">
+                <div class="label" for="name"> Name </div>
+                <input type="text" name="a_name_2" />
+                <div class="label" for="ns_host2"> Value </div>
+                <input type="text" name="a_value_2" />
+                <div class="label" for="name"> TTL </div>
+                <input type="number" name="a_ttl_2" />
+              </div>
+              <div class="group">
+                <div class="label" for="name"> Name </div>
+                <input type="text" name="a_name_3" />
+                <div class="label" for="ns_host2"> Value </div>
+                <input type="text" name="a_value_3" />
+                <div class="label" for="name"> TTL </div>
+                <input type="number" name="a_ttl_3" />
+              </div>
+            </div>
+          </div>
+          <div class="field submit-field">
+            <button type="reset">Reset</button>
+            <button type="submit">OK</button>
+          </div>
+        </form>
+
+        <form class="files-form" action="" method="POST" enctype="multipart/form-data">
+          <h1>File Form</h1>
+          <h3 style="color: red">error</h3>
+          <div class="field files-field">
+            <input type="file" name="file" />
+          </div>
+          <div class="field submit-field">
+            <button type="reset">Reset</button>
+            <button type="submit">OK</button>
+          </div>
+        </form>
+      </div>
+      <p class="createdby">
+        This project is made by Phan Dai
+        <img
+          src="{{url_for('static',filename='img/dai-brand-icon.png')}}"
+          alt="pd-icon"
+        />
+      </p>
     </div>
-    
-    <div>
-      <button type="reset">Reset</button>
-      <button type="submit">OK</button>
-    </div>
-  </form>
-  
-  <form action="" method="POST" enctype="multipart/form-data">
-    <h1>File Form</h1>
-    {% if error_message %}
-    <h3 style="color: red">{{ error_message }}</h3>
-    {% endif %}
-    <div>
-      <input type="file" name="file" />
-    </div>
-    <div>
-      <button type="reset">Reset</button>
-      <button type="submit">OK</button>
-    </div>
-  </form>
-  
-  <form action="resolve" method="POST" >
-    <h1>DNS domain return ip Form</h1>
-    <div>
-      <label for="ttl"> Domain </label>
-      <input
-        type="text"
-        name="domain"
-        placeholder=" Type domain ex: dai.com "
-        pattern="{{ domainFormat or '.*'}}"
-        required
-      />
-    </div>
-    <div>
-      <button type="reset">Reset</button>
-      <button type="submit">OK</button>
-    </div>
-  </form>
-  
+  </div>
+</div>
+<script src="{{url_for('static',filename='js/table-helper.js')}}"></script>
+{% endblock %}

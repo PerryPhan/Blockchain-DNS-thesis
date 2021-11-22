@@ -36,6 +36,14 @@ transactionsBusiness = TransactionBusiness()
 def home():
     return redirect('/dashboard')
 
+@app.route('/dashboard/form')
+def dashboard_form():
+    html_options = {
+        'title': 'Operation',
+        'type' : 3,
+    }
+    return render_template('_dnsform_template.html', **html_options)
+
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():

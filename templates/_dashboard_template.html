@@ -1,7 +1,7 @@
 {% extends 'template.html' %} {% block title %} {{ title or '' }} {% endblock %}
 {% block body %}
 <div class="dashboard container">
-  <div class="add-tx-button-group modal animation asideSlidetoRight">
+  <div class="add-tx-button-group modal">
     <a href="../dns/form">
       <div class="call-to-action">
         <div class="img-box">
@@ -69,13 +69,18 @@
   <div class="main">
     <div class="aside animation asideSlidetoRight">
       <div class="tab-title {% if type == 1 %} active {% endif %}">
-        <a href="{% if type == 2 %}/{% else %}#{% endif %}"
+        <a href="{% if type != 1 %}/{% else %}#{% endif %}"
           ><h3>Transaction List</h3></a
         >
       </div>
       <div class="tab-title {% if type == 2 %} active {% endif %}">
-        <a href="{% if type == 1 %}dashboard/domains{% else %}#{% endif %}"
+        <a href="{% if type != 2 %}dashboard/domains{% else %}#{% endif %}"
           ><h3>Domain List</h3></a
+        >
+      </div>
+      <div class="tab-title {% if type == 3 %} active {% endif %}">
+        <a href="{% if type != 3 and type == 1 %}dashboard/form{% else %}{% if type != 3 and type == 2 %}./form{% else %}#{% endif %}{% endif %}"
+          ><h3>Operation</h3></a
         >
       </div>
     </div>
@@ -83,7 +88,7 @@
       <div class="titles">
         <div class="title-left">
           <h1>{{ title or '' }}</h1>
-          <h4>Total <span> {{ count or 0 }} </span> {{ unit or ''}}</h4>
+          <h4>Total <span> {{ count or ''}} </span> {{ unit or ''}}</h4>
         </div>
         <div class="title-right">
           <div class="sort-btn-box">
