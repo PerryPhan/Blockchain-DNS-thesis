@@ -160,7 +160,8 @@ class Blocks(db.Model):
 class Transactions(db.Model):
     __tablename__ = 'transactions'
     __table_args__ = {'extend_existing': True}
-    id = db.Column(db.String(70), primary_key=True)
+    id = db.Column(db.Integer(), primary_key=True)
+    hash = db.Column(db.String(255), nullable=False)
     action = db.Column(db.String(64), nullable=False)
     domain = db.Column(db.String(64), nullable=False)
     soa = db.Column(db.JSON, nullable=True)
@@ -171,12 +172,11 @@ class Transactions(db.Model):
     # ===============
     account_id = db.Column(db.Integer(), db.ForeignKey('accounts.id'), nullable=True)
     block_id  = db.Column(db.Integer(), nullable=True)
-    hash = None
     
     def as_dict(self):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
     
-    def hash(self):
+    def _hash(self):
         block_string = json.dumps(
             self.as_dict(), sort_keys=True).encode()
         hash = hashlib.sha256(block_string).hexdigest()

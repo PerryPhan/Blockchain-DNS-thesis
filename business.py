@@ -370,12 +370,6 @@ class TransactionBusiness:
             checked['ttl'] = all( checked['ttl'] )
             checked['a'] = all([ checked['value'], checked['port'], checked['ttl'] ])
 
-            print(" CHECKED value ", checked['value'])
-            print(" CHECKED port ", checked['port'])
-            print(" CHECKED ttl ", checked['ttl'])
-            print(" CHECKED a ", checked['a'])
-
-        print( "CHECKING : ", [ checked[key] for key in checked.keys() ] )
         return all( [ checked[key] for key in checked.keys() ] )
     
     def newTransaction(self, domain, a , action, ttl = 14400, soa = None, ns = None, account_id = None):
@@ -391,7 +385,7 @@ class TransactionBusiness:
                 timestamp = time.time(),
                 ttl = ttl
             )
-            tran.id = tran.hash()
+            tran.hash = tran._hash()
             return tran, 200
         return None, 500
 
@@ -410,7 +404,7 @@ class TransactionBusiness:
             db.session.query(Transactions).filter(
                 Transactions.id == oldtransaction.id,
             ).update({
-                "id" : transaction.id
+                
             })
             db.session.commit()
             return transaction, 200
