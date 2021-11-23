@@ -755,7 +755,7 @@ body {
 }
 .dashboard.container .header .left .logo a {
   text-decoration: none;
-  color: #964B9C;
+  color: #964b9c;
 }
 .dashboard.container .header .left .logo a .img-box {
   display: inline-block;
@@ -826,7 +826,7 @@ body {
   background-color: #061495;
 }
 .dashboard.container .header .right .user a {
-  color: #FF0000;
+  color: #ff0000;
   text-decoration: none;
 }
 .dashboard.container .header .right .user a .img-box {
@@ -845,7 +845,7 @@ body {
   overflow: hidden;
   width: 0%;
   height: 100%;
-  background-color: #465A65;
+  background-color: #465a65;
 }
 .dashboard.container .main .aside .tab-title {
   cursor: pointer;
@@ -854,6 +854,16 @@ body {
   margin-bottom: 5px;
   transition: 0.2s;
   position: relative;
+}
+.dashboard.container .main .aside .tab-title.sub-tab {
+  padding: 10px;
+  margin-left: 5px;
+}
+.dashboard.container .main .aside .tab-title.sub-tab.select {
+  background-color: #34627b;
+}
+.dashboard.container .main .aside .tab-title.sub-tab a h3 {
+  font-size: 15px;
 }
 .dashboard.container .main .aside .tab-title:hover {
   background-color: #34424A;
@@ -909,7 +919,7 @@ body {
   display: flex;
   align-items: center;
   padding: 5px 15px;
-  background-color: #E3EDFF;
+  background-color: #e3edff;
   border-radius: 10px;
   cursor: pointer;
 }
@@ -934,7 +944,6 @@ body {
   font-size: 18px;
 }
 .dashboard.container .main .table-side .table-box table tbody tr {
-  cursor: pointer;
   height: 50px;
   border-bottom: 1px solid #adadad;
 }
@@ -948,12 +957,23 @@ body {
 .dashboard.container .main .table-side .table-box table .index-field {
   width: 1%;
 }
+.dashboard.container .main .table-side .table-box table .id-field {
+  width: 4%;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .dashboard.container .main .table-side .table-box table .transaction-hash-field {
   width: 14%;
   max-width: 250px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.dashboard.container .main .table-side .table-box table .transaction-hash-field a {
+  color: #235ece;
+  text-decoration: none;
 }
 .dashboard.container .main .table-side .table-box table .action-field {
   width: 14%;
@@ -1010,6 +1030,10 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.dashboard.container .main .table-side .table-box table .domain-field a {
+  color: #235ece;
+  text-decoration: none;
 }
 .dashboard.container .main .table-side .table-box table .a-field {
   width: 16%;
@@ -1089,27 +1113,27 @@ body {
   justify-content: center;
 }
 
-.dnsform.container {
+.detail.container {
   width: 100%;
   height: 100%;
   overflow: hidden;
   position: relative;
 }
-.dnsform.container .add-tx-button-group {
+.detail.container .add-tx-button-group {
   top: 90% !important;
   left: 91% !important;
 }
-.dnsform.container .add-tx-button-group a {
+.detail.container .add-tx-button-group a {
   text-decoration: none;
   color: black;
 }
-.dnsform.container .add-tx-button-group a .call-to-action {
+.detail.container .add-tx-button-group a .call-to-action {
   width: 160px;
   height: 50px;
   display: flex;
   align-items: center;
 }
-.dnsform.container .add-tx-button-group a .call-to-action .img-box {
+.detail.container .add-tx-button-group a .call-to-action .img-box {
   width: 60px;
   height: 50px;
   line-height: 10px;
@@ -1120,17 +1144,17 @@ body {
   justify-content: center;
   align-items: center;
 }
-.dnsform.container .add-tx-button-group a .call-to-action .img-box img {
+.detail.container .add-tx-button-group a .call-to-action .img-box img {
   object-fit: contain;
   width: 30px;
   height: 30px;
 }
-.dnsform.container .add-tx-button-group a .call-to-action .text {
+.detail.container .add-tx-button-group a .call-to-action .text {
   color: #036135;
   margin-left: 4px;
   font-weight: 600;
 }
-.dnsform.container .header {
+.detail.container .header {
   width: 100%;
   display: flex;
   align-items: center;
@@ -1139,50 +1163,50 @@ body {
   padding: 0px 30px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
-.dnsform.container .header > div {
+.detail.container .header > div {
   width: 50%;
 }
-.dnsform.container .header .left {
+.detail.container .header .left {
   display: flex;
   align-items: center;
 }
-.dnsform.container .header .left .menu-btn button {
+.detail.container .header .left .menu-btn button {
   background-color: none;
   border: none;
   outline: none;
   cursor: pointer;
 }
-.dnsform.container .header .left .logo {
+.detail.container .header .left .logo {
   margin-left: 15px;
 }
-.dnsform.container .header .left .logo a {
+.detail.container .header .left .logo a {
   text-decoration: none;
-  color: #964B9C;
+  color: #964b9c;
 }
-.dnsform.container .header .left .logo a .img-box {
+.detail.container .header .left .logo a .img-box {
   display: inline-block;
   width: 80px;
   height: 80px;
 }
-.dnsform.container .header .left .logo a .img-box img {
+.detail.container .header .left .logo a .img-box img {
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
-.dnsform.container .header .left .logo .logo-link {
+.detail.container .header .left .logo .logo-link {
   display: flex;
   align-items: center;
 }
-.dnsform.container .header .left .logo .logo-link h1 {
+.detail.container .header .left .logo .logo-link h1 {
   text-transform: uppercase;
 }
-.dnsform.container .header .left .search {
+.detail.container .header .left .search {
   width: 100%;
   position: relative;
   display: flex;
   margin-left: 50px;
 }
-.dnsform.container .header .left .search input {
+.detail.container .header .left .search input {
   width: calc(70% - 30px);
   padding: 18px 0;
   padding-left: 60px;
@@ -1192,29 +1216,29 @@ body {
   font-size: 16px;
   background-color: #F6F6F6;
 }
-.dnsform.container .header .left .search img {
+.detail.container .header .left .search img {
   position: absolute;
   width: 24px;
   height: 24px;
   top: 15px;
   left: 23px;
 }
-.dnsform.container .header .right {
+.detail.container .header .right {
   margin-right: 50px;
   display: flex;
   justify-content: flex-end;
 }
-.dnsform.container .header .right .user .hello {
+.detail.container .header .right .user .hello {
   display: flex;
   align-items: center;
   font-size: 20px;
   font-weight: 600;
   margin-bottom: 5px;
 }
-.dnsform.container .header .right .user .hello .name {
+.detail.container .header .right .user .hello .name {
   margin-left: 10px;
 }
-.dnsform.container .header .right .user .hello .type {
+.detail.container .header .right .user .hello .type {
   background-color: #dbdbdb;
   width: fit-content;
   padding: 4px 15px;
@@ -1224,32 +1248,32 @@ body {
   font-size: 16px;
   color: white;
 }
-.dnsform.container .header .right .user .hello .type.hoster {
+.detail.container .header .right .user .hello .type.hoster {
   background-color: #061495;
 }
-.dnsform.container .header .right .user a {
-  color: #FF0000;
+.detail.container .header .right .user a {
+  color: #ff0000;
   text-decoration: none;
 }
-.dnsform.container .header .right .user a .img-box {
+.detail.container .header .right .user a .img-box {
   display: flex;
   align-items: center;
   justify-content: flex-end;
 }
-.dnsform.container .header .right .user a .img-box img {
+.detail.container .header .right .user a .img-box img {
   margin-left: 10px;
 }
-.dnsform.container .main {
+.detail.container .main {
   height: 100%;
   display: flex;
 }
-.dnsform.container .main .aside {
+.detail.container .main .aside {
   overflow: hidden;
   width: 0%;
   height: 100%;
-  background-color: #465A65;
+  background-color: #465a65;
 }
-.dnsform.container .main .aside .tab-title {
+.detail.container .main .aside .tab-title {
   cursor: pointer;
   color: white;
   padding: 20px;
@@ -1257,14 +1281,24 @@ body {
   transition: 0.2s;
   position: relative;
 }
-.dnsform.container .main .aside .tab-title:hover {
+.detail.container .main .aside .tab-title.sub-tab {
+  padding: 10px;
+  margin-left: 5px;
+}
+.detail.container .main .aside .tab-title.sub-tab.select {
+  background-color: #34627B;
+}
+.detail.container .main .aside .tab-title.sub-tab a h3 {
+  font-size: 15px;
+}
+.detail.container .main .aside .tab-title:hover {
   background-color: #34424A;
 }
-.dnsform.container .main .aside .tab-title.active {
+.detail.container .main .aside .tab-title.active {
   padding-left: 30px;
   background-color: #34424A;
 }
-.dnsform.container .main .aside .tab-title.active::after {
+.detail.container .main .aside .tab-title.active::after {
   content: "";
   position: absolute;
   top: 0;
@@ -1273,109 +1307,112 @@ body {
   height: 100%;
   background-color: #1A89C9;
 }
-.dnsform.container .main .aside .tab-title a {
+.detail.container .main .aside .tab-title a {
   color: inherit;
   text-decoration: none;
 }
-.dnsform.container .main .table-side {
+.detail.container .main .table-side {
   display: flex;
   flex-direction: column;
   padding: 20px 30px;
   width: 100%;
 }
-.dnsform.container .main .table-side .titles {
+.detail.container .main .table-side .titles {
   display: flex;
   align-items: center;
   margin-bottom: 30px;
   height: fit-content;
 }
-.dnsform.container .main .table-side .titles > div {
+.detail.container .main .table-side .titles > div {
   width: 50%;
 }
-.dnsform.container .main .table-side .titles .title-left h4 {
+.detail.container .main .table-side .titles .title-left h4 {
   margin-top: 10px;
   font-weight: 500;
   color: #9F9F9F;
 }
-.dnsform.container .main .table-side .titles .title-left h4 span {
+.detail.container .main .table-side .titles .title-left h4 span {
   font-weight: 600;
 }
-.dnsform.container .main .table-side .titles .title-right {
+.detail.container .main .table-side .titles .title-right {
   margin-right: 50px;
   display: flex;
   justify-content: flex-end;
   align-items: flex-start;
 }
-.dnsform.container .main .table-side .titles .title-right .sort-btn-box button {
+.detail.container .main .table-side .titles .title-right .sort-btn-box button {
   border: none;
   display: flex;
   align-items: center;
   padding: 5px 15px;
-  background-color: #E3EDFF;
+  background-color: #e3edff;
   border-radius: 10px;
   cursor: pointer;
 }
-.dnsform.container .main .table-side .table-box {
+.detail.container .main .table-side .table-box {
   height: 20%;
   overflow: auto;
   overflow-x: hidden;
 }
-.dnsform.container .main .table-side .table-box table {
+.detail.container .main .table-side .table-box table {
   width: 100%;
   overflow: auto;
   border-collapse: collapse;
 }
-.dnsform.container .main .table-side .table-box table thead {
+.detail.container .main .table-side .table-box table thead {
   width: 100%;
   height: 30px;
   background-color: #f0e5fd;
   color: #591590;
 }
-.dnsform.container .main .table-side .table-box table thead th {
+.detail.container .main .table-side .table-box table thead th {
   text-align: left;
   padding: 10px;
   font-size: 18px;
 }
-.dnsform.container .main .table-side .table-box table tbody tr {
+.detail.container .main .table-side .table-box table tbody tr {
   cursor: pointer;
   height: 50px;
   border-bottom: 1px solid #adadad;
 }
-.dnsform.container .main .table-side .table-box table tbody tr:hover, .dnsform.container .main .table-side .table-box table tbody tr.active {
+.detail.container .main .table-side .table-box table tbody tr:hover, .detail.container .main .table-side .table-box table tbody tr.active {
   background-color: #D4D4D4;
 }
-.dnsform.container .main .table-side .table-box table tbody tr td {
+.detail.container .main .table-side .table-box table tbody tr td {
   font-weight: 500;
   padding: 10px;
 }
-.dnsform.container .main .table-side .table-box table .index-field {
+.detail.container .main .table-side .table-box table .index-field {
   width: 1%;
 }
-.dnsform.container .main .table-side .table-box table .transaction-hash-field {
+.detail.container .main .table-side .table-box table .id-field {
+  width: 4%;
+}
+.detail.container .main .table-side .table-box table .transaction-hash-field {
   width: 14%;
   max-width: 250px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.dnsform.container .main .table-side .table-box table .action-field {
+.detail.container .main .table-side .table-box table .action-field {
   width: 14%;
   max-width: 250px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.dnsform.container .main .table-side .table-box table .block-field {
+.detail.container .main .table-side .table-box table .block-field {
   width: 14%;
   max-width: 250px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.dnsform.container .main .table-side .table-box table .status-field {
+.detail.container .main .table-side .table-box table .status-field {
   width: 7%;
 }
-.dnsform.container .main .table-side .table-box table .status-field .status {
+.detail.container .main .table-side .table-box table .status-field .status {
   background-color: #c7c7c7;
   text-align: center;
   width: 80px;
@@ -1384,149 +1421,571 @@ body {
   border-radius: 15px;
   color: white;
 }
-.dnsform.container .main .table-side .table-box table .status-field .status.success {
+.detail.container .main .table-side .table-box table .status-field .status.success {
   background-color: #13aa61;
 }
-.dnsform.container .main .table-side .table-box table .status-field .status.new {
+.detail.container .main .table-side .table-box table .status-field .status.new {
   background-color: #d33f3f;
 }
-.dnsform.container .main .table-side .table-box table .time-field {
-  width: 14%;
+.detail.container .main .table-side .table-box table .time-field {
+  width: 10%;
 }
-.dnsform.container .main .table-side .table-box table .from-field {
-  width: 14%;
-  max-width: 200px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.dnsform.container .main .table-side .table-box table .to-field {
+.detail.container .main .table-side .table-box table .from-field {
   width: 14%;
   max-width: 200px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.dnsform.container .main .table-side .table-box table .domain-field {
+.detail.container .main .table-side .table-box table .to-field {
+  width: 14%;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.detail.container .main .table-side .table-box table .domain-field {
   width: 16%;
   max-width: 200px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.dnsform.container .main .table-side .table-box table .a-field {
+.detail.container .main .table-side .table-box table .a-field {
   width: 16%;
   max-width: 250px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.dnsform.container .main .table-side .table-box table .soa-field {
+.detail.container .main .table-side .table-box table .soa-field {
   width: 16%;
   max-width: 250px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.dnsform.container .main .table-side .table-box table .ns-field {
+.detail.container .main .table-side .table-box table .ns-field {
   width: 16%;
   max-width: 250px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.dnsform.container .main .table-side .table-box table .account-field {
+.detail.container .main .table-side .table-box table .account-field {
   width: 16%;
   max-width: 250px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.dnsform.container .main .table-side .table-box table .ttl-field {
+.detail.container .main .table-side .table-box table .ttl-field {
   width: 16%;
   max-width: 250px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.dnsform.container .main .table-side .form-box {
+.detail.container .main .table-side .detail-box {
+  height: 520px;
+  padding: 10px;
+  border: 5px solid rgba(0, 0, 0, 0.445);
+}
+.detail.container .main .table-side .detail-box .detail.transaction-detail .row {
+  padding: 15px 0;
+}
+.detail.container .main .table-side .detail-box .detail.transaction-detail .row.timestamp-row .value span {
+  margin-left: 5px;
+  color: #7c7c7c;
+}
+.detail.container .main .table-side .detail-box .detail.transaction-detail .row.action-row .value.add {
+  width: fit-content;
+  padding: 10px;
+  background-color: springgreen;
+  font-weight: bold;
+  border-radius: 10px;
+}
+.detail.container .main .table-side .detail-box .detail.transaction-detail .row .value {
+  display: flex;
+  align-items: center;
+}
+.detail.container .main .table-side .detail-box .detail.transaction-detail .row .value span.img-box {
+  margin-right: 10px;
+}
+.detail.container .main .table-side .detail-box .detail.domain-detail .row {
+  padding: 15px 0 10px;
+  align-items: flex-start;
+}
+.detail.container .main .table-side .detail-box .detail.domain-detail .row .value {
+  padding: 5px 0;
+}
+.detail.container .main .table-side .detail-box .detail.domain-detail .row .value .subrow {
+  display: flex;
+  padding-bottom: 20px;
+}
+.detail.container .main .table-side .detail-box .detail.domain-detail .row .value .subrow .sublabel {
+  width: 100px;
+}
+.detail.container .main .table-side .detail-box .detail.domain-detail .row .value .subrow .subvalue {
+  width: 100px;
+  margin-right: 10px;
+}
+.detail.container .main .table-side .detail-box .detail .row {
+  display: flex;
+  align-items: center;
+}
+.detail.container .main .table-side .detail-box .detail .row .label {
+  font-size: 20px;
+  font-weight: bold;
+  width: 150px;
+}
+.detail.container .main .table-side .detail-box .detail .row .value {
+  font-size: 16px;
+}
+
+.operation.container {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+.operation.container .add-tx-button-group {
+  top: 90% !important;
+  left: 91% !important;
+}
+.operation.container .add-tx-button-group a {
+  text-decoration: none;
+  color: black;
+}
+.operation.container .add-tx-button-group a .call-to-action {
+  width: 160px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+}
+.operation.container .add-tx-button-group a .call-to-action .img-box {
+  width: 60px;
+  height: 50px;
+  line-height: 10px;
+  border-radius: 20px;
+  border: 3px solid #036135;
+  background-color: #13aa61;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.operation.container .add-tx-button-group a .call-to-action .img-box img {
+  object-fit: contain;
+  width: 30px;
+  height: 30px;
+}
+.operation.container .add-tx-button-group a .call-to-action .text {
+  color: #036135;
+  margin-left: 4px;
+  font-weight: 600;
+}
+.operation.container .header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  max-height: 100px;
+  background-color: white;
+  padding: 0px 30px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+.operation.container .header > div {
+  width: 50%;
+}
+.operation.container .header .left {
+  display: flex;
+  align-items: center;
+}
+.operation.container .header .left .menu-btn button {
+  background-color: none;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+.operation.container .header .left .logo {
+  margin-left: 15px;
+}
+.operation.container .header .left .logo a {
+  text-decoration: none;
+  color: #964b9c;
+}
+.operation.container .header .left .logo a .img-box {
+  display: inline-block;
+  width: 80px;
+  height: 80px;
+}
+.operation.container .header .left .logo a .img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.operation.container .header .left .logo .logo-link {
+  display: flex;
+  align-items: center;
+}
+.operation.container .header .left .logo .logo-link h1 {
+  text-transform: uppercase;
+}
+.operation.container .header .left .search {
+  width: 100%;
+  position: relative;
+  display: flex;
+  margin-left: 50px;
+}
+.operation.container .header .left .search input {
+  width: calc(70% - 30px);
+  padding: 18px 0;
+  padding-left: 60px;
+  border-radius: 15px;
+  outline: none;
+  border: 0;
+  font-size: 16px;
+  background-color: #F6F6F6;
+}
+.operation.container .header .left .search img {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  top: 15px;
+  left: 23px;
+}
+.operation.container .header .right {
+  margin-right: 50px;
+  display: flex;
+  justify-content: flex-end;
+}
+.operation.container .header .right .user .hello {
+  display: flex;
+  align-items: center;
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+.operation.container .header .right .user .hello .name {
+  margin-left: 10px;
+}
+.operation.container .header .right .user .hello .type {
+  background-color: #dbdbdb;
+  width: fit-content;
+  padding: 4px 15px;
+  margin-top: 2px;
+  margin-left: 10px;
+  border-radius: 12px;
+  font-size: 16px;
+  color: white;
+}
+.operation.container .header .right .user .hello .type.hoster {
+  background-color: #061495;
+}
+.operation.container .header .right .user a {
+  color: #ff0000;
+  text-decoration: none;
+}
+.operation.container .header .right .user a .img-box {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.operation.container .header .right .user a .img-box img {
+  margin-left: 10px;
+}
+.operation.container .main {
+  height: 100%;
+  display: flex;
+}
+.operation.container .main .aside {
+  overflow: hidden;
+  width: 0%;
+  height: 100%;
+  background-color: #465a65;
+}
+.operation.container .main .aside .tab-title {
+  cursor: pointer;
+  color: white;
+  padding: 20px;
+  margin-bottom: 5px;
+  transition: 0.2s;
+  position: relative;
+}
+.operation.container .main .aside .tab-title.sub-tab {
+  padding: 10px;
+  margin-left: 5px;
+}
+.operation.container .main .aside .tab-title.sub-tab.select {
+  background-color: #34627b;
+}
+.operation.container .main .aside .tab-title.sub-tab a h3 {
+  font-size: 15px;
+}
+.operation.container .main .aside .tab-title:hover {
+  background-color: #34424A;
+}
+.operation.container .main .aside .tab-title.active {
+  padding-left: 30px;
+  background-color: #34424A;
+}
+.operation.container .main .aside .tab-title.active::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 100%;
+  background-color: #1A89C9;
+}
+.operation.container .main .aside .tab-title a {
+  color: inherit;
+  text-decoration: none;
+}
+.operation.container .main .table-side {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 30px;
+  width: 100%;
+}
+.operation.container .main .table-side .titles {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+  height: fit-content;
+}
+.operation.container .main .table-side .titles > div {
+  width: 50%;
+}
+.operation.container .main .table-side .titles .title-left h4 {
+  margin-top: 10px;
+  font-weight: 500;
+  color: #9F9F9F;
+}
+.operation.container .main .table-side .titles .title-left h4 span {
+  font-weight: 600;
+}
+.operation.container .main .table-side .titles .title-right {
+  margin-right: 50px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+}
+.operation.container .main .table-side .titles .title-right .sort-btn-box button {
+  border: none;
+  display: flex;
+  align-items: center;
+  padding: 5px 15px;
+  background-color: #e3edff;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.operation.container .main .table-side .table-box {
+  height: 20%;
+  overflow: auto;
+  overflow-x: hidden;
+}
+.operation.container .main .table-side .table-box table {
+  width: 100%;
+  overflow: auto;
+  border-collapse: collapse;
+}
+.operation.container .main .table-side .table-box table thead {
+  width: 100%;
+  height: 30px;
+  background-color: #f0e5fd;
+  color: #591590;
+}
+.operation.container .main .table-side .table-box table thead th {
+  text-align: left;
+  padding: 10px;
+  font-size: 18px;
+}
+.operation.container .main .table-side .table-box table tbody tr {
+  cursor: pointer;
+  height: 50px;
+  border-bottom: 1px solid #adadad;
+}
+.operation.container .main .table-side .table-box table tbody tr:hover, .operation.container .main .table-side .table-box table tbody tr.active {
+  background-color: #D4D4D4;
+}
+.operation.container .main .table-side .table-box table tbody tr td {
+  font-weight: 500;
+  padding: 10px;
+}
+.operation.container .main .table-side .table-box table .index-field {
+  width: 1%;
+}
+.operation.container .main .table-side .table-box table .transaction-hash-field {
+  width: 14%;
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.operation.container .main .table-side .table-box table .action-field {
+  width: 14%;
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.operation.container .main .table-side .table-box table .block-field {
+  width: 14%;
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.operation.container .main .table-side .table-box table .status-field {
+  width: 7%;
+}
+.operation.container .main .table-side .table-box table .status-field .status {
+  background-color: #c7c7c7;
+  text-align: center;
+  width: 80px;
+  padding: 5px 10px;
+  margin-left: -10px;
+  border-radius: 15px;
+  color: white;
+}
+.operation.container .main .table-side .table-box table .status-field .status.success {
+  background-color: #13aa61;
+}
+.operation.container .main .table-side .table-box table .status-field .status.new {
+  background-color: #d33f3f;
+}
+.operation.container .main .table-side .table-box table .time-field {
+  width: 14%;
+}
+.operation.container .main .table-side .table-box table .from-field {
+  width: 14%;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.operation.container .main .table-side .table-box table .to-field {
+  width: 14%;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.operation.container .main .table-side .table-box table .domain-field {
+  width: 16%;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.operation.container .main .table-side .table-box table .a-field {
+  width: 16%;
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.operation.container .main .table-side .table-box table .soa-field {
+  width: 16%;
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.operation.container .main .table-side .table-box table .ns-field {
+  width: 16%;
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.operation.container .main .table-side .table-box table .account-field {
+  width: 16%;
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.operation.container .main .table-side .table-box table .ttl-field {
+  width: 16%;
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.operation.container .main .table-side .form-box {
   margin-top: 20px;
-  height: 55%;
+  height: 520px;
+  overflow: hidden;
   display: flex;
   border: 2px solid rebeccapurple;
 }
-.dnsform.container .main .table-side .form-box form {
+.operation.container .main .table-side .form-box form {
   padding: 15px;
   width: 50%;
 }
-.dnsform.container .main .table-side .form-box form h1 {
+.operation.container .main .table-side .form-box form h1 {
   font-size: 24px;
 }
-.dnsform.container .main .table-side .form-box form:first-child {
+.operation.container .main .table-side .form-box form:first-child {
   border-right: 1px solid black;
 }
-.dnsform.container .main .table-side .form-box form.typing-form .field, .dnsform.container .main .table-side .form-box form.files-form .field {
+.operation.container .main .table-side .form-box form.typing-form .field, .operation.container .main .table-side .form-box form.files-form .field {
   padding: 5px 0;
 }
-.dnsform.container .main .table-side .form-box form.typing-form .field h5, .dnsform.container .main .table-side .form-box form.files-form .field h5 {
+.operation.container .main .table-side .form-box form.typing-form .field h5, .operation.container .main .table-side .form-box form.files-form .field h5 {
   font-size: 15px;
   padding-bottom: 10px;
 }
-.dnsform.container .main .table-side .form-box form.typing-form .field.submit-field, .dnsform.container .main .table-side .form-box form.files-form .field.submit-field {
+.operation.container .main .table-side .form-box form.typing-form .field.submit-field, .operation.container .main .table-side .form-box form.files-form .field.submit-field {
   margin-top: 5px;
   display: flex;
   justify-content: flex-end;
 }
-.dnsform.container .main .table-side .form-box form.typing-form .field.submit-field button, .dnsform.container .main .table-side .form-box form.files-form .field.submit-field button {
+.operation.container .main .table-side .form-box form.typing-form .field.submit-field button, .operation.container .main .table-side .form-box form.files-form .field.submit-field button {
   border: none;
   cursor: pointer;
   background-color: white;
   padding: 10px 25px;
   margin: 0 5px;
 }
-.dnsform.container .main .table-side .form-box form.typing-form .field.submit-field button[type=reset], .dnsform.container .main .table-side .form-box form.files-form .field.submit-field button[type=reset] {
+.operation.container .main .table-side .form-box form.typing-form .field.submit-field button[type=reset], .operation.container .main .table-side .form-box form.files-form .field.submit-field button[type=reset] {
   color: #036135;
   border: 1px solid #036135;
 }
-.dnsform.container .main .table-side .form-box form.typing-form .field.submit-field button[type=submit], .dnsform.container .main .table-side .form-box form.files-form .field.submit-field button[type=submit] {
+.operation.container .main .table-side .form-box form.typing-form .field.submit-field button[type=submit], .operation.container .main .table-side .form-box form.files-form .field.submit-field button[type=submit] {
   color: white;
   background-color: #036135;
 }
-.dnsform.container .main .table-side .form-box form.typing-form .field.domain-field input, .dnsform.container .main .table-side .form-box form.files-form .field.domain-field input {
+.operation.container .main .table-side .form-box form.typing-form .field.domain-field input, .operation.container .main .table-side .form-box form.files-form .field.domain-field input {
   width: 100%;
   font-size: 14px;
   padding: 7px 0 7px 10px;
 }
-.dnsform.container .main .table-side .form-box form.typing-form .field .form-oneline-group .group, .dnsform.container .main .table-side .form-box form.files-form .field .form-oneline-group .group {
+.operation.container .main .table-side .form-box form.typing-form .field .form-oneline-group .group, .operation.container .main .table-side .form-box form.files-form .field .form-oneline-group .group {
   display: flex;
   padding: 2px 0;
 }
-.dnsform.container .main .table-side .form-box form.typing-form .field .form-oneline-group .group .label, .dnsform.container .main .table-side .form-box form.files-form .field .form-oneline-group .group .label {
+.operation.container .main .table-side .form-box form.typing-form .field .form-oneline-group .group .label, .operation.container .main .table-side .form-box form.files-form .field .form-oneline-group .group .label {
   font-size: 14px;
   width: 100px;
   text-align: center;
 }
-.dnsform.container .main .table-side .form-box form.typing-form .field .form-oneline-group .group input, .dnsform.container .main .table-side .form-box form.files-form .field .form-oneline-group .group input {
+.operation.container .main .table-side .form-box form.typing-form .field .form-oneline-group .group input, .operation.container .main .table-side .form-box form.files-form .field .form-oneline-group .group input {
   border: none;
   outline: none;
   border-bottom: 2px solid rgba(80, 80, 80, 0.541);
 }
-.dnsform.container .main .table-side .form-box form.typing-form .field .form-oneline-group .group input.error, .dnsform.container .main .table-side .form-box form.files-form .field .form-oneline-group .group input.error {
+.operation.container .main .table-side .form-box form.typing-form .field .form-oneline-group .group input.error, .operation.container .main .table-side .form-box form.files-form .field .form-oneline-group .group input.error {
   border-bottom: 2px solid red;
 }
-.dnsform.container .main .table-side .form-box form.typing-form .field .form-oneline-group .group input:hover, .dnsform.container .main .table-side .form-box form.files-form .field .form-oneline-group .group input:hover {
+.operation.container .main .table-side .form-box form.typing-form .field .form-oneline-group .group input:hover, .operation.container .main .table-side .form-box form.files-form .field .form-oneline-group .group input:hover {
   border-bottom: 2px solid rebeccapurple;
 }
-.dnsform.container .main .table-side .form-box form.typing-form .field.files-field, .dnsform.container .main .table-side .form-box form.files-form .field.files-field {
+.operation.container .main .table-side .form-box form.typing-form .field.files-field, .operation.container .main .table-side .form-box form.files-form .field.files-field {
   height: 75%;
   margin: 5px 0;
   background-color: #dddddda2;
-}
-.dnsform.container .main .table-side .createdby {
-  margin-top: 10px;
-  width: 100%;
-  text-align: center;
-  justify-content: center;
 }
 
 /*# sourceMappingURL=index.css.map */

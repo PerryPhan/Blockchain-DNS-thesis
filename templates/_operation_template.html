@@ -1,6 +1,6 @@
 {% extends 'template.html' %} {% block title %} {{ title or '' }} {% endblock %}
 {% block body %}
-<div class="dnsform container">
+<div class="operation container">
   <div class="header">
     <div class="left">
       <div class="menu-btn">
@@ -54,17 +54,27 @@
   <div class="main">
     <div class="aside animation asideSlidetoRight">
       <div class="tab-title {% if type == 1 %} active {% endif %}">
-        <a href="{% if type != 1 %}/{% else %}#{% endif %}"
+        <a href="./transactions"
           ><h3>Transaction List</h3></a
         >
       </div>
+      <div class="sub-tab tab-title {% if type == 1 %} active {% endif %}">
+        <a href="./transactions/detail"
+          ><h3>Recent transaction detail</h3>
+        </a>
+      </div>
       <div class="tab-title {% if type == 2 %} active {% endif %}">
-        <a href="{% if type != 2 %}./domains{% else %}#{% endif %}"
+        <a href="./domains"
           ><h3>Domain List</h3></a
         >
       </div>
+      <div class="sub-tab tab-title {% if type == 2 %} active {% endif %}">
+        <a href="./domains/detail"
+          ><h3>Recent domain detail</h3>
+        </a>
+      </div>
       <div class="tab-title {% if type == 3 %} active {% endif %}">
-        <a href="{% if type != 3 %}dashboard/domains{% else %}#{% endif %}"
+        <a href="#"
           ><h3>Operation</h3></a
         >
       </div>
@@ -279,15 +289,9 @@
           </div>
         </form>
       </div>
-      <p class="createdby">
-        This project is made by Phan Dai
-        <img
-          src="{{url_for('static',filename='img/dai-brand-icon.png')}}"
-          alt="pd-icon"
-        />
-      </p>
+
     </div>
   </div>
 </div>
-<script src="{{url_for('static',filename='js/table-helper.js')}}"></script>
+<script src="{{url_for('static',filename='js/dashboard-helper.js')}}"></script>
 {% endblock %}

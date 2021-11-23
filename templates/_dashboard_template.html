@@ -2,7 +2,7 @@
 {% block body %}
 <div class="dashboard container">
   <div class="add-tx-button-group modal">
-    <a href="../dns/form">
+    <a href="./operation">
       <div class="call-to-action">
         <div class="img-box">
           <img
@@ -69,17 +69,27 @@
   <div class="main">
     <div class="aside animation asideSlidetoRight">
       <div class="tab-title {% if type == 1 %} active {% endif %}">
-        <a href="{% if type != 1 %}/{% else %}#{% endif %}"
+        <a href="{% if type != 1 %}./transactions{% else %}#{% endif %}"
           ><h3>Transaction List</h3></a
         >
       </div>
+      <div class="sub-tab tab-title {% if type == 1 %} active {% endif %}">
+        <a href="./transactions/detail"
+          ><h3>Recent transaction detail</h3>
+        </a>
+      </div>
       <div class="tab-title {% if type == 2 %} active {% endif %}">
-        <a href="{% if type != 2 %}dashboard/domains{% else %}#{% endif %}"
+        <a href="{% if type != 2 %}./domains{% else %}#{% endif %}"
           ><h3>Domain List</h3></a
         >
       </div>
+      <div class="sub-tab tab-title {% if type == 2 %} active {% endif %}">
+        <a href="./domains/detail"
+          ><h3>Recent domain detail</h3>
+        </a>
+      </div>
       <div class="tab-title {% if type == 3 %} active {% endif %}">
-        <a href="{% if type != 3 and type == 1 %}dashboard/form{% else %}{% if type != 3 and type == 2 %}./form{% else %}#{% endif %}{% endif %}"
+        <a href="./operation"
           ><h3>Operation</h3></a
         >
       </div>
@@ -108,13 +118,14 @@
             {% if type == 1 %}
             <tr>
               <th class="index-field"></th>
+              <th class="id-field">ID</th>
               <th class="transaction-hash-field">Transaction Hash</th>
               <th class="action-field">Action</th>
               <th class="block-field">Block</th>
               <th class="time-field">Datetime</th>
               <th class="status-field">Status</th>
-              <th class="from-field">From field</th>
-              <th class="to-field">To field</th>
+              <th class="from-field">From </th>
+              <th class="to-field">To </th>
             </tr>
             {% else %}
             <tr>
@@ -161,8 +172,9 @@
                   ></path>
                 </svg>
               </td>
+              <th class="id-field">{{ transaction.id or '' }}</th>
               <td class="transaction-hash-field">
-                {{transaction.hash() or ''}}
+                <a href="./transactions/detail?id={{transaction.id}}">{{transaction.hash or ''}}</a> 
               </td>
               <td class="action-field">{{transaction.action or ''}}</td>
               <td class="block-field">{{transaction.block_id or ''}}</td>
@@ -205,7 +217,9 @@
                   ></path>
                 </svg>
               </td>
-              <td class="domain-field">{{domain.domain or ''}}</td>
+              <td class="domain-field">
+                <a href="./domains/detail?domain={{domain.domain}}">{{domain.domain or ''}}</a>
+              </td>
               <td class="a-field">{{ domain.a[0]['value'] or '' }}</td>
               <td class="soa-field">{{ domain.soa or ''}}</td>
               <td class="ns-field">{{ domain.ns_count or ''}}</td>
@@ -258,5 +272,5 @@
     </div>
   </div>
 </div>
-<script src="{{url_for('static',filename='js/table-helper.js')}}"></script>
+<script src="{{url_for('static',filename='js/dashboard-helper.js')}}"></script>
 {% endblock %}

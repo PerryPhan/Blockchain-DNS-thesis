@@ -1,3 +1,5 @@
+ACTIVE_CLASS = "active"
+SELECT_CLASS = "select"
 // Aside
 // $("#menu-toggler").click(function () {
 //   let aside = $(".dashboard .aside");
@@ -13,9 +15,15 @@
 // });
 
 $(".tab-title").click(function () {
-  $(".tab-title").removeClass("active");
-  $(this).addClass("active");
-  $(this).children(a).trigger("click");
+  $(".tab-title").removeClass(ACTIVE_CLASS);
+  $(this).addClass(ACTIVE_CLASS);
+  $(this).children('a').trigger("click");
+});
+
+$(".sub-tab").click(function () {
+  $(".sub-tab").removeClass(SELECT_CLASS);
+  $(this).addClass(SELECT_CLASS);
+  $(this).children('a').trigger("click");
 });
 
 // Table Operation Save
@@ -30,7 +38,6 @@ function disablePaginationATag(id) {
 }
 
 function enablePaginationATag(id, href) {
-  
   $(id).attr("href", href);
 }
 

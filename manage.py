@@ -34,15 +34,15 @@ transactionsBusiness = TransactionBusiness()
 
 @app.route('/')
 def home():
-    return redirect('/dashboard')
+    return redirect('/dashboard/transactions/detail')
 
-@app.route('/dashboard/form')
+@app.route('/dashboard/operation')
 def dashboard_form():
     html_options = {
         'title': 'Operation',
         'type' : 3,
     }
-    return render_template('_dnsform_template.html', **html_options)
+    return render_template('_operation_template.html', **html_options)
 
 
 @app.route('/admin', methods=['GET', 'POST'])
@@ -72,18 +72,27 @@ def admin():
     return render_template('_admin_template.html', **html_options)
 
 
-@app.route('/dashboard')
+@app.route('/dashboard/transactions')
 def dashboardTransactions():
     list = dns.blockchain.transactions.getTransactionsPool()
     html_options = {
         'type' : 1,
         'title': 'Transaction Dashboard ',
-        'count': len(list),
+        'count': len(list) if list else 0,
         'unit' : 'tx',
         'list' : list
     }
     
     return render_template('_dashboard_template.html', **html_options)
+
+@app.route('/dashboard/transactions/detail')
+def detailDashboardTransactions():
+    html_options = {
+        'type' : 1,
+        'title': 'Transaction Detail',
+    }
+    
+    return render_template('_detail_dashboard_template.html', **html_options)
 
 @app.route('/dashboard/domains')
 def dashboardDomains():
@@ -91,13 +100,21 @@ def dashboardDomains():
     html_options = {
         'type' : 2,
         'title': 'Domains Dashboard ',
-        'count': len(list),
+        'count': len(list) if list else 0,
         'unit' : 'domains',
         'list' : list
     }
     
     return render_template('_dashboard_template.html', **html_options)
-    pass
+
+@app.route('/dashboard/domains/detail')
+def detailDashboardDomains():
+    html_options = {
+        'type' : 2,
+        'title': 'Domains Detail',
+    }
+    
+    return render_template('_detail_dashboard_template.html', **html_options)
 
 @app.route('/dns/form', methods=['POST', 'GET'])
 def form():

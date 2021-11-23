@@ -1,0 +1,290 @@
+{% extends 'template.html' %} {% block title %} {{ title or '' }} {% endblock %}
+{% block body %}
+<div class="detail container">
+  <div class="header">
+    <div class="left">
+      <div class="menu-btn">
+        <button id="menu-toggler">
+          <img
+            src="{{url_for('static',filename='img/menu-icon.png')}}"
+            alt="btn-menu-img"
+          />
+        </button>
+      </div>
+      <div class="logo">
+        <a href="#">
+          <div class="logo-link">
+            <div class="img-box">
+              <img
+                src="{{url_for('static',filename='img/dnschain-logo-last.png')}}"
+                alt="logo"
+              />
+            </div>
+            <h1>dnschain</h1>
+          </div>
+        </a>
+      </div>
+      <div class="search">
+        <img
+          src="{{url_for('static',filename='img/search-icon.png')}}"
+          alt="search-icon"
+        />
+        <input type="text" placeholder="Search infromation in profile" />
+      </div>
+    </div>
+    <div class="right">
+      <div class="user">
+        <div class="hello">
+          Hi.
+          <div class="name">{{ fullname or ''}}</div>
+          <div class="type hoster">Hoster</div>
+        </div>
+        <a href="/logout">
+          <div class="img-box">
+            Logout
+            <img
+              src="{{url_for('static',filename='img/logout-icon.png')}}"
+              alt="logout-icon"
+            />
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="main">
+    <div class="aside animation asideSlidetoRight">
+      <div class="tab-title {% if type == 1 %} active {% endif %}">
+        <a href="../transactions"
+          ><h3>Transaction List</h3>
+        </a>
+      </div>
+      <div class="sub-tab tab-title {% if type == 1 %} active select {% endif %} ">
+        <a href="{% if type != 1 %}../transactions/detail{% else %}#{% endif %}"
+          ><h3>Recent transaction detail</h3>
+        </a>
+      </div>
+      <div class="tab-title {% if type == 2 %} active {% endif %}">
+        <a href="../domains"
+          ><h3>Domain List</h3></a
+        >
+      </div>
+      <div class="sub-tab tab-title {% if type == 2 %} active select {% endif %} ">
+        <a href="{% if type != 2 %}../domains/detail{% else %}#{% endif %}"
+          ><h3>Recent domain detail</h3>
+        </a>
+      </div>
+      <div class="tab-title {% if type == 3 %} active {% endif %}">
+        <a href="../operation"
+          ><h3>Operation</h3></a
+        >
+      </div>
+    </div>
+    <div class="table-side">
+      <div class="titles">
+        <div class="title-left">
+          <h1>{{ title or '' }}</h1>
+          <h4>Total <span> {{ count or ''}} </span> {{ unit or ''}}</h4>
+        </div>
+        <div class="title-right">
+          <div class="sort-btn-box">
+            <button>
+              <h3>Sort</h3>
+              <img
+                src="{{url_for('static',filename='img/sort-icon.png')}}"
+                alt="sort-icon"
+              />
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="table-box">
+        <table>
+          <thead>
+            {% if type == 1 %}
+            <tr>
+              <th class="index-field"></th>
+              <th class="id-field">ID</th>
+              <th class="transaction-hash-field">Transaction Hash</th>
+              <th class="action-field">Action</th>
+              <th class="block-field">Block</th>
+              <th class="time-field">Datetime</th>
+              <th class="status-field">Status</th>
+              <th class="from-field">From </th>
+              <th class="to-field">To </th>
+            </tr>
+            {% else %}
+            <tr>
+              <th class="index-field"></th>
+              <th class="domain-field">Domain</th>
+              <th class="a-field">A record</th>
+              <th class="soa-field">Soa</th>
+              <th class="ns-field">NS</th>
+              <th class="account-field">Account ID</th>
+              <th class="ttl-field">TTL</th>
+            </tr>
+            {% endif %}
+          </thead>
+          <tbody>
+            {% if type == 1 %}
+            <tr>
+              <td class="index-field"></td>
+              <th class="id-field">1</th>
+              <td class="transaction-hash-field">Transaction Hash</td>
+              <td class="action-field">Action</td>
+              <td class="block-field">Block</td>
+              <td class="time-field">Datetime</td>
+              <td class="status-field">Status</td>
+              <td class="from-field">From field</td>
+              <td class="to-field">To field</td>
+            </tr>
+            {% else %}
+            <tr>
+              <td class="index-field"></td>
+              <td class="domain-field">Domain</td>
+              <td class="a-field">A record</td>
+              <td class="soa-field">Soa</td>
+              <td class="ns-field">NS</td>
+              <td class="account-field">Account ID</td>
+              <td class="ttl-field">TTL</td>
+            </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+      <div class="detail-box">
+        {% if type == 1 %}
+        <div class="detail transaction-detail">
+          <div class="row id-row">
+            <div class="label">ID</div>
+            <div class="value">1</div>
+          </div>
+          <div class="row tx-hash-row">
+            <div class="label">Tx Hash</div>
+            <div class="value">dsadasdasda16516asda5d16as1dsa61d6asd1ad</div>
+          </div>
+          <div class="row timestamp-row">
+            <div class="label">Timestamp</div>
+            <div class="value">1921.215 <span> - </span> <span> on Tuesday,  20 November 2021 at 19:30  </span> </div>
+          </div>
+          <div class="row action-row">
+            <div class="label">Action</div>
+            <div class="value add">Add</div>
+          </div>
+          <div class="row ttl-row">
+            <div class="label">TTL</div>
+            <div class="value">14400s</div>
+          </div>
+          <div class="row account-row">
+            <div class="label">Account</div>
+            <div class="value"> <span class="img-box"> <img src="{{url_for('static',filename='img/account-black-icon.png')}}" alt=""></span> Phan Dai</div>
+          </div>
+          <div class="row block-row">
+            <div class="label">Block</div>
+            <div class="value">ad151asd151grcefqc61a5dwd1r5fq651d5q1dsq</div>
+          </div>
+          <div class="row record-row">
+            <div class="label">Record</div>
+            <div class="value">
+              <a href="../domains/detail">example.com</a>
+            </div>
+          </div>
+        </div>
+        {% endif %} {% if type == 2 %}
+        <div class="detail domain-detail">
+          <div class="row domain-row">
+            <div class="label">Domain:</div>
+            <div class="value">example.com</div>
+          </div>
+          <div class="row soa-record-row">
+            <div class="label">SOA Record:</div>
+            <div class="value">
+              <div class="subrow">
+                <div class="sublabel">Mnname</div>
+                <div class="subvalue">ns1.daidns1.com</div>
+              </div>
+              <div class="subrow">
+                <div class="sublabel">Rname</div>
+                <div class="subvalue">admin.daidns1.com</div>
+              </div>
+              <div class="subrow">
+                <div class="sublabel">Refresh</div>
+                <div class="subvalue">3600</div>
+                <div class="sublabel">Retry</div>
+                <div class="subvalue">600</div>
+              </div>
+              <div class="subrow">
+                <div class="sublabel">Expire</div>
+                <div class="subvalue">30</div>
+                <div class="sublabel">Minimum</div>
+                <div class="subvalue">86400</div>
+              </div>
+            </div>
+          </div>
+          <div class="row ns-record-row">
+            <div class="label">NS Records:</div>
+            <div class="value">
+              <div class="subrow">
+                <div class="sublabel">Host 1</div>
+                <div class="subvalue">ns1.daidns1.com</div>
+              </div>
+              <div class="subrow">
+                <div class="sublabel">Host 2</div>
+                <div class="subvalue">ns2.daidns1.com</div>
+              </div>
+            </div>
+          </div>
+          <div class="row a-row">
+            <div class="label">A Records:</div>
+            <div class="value">
+              <div class="subrow">
+                <div class="sublabel">Name</div>
+                <div class="subvalue">
+                  @
+                </div>
+                <div class="sublabel">Value</div>
+                <div class="subvalue">
+                  192.168.1.1
+                </div>
+                <div class="sublabel">TTL</div>
+                <div class="subvalue">
+                  400
+                </div>
+              </div>
+              <div class="subrow">
+                <div class="sublabel">Name</div>
+                <div class="subvalue">
+                  @
+                </div>
+                <div class="sublabel">Value</div>
+                <div class="subvalue">
+                  192.168.1.1
+                </div>
+                <div class="sublabel">TTL</div>
+                <div class="subvalue">
+                  400
+                </div>
+              </div>
+              <div class="subrow">
+                <div class="sublabel">Name</div>
+                <div class="subvalue">
+                  @
+                </div>
+                <div class="sublabel">Value</div>
+                <div class="subvalue">
+                  192.168.1.1
+                </div>
+                <div class="sublabel">TTL</div>
+                <div class="subvalue">
+                  400
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+<script src="{{url_for('static',filename='js/dashboard-helper.js')}}"></script>
+{% endblock %}

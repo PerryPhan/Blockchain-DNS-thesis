@@ -199,9 +199,9 @@ class Records :
         self.domain     = transaction.domain
         self.soa        = transaction.soa
         self.ns         = transaction.ns
-        self.ns_count   = len(transaction.ns)
+        self.ns_count   = len(transaction.ns) if self.ns else 0
         self.a          = transaction.a
-        self.a_count    = len(transaction.a)
+        self.a_count    = len(transaction.a) if self.a else 0
         self.ttl        = transaction.ttl
         self.account_id = transaction.account_id
 
