@@ -15,12 +15,14 @@ SELECT_CLASS = "select"
 // });
 
 $(".tab-title").click(function () {
+  if ($(this).hasClass(ACTIVE_CLASS)) return
   $(".tab-title").removeClass(ACTIVE_CLASS);
   $(this).addClass(ACTIVE_CLASS);
   $(this).children('a').trigger("click");
 });
 
 $(".sub-tab").click(function () {
+  if ($(this).hasClass(SELECT_CLASS)) return
   $(".sub-tab").removeClass(SELECT_CLASS);
   $(this).addClass(SELECT_CLASS);
   $(this).children('a').trigger("click");

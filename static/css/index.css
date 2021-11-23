@@ -825,6 +825,9 @@ body {
 .dashboard.container .header .right .user .hello .type.hoster {
   background-color: #061495;
 }
+.dashboard.container .header .right .user .hello .type.client {
+  background-color: #069550;
+}
 .dashboard.container .header .right .user a {
   color: #ff0000;
   text-decoration: none;
@@ -1251,6 +1254,9 @@ body {
 .detail.container .header .right .user .hello .type.hoster {
   background-color: #061495;
 }
+.detail.container .header .right .user .hello .type.client {
+  background-color: #069550;
+}
 .detail.container .header .right .user a {
   color: #ff0000;
   text-decoration: none;
@@ -1387,6 +1393,10 @@ body {
 }
 .detail.container .main .table-side .table-box table .id-field {
   width: 4%;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .detail.container .main .table-side .table-box table .transaction-hash-field {
   width: 14%;
@@ -1681,6 +1691,9 @@ body {
 .operation.container .header .right .user .hello .type.hoster {
   background-color: #061495;
 }
+.operation.container .header .right .user .hello .type.client {
+  background-color: #069550;
+}
 .operation.container .header .right .user a {
   color: #ff0000;
   text-decoration: none;
@@ -1814,6 +1827,13 @@ body {
 }
 .operation.container .main .table-side .table-box table .index-field {
   width: 1%;
+}
+.operation.container .main .table-side .table-box table .id-field {
+  width: 4%;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .operation.container .main .table-side .table-box table .transaction-hash-field {
   width: 14%;
@@ -1961,6 +1981,15 @@ body {
   width: 100%;
   font-size: 14px;
   padding: 7px 0 7px 10px;
+  outline: none;
+  border: none;
+  border-bottom: 2px solid rgba(80, 80, 80, 0.541);
+}
+.operation.container .main .table-side .form-box form.typing-form .field.domain-field input.error, .operation.container .main .table-side .form-box form.files-form .field.domain-field input.error {
+  border-bottom: 2px solid red;
+}
+.operation.container .main .table-side .form-box form.typing-form .field.domain-field input:hover, .operation.container .main .table-side .form-box form.files-form .field.domain-field input:hover {
+  border-bottom: 2px solid rebeccapurple;
 }
 .operation.container .main .table-side .form-box form.typing-form .field .form-oneline-group .group, .operation.container .main .table-side .form-box form.files-form .field .form-oneline-group .group {
   display: flex;
@@ -1972,6 +2001,7 @@ body {
   text-align: center;
 }
 .operation.container .main .table-side .form-box form.typing-form .field .form-oneline-group .group input, .operation.container .main .table-side .form-box form.files-form .field .form-oneline-group .group input {
+  padding-left: 10px;
   border: none;
   outline: none;
   border-bottom: 2px solid rgba(80, 80, 80, 0.541);

@@ -152,6 +152,10 @@
             &.hoster {
               background-color: ($dashboard-user-type-hoster-color);
             }
+
+            &.client{
+              background-color: ($dashboard-user-type-client-color);
+            }            
           }
         }
 

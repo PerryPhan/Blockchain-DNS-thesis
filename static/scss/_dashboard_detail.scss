@@ -152,6 +152,9 @@
             &.hoster {
               background-color: ($dashboard-user-type-hoster-color);
             }
+            &.client{
+              background-color: ($dashboard-user-type-client-color);
+            }    
           }
         }
 
@@ -322,8 +325,12 @@
             width: 1%;
           }
 
-          .id-field{
+          .id-field {
             width: 4%;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
 
           // Transactions

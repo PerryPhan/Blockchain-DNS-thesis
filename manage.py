@@ -34,16 +34,7 @@ transactionsBusiness = TransactionBusiness()
 
 @app.route('/')
 def home():
-    return redirect('/dashboard/transactions/detail')
-
-@app.route('/dashboard/operation')
-def dashboard_form():
-    html_options = {
-        'title': 'Operation',
-        'type' : 3,
-    }
-    return render_template('_operation_template.html', **html_options)
-
+    return redirect('/dashboard/transactions')
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
@@ -75,46 +66,119 @@ def admin():
 @app.route('/dashboard/transactions')
 def dashboardTransactions():
     list = dns.blockchain.transactions.getTransactionsPool()
+        
     html_options = {
         'type' : 1,
         'title': 'Transaction Dashboard ',
         'count': len(list) if list else 0,
         'unit' : 'tx',
-        'list' : list
+        'list' : list,
     }
+    if session:
+        if 'account' in session:
+            account_options = {
+                'account_id': session['account']['id'],
+                'account_fullname': session['account']['fullname']
+            }
+            return render_template('_dashboard_template.html', **html_options, **account_options)
     
     return render_template('_dashboard_template.html', **html_options)
 
 @app.route('/dashboard/transactions/detail')
 def detailDashboardTransactions():
+    id = request.args.get('id', default = 1, type = int)
+    
     html_options = {
         'type' : 1,
         'title': 'Transaction Detail',
+        'unit' : 'tx',
     }
+    
+    if session:
+        if 'account' in session:
+            account_options = {
+                'account_id': session['account']['id'],
+                'account_fullname': session['account']['fullname']
+            }
+            return render_template('_detail_dashboard_template.html', **html_options, **account_options)
     
     return render_template('_detail_dashboard_template.html', **html_options)
 
 @app.route('/dashboard/domains')
 def dashboardDomains():
     list = dns.blockchain.transactions.getDomainList()
+    
     html_options = {
         'type' : 2,
         'title': 'Domains Dashboard ',
         'count': len(list) if list else 0,
         'unit' : 'domains',
-        'list' : list
+        'list' : list,
     }
+    
+    if session :
+        if 'account' in session:
+            account_options = {
+                'account_id': session['account']['id'],
+                'account_fullname': session['account']['fullname']
+            }
+            return render_template('_dashboard_template.html', **html_options, **account_options)
     
     return render_template('_dashboard_template.html', **html_options)
 
 @app.route('/dashboard/domains/detail')
 def detailDashboardDomains():
+    domain = request.args.get('domain', default = '', type = str)
+    
     html_options = {
         'type' : 2,
         'title': 'Domains Detail',
+        'unit' : 'domains',
     }
     
+    if session:
+        if 'account' in session:
+            account_options = {
+                'account_id': session['account']['id'],
+                'account_fullname': session['account']['fullname']
+            }
+            return render_template('_detail_dashboard_template.html', **html_options, **account_options)
+    
     return render_template('_detail_dashboard_template.html', **html_options)
+
+@app.route('/dashboard/operation', methods=['GET','POST'])
+def dashboard_form():
+    # Check account 
+    if not session or not 'account' in session :
+        return redirect('/login')
+        
+    account_options = {
+        'account_id': session['account']['id'],
+        'account_fullname': session['account']['fullname'],
+    }
+    
+    html_options = {
+        'title': 'Operation',
+        'type' : 3,
+        **account_options,
+    }
+    
+    if request.method == 'POST':
+        status = 200
+        if 'file' in request.files:
+            return {
+            'status' : status, 
+            'form'   : request.form,
+            'file'  : request.files['file'].filename
+            }
+            
+        return {
+            'status' : status, 
+            'form'   : request.form,
+        }
+            
+    return render_template('_operation_template.html', **html_options)
+    
 
 @app.route('/dns/form', methods=['POST', 'GET'])
 def form():
@@ -198,7 +262,7 @@ def form():
 @app.route('/logout')
 def logout():
     session.pop('account', None)
-    return 'Log out successfully'
+    return redirect('/')
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -226,15 +290,15 @@ def login():
         if account:
             account = account.as_dict()
             # TODO : create safe as_dict function
-            if account.pop('password', None):
-                del account['password']
-            if account.pop('id', None):
-                del account['id']
-
+            # account.pop('password', None):
+            account['password'] = ''
+            # account.pop('id', None):
+            
             session['account'] = account
 
         response = {'status': status, 'message': message}
-        return render_template('_login_template.html', **html_options, **response)
+        # return render_template('_login_template.html', **html_options, **response)
+        return redirect('/dashboard/transactions')
 
     regis_email = ''
     if session and session.get('regis_email'):
@@ -248,7 +312,7 @@ def login():
 def register():
     panel_options = {
         'panel_p_text': 'Already have had an account?',
-        'panel_a_link': '/',
+        'panel_a_link': '/login',
         'panel_a_text': 'Sign in',
     }
     html_options = {

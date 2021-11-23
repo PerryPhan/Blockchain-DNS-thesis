@@ -11,11 +11,13 @@
     a {
       text-decoration: none;
       color: black;
+
       .call-to-action {
         width: 160px;
         height: 50px;
         display: flex;
         align-items: center;
+
         .img-box {
           width: 60px;
           height: 50px;
@@ -26,12 +28,14 @@
           display: flex;
           justify-content: center;
           align-items: center;
+
           img {
             object-fit: contain;
             width: 30px;
             height: 30px;
           }
         }
+
         .text {
           color: rgb(3, 97, 53);
           margin-left: 4px;
@@ -50,7 +54,7 @@
     padding: 0px 30px;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 
-    & > div {
+    &>div {
       width: 50%;
     }
 
@@ -152,6 +156,10 @@
             &.hoster {
               background-color: ($dashboard-user-type-hoster-color);
             }
+
+            &.client {
+              background-color: ($dashboard-user-type-client-color);
+            }
           }
         }
 
@@ -190,18 +198,22 @@
         margin-bottom: 5px;
         transition: 0.2s;
         position: relative;
+
         &.sub-tab {
           padding: 10px;
           margin-left: 5px;
+
           &.select {
             background-color: #34627b;
           }
+
           a {
             h3 {
               font-size: 15px;
             }
           }
         }
+
         &:hover {
           background-color: ($dashboard-hovered-tab-title-bgcolor);
         }
@@ -240,7 +252,7 @@
         margin-bottom: 30px;
         height: fit-content;
 
-        & > div {
+        &>div {
           width: 50%;
         }
 
@@ -280,6 +292,7 @@
         height: 20%;
         overflow: auto;
         overflow-x: hidden;
+
         table {
           width: 100%;
           overflow: auto;
@@ -318,6 +331,14 @@
 
           .index-field {
             width: 1%;
+          }
+
+          .id-field {
+            width: 4%;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
 
           // Transactions
@@ -447,72 +468,100 @@
         overflow: hidden;
         display: flex;
         border: 2px solid rebeccapurple;
+
         form {
           padding: 15px;
           width: 50%;
+
           h1 {
             font-size: 24px;
           }
+
           &:first-child {
             border-right: 1px solid black;
           }
+
           &.typing-form,
           &.files-form {
             .field {
               padding: 5px 0;
+
               h5 {
                 font-size: 15px;
                 padding-bottom: 10px;
               }
+
               &.submit-field {
                 margin-top: 5px;
                 display: flex;
                 justify-content: flex-end;
+
                 button {
                   border: none;
                   cursor: pointer;
                   background-color: white;
                   padding: 10px 25px;
                   margin: 0 5px;
+
                   &[type="reset"] {
                     color: rgb(3, 97, 53);
                     border: 1px solid rgb(3, 97, 53);
                   }
+
                   &[type="submit"] {
                     color: white;
                     background-color: rgb(3, 97, 53);
                   }
                 }
               }
+
               &.domain-field {
                 input {
                   width: 100%;
                   font-size: 14px;
                   padding: 7px 0 7px 10px;
+                  outline: none;
+                  border: none;
+                  border-bottom: 2px solid rgba(80, 80, 80, 0.541);
+
+                  &.error {
+                    border-bottom: 2px solid red;
+                  }
+
+                  &:hover {
+                    border-bottom: 2px solid rebeccapurple;
+                  }
                 }
               }
+
               .form-oneline-group {
                 .group {
                   display: flex;
                   padding: 2px 0;
+
                   .label {
                     font-size: 14px;
                     width: 100px;
                     text-align: center;
                   }
+
                   input {
+                    padding-left: 10px;
                     border: none;
                     outline: none;
                     border-bottom: 2px solid rgba(80, 80, 80, 0.541);
+
                     &.error {
                       border-bottom: 2px solid red;
                     }
+
                     &:hover {
                       border-bottom: 2px solid rebeccapurple;
                     }
                   }
                 }
               }
+
               &.files-field {
                 height: 75%;
                 margin: 5px 0;

@@ -35,10 +35,15 @@
     <div class="right">
       <div class="user">
         <div class="hello">
-          Hi.
-          <div class="name">{{ fullname or ''}}</div>
+          Hi. {% if account_id %}
+          <div class="name">{{ account_fullname or ''}}</div>
           <div class="type hoster">Hoster</div>
+          {% else %}
+          <div class="name">Guest</div>
+          <div class="type client">Client</div>
+          {% endif %}
         </div>
+        {% if account_id %}
         <a href="/logout">
           <div class="img-box">
             Logout
@@ -48,42 +53,43 @@
             />
           </div>
         </a>
+        {% else %}
+        <a href="/login">
+          <div class="img-box">
+            Login
+            <img
+              src="{{url_for('static',filename='img/logout-icon.png')}}"
+              alt="login-icon"
+            />
+          </div>
+        </a>
+        {% endif %}
       </div>
     </div>
   </div>
   <div class="main">
     <div class="aside animation asideSlidetoRight">
       <div class="tab-title {% if type == 1 %} active {% endif %}">
-        <a href="./transactions"
-          ><h3>Transaction List</h3></a
-        >
+        <a href="./transactions"><h3>Transaction List</h3></a>
       </div>
       <div class="sub-tab tab-title {% if type == 1 %} active {% endif %}">
-        <a href="./transactions/detail"
-          ><h3>Recent transaction detail</h3>
-        </a>
+        <a href="./transactions/detail"><h3>Recent transaction detail</h3> </a>
       </div>
       <div class="tab-title {% if type == 2 %} active {% endif %}">
-        <a href="./domains"
-          ><h3>Domain List</h3></a
-        >
+        <a href="./domains"><h3>Domain List</h3></a>
       </div>
       <div class="sub-tab tab-title {% if type == 2 %} active {% endif %}">
-        <a href="./domains/detail"
-          ><h3>Recent domain detail</h3>
-        </a>
+        <a href="./domains/detail"><h3>Recent domain detail</h3> </a>
       </div>
       <div class="tab-title {% if type == 3 %} active {% endif %}">
-        <a href="#"
-          ><h3>Operation</h3></a
-        >
+        <a href="#"><h3>Operation</h3></a>
       </div>
     </div>
     <div class="table-side">
       <div class="titles">
         <div class="title-left">
           <h1>{{ title or '' }}</h1>
-          <h4>Total <span> {{ count or ''}} </span> {{ unit or ''}}</h4>
+          <h4>Total <span> {{ count or '0'}} </span> {{ unit or 'domains'}}</h4>
         </div>
         <div class="title-right">
           <div class="sort-btn-box">
@@ -102,21 +108,23 @@
           <thead>
             <tr>
               <th class="index-field"></th>
-              <th class="domain-field">Domain</th>
-              <th class="a-field">A record</th>
-              <th class="soa-field">Soa</th>
-              <th class="ns-field">NS</th>
-              <th class="account-field">Account ID</th>
-              <th class="ttl-field">TTL</th>
+              <th class="id-field">ID</th>
+              <th class="transaction-hash-field">Transaction Hash</th>
+              <th class="action-field">Action</th>
+              <th class="block-field">Block</th>
+              <th class="time-field">Datetime</th>
+              <th class="status-field">Status</th>
+              <th class="from-field">From</th>
+              <th class="to-field">To</th>
             </tr>
           </thead>
           <tbody>
-            {% for domain in list %}
+            {% for transaction in list %}
             <tr>
               <td class="index-field">
                 <svg
                   style="
-                    fill: rgb(221, 87, 47);
+                    fill: rgb(34, 34, 34);
                     background-color: rgb(211, 211, 211);
                     border-radius: 10px;
                     padding: 1px;
@@ -143,49 +151,32 @@
                   ></path>
                 </svg>
               </td>
-              <td class="domain-field">{{domain.domain or ''}}</td>
-              <td class="a-field">{{ domain.a[0]['value'] or '' }}</td>
-              <td class="soa-field">{{ domain.soa or ''}}</td>
-              <td class="ns-field">{{ domain.ns_count or ''}}</td>
-              <td class="account-field">{{ domain.account_id or ''}}</td>
-              <td class="ttl-field">{{ domain.ttl or '' }}</td>
+              <th class="id-field">{{ transaction.id or '' }}</th>
+              <td class="transaction-hash-field">
+                <a href="./transactions/detail?id={{transaction.id}}"
+                  >{{transaction.hash or ''}}</a
+                >
+              </td>
+              <td class="action-field">{{transaction.action or ''}}</td>
+              <td class="block-field">{{transaction.block_id or ''}}</td>
+              <td class="time-field">{{transaction.timestamp or ''}}</td>
+              <td class="status-field">
+                <div class="status success">Success</div>
+              </td>
+              <td class="from-field">{{transaction.account_id or ''}}</td>
+              <td class="to-field">Here</td>
             </tr>
             {% endfor %}
             <tr>
               <td class="index-field"></td>
-              <td class="domain-field">Domain</td>
-              <td class="a-field">A record</td>
-              <td class="soa-field">Soa</td>
-              <td class="ns-field">NS</td>
-              <td class="account-field">Account ID</td>
-              <td class="ttl-field">TTL</td>
-            </tr>
-            <tr>
-              <td class="index-field"></td>
-              <td class="domain-field">Domain</td>
-              <td class="a-field">A record</td>
-              <td class="soa-field">Soa</td>
-              <td class="ns-field">NS</td>
-              <td class="account-field">Account ID</td>
-              <td class="ttl-field">TTL</td>
-            </tr>
-            <tr>
-              <td class="index-field"></td>
-              <td class="domain-field">Domain</td>
-              <td class="a-field">A record</td>
-              <td class="soa-field">Soa</td>
-              <td class="ns-field">NS</td>
-              <td class="account-field">Account ID</td>
-              <td class="ttl-field">TTL</td>
-            </tr>
-            <tr>
-              <td class="index-field"></td>
-              <td class="domain-field">Domain</td>
-              <td class="a-field">A record</td>
-              <td class="soa-field">Soa</td>
-              <td class="ns-field">NS</td>
-              <td class="account-field">Account ID</td>
-              <td class="ttl-field">TTL</td>
+              <td class="id-field">ID</td>
+              <td class="transaction-hash-field">Transaction Hash</td>
+              <td class="action-field">Action</td>
+              <td class="block-field">Block</td>
+              <td class="time-field">Datetime</td>
+              <td class="status-field">Status</td>
+              <td class="from-field">From</td>
+              <td class="to-field">To</td>
             </tr>
           </tbody>
         </table>
@@ -193,7 +184,9 @@
       <div class="form-box">
         <form class="typing-form" action="" method="POST">
           <h1>Typing Form</h1>
-          <h3 style="color: red">error</h3>
+          {% if message %}
+          <h3 style="color: red">{{message}}</h3>
+          {% endif %}
           <div class="field domain-field">
             <h5 for="domain">Domain</h5>
             <input
@@ -246,27 +239,27 @@
             <h5 for="a">A Record</h5>
             <div class="form-oneline-group a-inputs-group">
               <div class="group">
-                <div class="label" for="name"> Name </div>
+                <div class="label" for="name">Name</div>
                 <input type="text" name="a_name_1" />
-                <div class="label" for="ns_host2"> Value </div>
+                <div class="label" for="ns_host2">Value</div>
                 <input type="text" name="a_value_1" />
-                <div class="label" for="name"> TTL </div>
+                <div class="label" for="name">TTL</div>
                 <input type="number" name="a_ttl_1" />
               </div>
               <div class="group">
-                <div class="label" for="name"> Name </div>
+                <div class="label" for="name">Name</div>
                 <input type="text" name="a_name_2" />
-                <div class="label" for="ns_host2"> Value </div>
+                <div class="label" for="ns_host2">Value</div>
                 <input type="text" name="a_value_2" />
-                <div class="label" for="name"> TTL </div>
+                <div class="label" for="name">TTL</div>
                 <input type="number" name="a_ttl_2" />
               </div>
               <div class="group">
-                <div class="label" for="name"> Name </div>
+                <div class="label" for="name">Name</div>
                 <input type="text" name="a_name_3" />
-                <div class="label" for="ns_host2"> Value </div>
+                <div class="label" for="ns_host2">Value</div>
                 <input type="text" name="a_value_3" />
-                <div class="label" for="name"> TTL </div>
+                <div class="label" for="name">TTL</div>
                 <input type="number" name="a_ttl_3" />
               </div>
             </div>
@@ -277,9 +270,16 @@
           </div>
         </form>
 
-        <form class="files-form" action="" method="POST" enctype="multipart/form-data">
+        <form
+          class="files-form"
+          action=""
+          method="POST"
+          enctype="multipart/form-data"
+        >
           <h1>File Form</h1>
-          <h3 style="color: red">error</h3>
+          {% if message %}
+          <h3 style="color: red">{{message}}</h3>
+          {% endif %}
           <div class="field files-field">
             <input type="file" name="file" />
           </div>
@@ -289,7 +289,6 @@
           </div>
         </form>
       </div>
-
     </div>
   </div>
 </div>
