@@ -113,6 +113,10 @@ body {
   transition: 0.2s;
 }
 
+.animation.blur-screen {
+  animation: blurScreen 0.5s cubic-bezier(0, 0.52, 1, 0.45) forwards;
+}
+
 .animation.popup {
   opacity: 0;
   animation: popup 1s cubic-bezier(0.075, 0.82, 0.165, 1) forwards;
@@ -173,6 +177,16 @@ body {
   animation-delay: 2s;
 }
 
+@keyframes blurScreen {
+  0% {
+    filter: blur(0px) !important;
+    background-color: none !important;
+  }
+  100% {
+    filter: blur(2px) !important;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+  }
+}
 @keyframes slidetoRight {
   0% {
     opacity: 0;
@@ -2001,6 +2015,7 @@ body {
   text-align: center;
 }
 .operation.container .main .table-side .form-box form.typing-form .field .form-oneline-group .group input, .operation.container .main .table-side .form-box form.files-form .field .form-oneline-group .group input {
+  padding: 1px 0;
   padding-left: 10px;
   border: none;
   outline: none;

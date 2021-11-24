@@ -1,3 +1,4 @@
+from re import T
 import requests
 from requests.models import Response
 from include import *
@@ -322,6 +323,7 @@ class TransactionBusiness:
     def __init__(self):
         self.current_transactions = []
     # New ---------------------------------
+
     def getTransactionsPool(self):
         return Transactions.query.all()
 
@@ -331,62 +333,114 @@ class TransactionBusiness:
         for transaction in self.getTransactionsPool():
             # TODO : Add + Update Tx
             if transaction.action == 'Add':
-                records.append( Records(transaction)) 
+                records.append(Records(transaction))
             elif transaction.action == 'Update':
-                pass 
+                pass
         return records
 
-    def checkTransactionFormat(self, domain, a, soa = None, ns = None, account_id = None , block_id = None):
-        # TODO : check like account
+    def convertRequestToTransactionObj(self, request_form):
+        return {
+            "domain": request_form['domain'],
+
+            'soa': {
+                "mname": request_form['soa_mname'],
+                "rname": request_form['soa_rname'],
+                "refresh": request_form['soa_refresh'],
+                "retry": request_form['soa_retry'],
+                "expire": request_form['soa_expire'],
+                "minimum": request_form['soa_minimum'],
+            },
+
+            'ns':  [
+                {"host": request_form['ns_host1']},
+                {"host": request_form['ns_host2']},
+            ],
+
+            'a':  [
+                {
+                    "name": request_form['a_name_1'],
+                    "ttl": request_form['a_ttl_1'],
+                    "value": request_form['a_value_1']
+                },
+                {
+                    "name": request_form['a_name_2'],
+                    "ttl": request_form['a_ttl_2'],
+                    "value": request_form['a_value_2']
+                },
+                {
+                    "name": request_form['a_name_3'],
+                    "ttl": request_form['a_ttl_3'],
+                    "value": request_form['a_value_3']
+                },
+            ],
+        }
+
+    def checkTransactionFormat(self, obj):
         checked = copy(RECORD_FORMAT)
-        checked['domain'] = True if domain and re.match(checked['domain'], domain ) else False
-        if 'a' in checked :
-            regex = copy(checked['a'])
-            checked['value'] = []
-            checked['port'] = []
-            checked['ttl'] = []
-            for a_record in a :
-                # Check A IP ----------------------------------------------------------------------
-                print ( regex['value'], a_record['value'] ,re.match(regex['value'], a_record['value']))
-                if 'value' in a_record and a_record['value'] and re.match(regex['value'], a_record['value']):
-                    checked['value'].append(True)
-                else :
-                    checked['value'].append(False)
+        if 'domain' in obj:
+            if obj['domain'] :
+                checked['domain'] = copy(checked['domain'])
+                checked['domain'] = True if re.match( checked['domain'], obj['domain']) else False
+        
+        checked['soa'] = copy(checked['soa'])
+        if 'soa' in obj:
+            if obj['soa'] :
+                for key in obj['soa'].keys():
+                    checked['soa'][key] = True if obj['soa'][key] and re.match( checked['soa'][key], obj['soa'][key]) else False
+        
+        checked['soa'] = all([ checked['soa'][key] for key in checked['soa'].keys() ])
+        
+        checked['ns'] = copy(checked['ns'])
+        if 'ns' in obj:
+            if obj['ns'] :
+                for i in range(len(obj['ns'])):
+                    checked['ns'][i] = copy(checked['ns'][i])
+                    checked['ns'][i]['host'] = copy(checked['ns'][i]['host'])
+                    checked['ns'][i]['host'] = True if obj['ns'][i]['host'] and re.match( checked['ns'][i]['host'], obj['ns'][i]['host']) else False
+        
+        checked['ns'] = all([ ns['host'] for ns in checked['ns'] ])
+        
+        checked['a'] = copy(checked['a']) 
+        if 'a' in obj:
+            if obj['a'] :
+                for i in range(len(obj['a'])):
+                    if obj['a'][i]['value'] != "":
+                        for key in obj['a'][i].keys():
+                            checked['a'][i] = copy(checked['a'][i])
+                            checked['a'][i][key] = copy(checked['a'][i][key])
+                            checked['a'][i][key] = True if obj['a'][i][key] and re.match( checked['a'][i][key], obj['a'][i][key]) else False
+            
+        for spec in checked['a']:
+            spec = all([ spec[key] for key in spec.keys() ])
+            
+        checked['a'] = all([spec for spec in checked['a']])
+        
+        print(f"CHECKING domain : ",checked['domain'])
+        print(f"CHECKING soa : ",checked['soa'])
+        print(f"CHECKING ns : ",checked['ns'])
+        print(f"CHECKING a : ",checked['a'])
 
-                # Check A PORT ----------------------------------------------------------------------
-                if 'port' in a_record and a_record['port'] and re.match(regex['port'], a_record['port']):
-                    checked['port'].append(True)
-                else :
-                    checked['port'].append(False)
+        return all([checked[key] for key in checked.keys()])
 
-                # Check A TTL ----------------------------------------------------------------------
-                if 'ttl' in a_record and a_record['ttl'] and re.match(regex['ttl'], a_record['ttl']):
-                    checked['ttl'].append(True)
-                else:
-                    checked['ttl'].append(False)
-
-            checked['value'] = all( checked['value'] )
-            checked['port'] = all( checked['port'] )
-            checked['ttl'] = all( checked['ttl'] )
-            checked['a'] = all([ checked['value'], checked['port'], checked['ttl'] ])
-
-        return all( [ checked[key] for key in checked.keys() ] )
-    
-    def newTransaction(self, domain, a , action, ttl = 14400, soa = None, ns = None, account_id = None):
-        if self.checkTransactionFormat( domain, a, soa, ns, account_id) == True :
-            tran =  Transactions(
-                domain = domain,
-                a = a,
-                soa = soa,
-                ns = ns,
-                account_id = account_id,
-                block_id = None,
-                action = action,
-                timestamp = time.time(),
-                ttl = ttl
-            )
-            tran.hash = tran._hash()
-            return tran, 200
+    def newTransaction(self, request_form, convertToObj = False):
+        
+        if convertToObj == True:  
+            obj = self.convertRequestToTransactionObj( request_form )
+        if self.checkTransactionFormat(obj) == True:
+        #  Add serial & ttl to SOA 
+            # tran =  Transactions(
+            #     domain = domain,
+            #     a = a,
+            #     soa = soa,
+            #     ns = ns,
+            #     account_id = account_id,
+            #     block_id = None,
+            #     action = action,
+            #     timestamp = time.time(),
+            #     ttl = ttl
+            # )
+            # tran.hash = tran._hash()
+            return None, 200
         return None, 500
 
     def addTransactionPool(self, transaction):
@@ -404,7 +458,7 @@ class TransactionBusiness:
             db.session.query(Transactions).filter(
                 Transactions.id == oldtransaction.id,
             ).update({
-                
+
             })
             db.session.commit()
             return transaction, 200
@@ -425,7 +479,6 @@ class TransactionBusiness:
             return 501  # duplicate
 
         return 200
-
 
     def createSampleTransactions(self, number):
         chain = []
@@ -485,7 +538,6 @@ class TransactionBusiness:
         self.current_transactions = []
         return self.current_transactions
 
-   
     def setTransaction(self, trans):
         self.current_transactions = trans
 
@@ -684,12 +736,13 @@ class NodesBusiness:
 
 class AccountBusiness:
     # Login
-    def getAccountByEmail(self, email, password = None):
-        account = Accounts.query.filter(Accounts.email == email, Accounts.is_deleted == False).first() or None
+    def getAccountByEmail(self, email, password=None):
+        account = Accounts.query.filter(
+            Accounts.email == email, Accounts.is_deleted == False).first() or None
         if password:
-            return account if account and check_password_hash( account.password, password ) else None
-        return account 
-        
+            return account if account and check_password_hash(account.password, password) else None
+        return account
+
     def getAccountById(self, id=0):
         return Accounts.query.filter(Accounts.id == id, Accounts.is_deleted == False).first()
 
@@ -713,24 +766,24 @@ class AccountBusiness:
 
         return account, status
 
-
     # Register
+
     def checkAccountInformation(self, fullname, email, password, repassword, type_cd):
         check = copy(ACCOUNT_FORMAT)
-        
+
         check['fullname'] = True if fullname and re.match(
             check['fullname'], fullname) else False
 
-        check['email'] = True if  email and re.match(
+        check['email'] = True if email and re.match(
             check['email'], email) else False
 
-        check['password'] = True if  password and re.match(
+        check['password'] = True if password and re.match(
             check['password'], password) else False
 
-        check['repassword'] = True if  repassword and re.match(
+        check['repassword'] = True if repassword and re.match(
             check['repassword'], repassword) else False
 
-        check['type_cd'] = True if  type_cd and re.match(
+        check['type_cd'] = True if type_cd and re.match(
             check['type_cd'], str(type_cd)) else False
 
         return all([check[key] for key in check.keys()])
@@ -739,20 +792,20 @@ class AccountBusiness:
         # Check format
         if self.checkAccountInformation(fullname, email, password, repassword, type_cd) == False:
             return None, 500
-        
-        #Check duplicate 
+
+        # Check duplicate
         if self.getAccountByEmail(email, None):
             return None, 501
-        
-        #Encrypt
+
+        # Encrypt
         password = generate_password_hash(password)
-        
+
         return Accounts(
-            fullname = fullname,
-            email = email, 
-            password = password, 
-            type_cd = type_cd,
-            is_deleted = False
+            fullname=fullname,
+            email=email,
+            password=password,
+            type_cd=type_cd,
+            is_deleted=False
         ), 200
 
     def addAccount(self, newAccount):
@@ -769,4 +822,3 @@ class AccountBusiness:
 
     def deleteAccount(self):
         pass
-

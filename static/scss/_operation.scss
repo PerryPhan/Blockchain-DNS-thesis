@@ -483,6 +483,7 @@
 
           &.typing-form,
           &.files-form {
+            
             .field {
               padding: 5px 0;
 
@@ -546,7 +547,9 @@
                   }
 
                   input {
+                    padding: 1px 0;
                     padding-left: 10px;
+                    
                     border: none;
                     outline: none;
                     border-bottom: 2px solid rgba(80, 80, 80, 0.541);

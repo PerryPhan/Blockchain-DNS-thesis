@@ -12,14 +12,45 @@ MESSAGE = {
     'FileError02' : 'File don\'t have a name',
     'FileError03' : 'File wrong format',
 }
+# IP , ex : 1.1.1.1
 IP_FORMAT = '^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
+# Tên miền, ex : example.com
+DOMAIN_FORMAT = '^[a-zA-Z0-9][a-zA-Z0-9-_]{0,61}[a-zA-Z0-9]{0,1}\.([a-zA-Z]{1,6}|[a-zA-Z0-9-]{1,30}\.[a-zA-Z]{2,3})$'
+# Số , ex :  0 - 99999+
+NUMBER_FORMAT = '^[0-9]+$'
 RECORD_FORMAT = {
-    'domain' : '^[a-zA-Z0-9][a-zA-Z0-9-_]{0,61}[a-zA-Z0-9]{0,1}\.([a-zA-Z]{1,6}|[a-zA-Z0-9-]{1,30}\.[a-zA-Z]{2,3})$',   # Tên miền, ex : example.com
-    'a' : {
-        'value' : IP_FORMAT,   # Giá trị IP , ex : 1.1.1.1
-        'port'   : '^[1-9][0-9]{1,3}$',   # Giao thức cổng , ex: 80 ( HTTP )
-        'ttl'    : '^[1-9]{1}[0-9]{1,4}$' # Thời gian tồn tại, ex : 14400 ( 4h )
-    }
+    'domain' : DOMAIN_FORMAT,
+    'soa': {
+        "mname": DOMAIN_FORMAT, 
+        "rname": DOMAIN_FORMAT, 
+        "refresh": NUMBER_FORMAT,
+        "retry": NUMBER_FORMAT,
+        "expire": NUMBER_FORMAT,
+        "minimum": NUMBER_FORMAT,
+    },
+
+    'ns':  [
+        {"host": DOMAIN_FORMAT},
+        {"host": DOMAIN_FORMAT},
+    ],
+
+    'a':  [
+        {
+            "name": "@",
+            "ttl": NUMBER_FORMAT,
+            "value": IP_FORMAT
+        },
+        {
+            "name": "@",
+            "ttl": NUMBER_FORMAT,
+            "value": IP_FORMAT
+        },
+        {
+            "name": "@",
+            "ttl": NUMBER_FORMAT,
+            "value": IP_FORMAT
+        },
+    ],
 }
 
 ACCOUNT_FORMAT = {

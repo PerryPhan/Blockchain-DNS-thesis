@@ -147,7 +147,49 @@ def detailDashboardDomains():
     return render_template('_detail_dashboard_template.html', **html_options)
 
 @app.route('/dashboard/operation', methods=['GET','POST'])
-def dashboard_form():
+def dashboard_operation():
+    ALLOWED_EXTS = {"txt"}
+    
+    def checkFileExtension(file):
+        return '.' in file and len(file.rsplit('.')) == 2 and file.rsplit('.', 1)[1].lower() in ALLOWED_EXTS
+
+    def checkFileNameFormat(filename):
+        # Check file name
+        if filename == '':
+            return render_template('_dnsform_template.html', error_message=MESSAGE['FileError02']), 404
+
+        # Check file extension
+        if checkFileExtension(filename) == False:
+            return render_template('_dnsform_template.html', error_message=MESSAGE['FileError03']), 404
+
+        # Format that filename can store any where
+        filename = secure_filename(filename)
+        return filename, 200
+
+    def handleOneRecordForm(form):
+        # New transaction
+        tran, status = transactionsBusiness.newTransaction(
+           form, True
+        )
+        # Add single Transaction 
+        # status = transactionsBusiness.addTransactionPool(tran)
+        
+        return {'status': status, 'tran': tran.as_dict() if tran else None}
+    
+    def handleMultipleRecordsForm(file):
+        filename, status = checkFileNameFormat(file.filename)
+        if status != 200:
+            return status
+
+        # Check uploads folder
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+        # Open file and add the content to TRANSACTION
+        with open(file_path, "r", encoding="utf-8") as f:
+        #    Do like 1 form
+            return 200
+    
     # Check account 
     if not session or not 'account' in session :
         return redirect('/login')
@@ -164,14 +206,17 @@ def dashboard_form():
     }
     
     if request.method == 'POST':
-        status = 200
+        status = 0
         if 'file' in request.files:
+            status = handleMultipleRecordsForm(request.files['file'])
+            
             return {
             'status' : status, 
             'form'   : request.form,
-            'file'  : request.files['file'].filename
+            'file'  :  request.files['file'].filename
             }
-            
+        
+        status = handleOneRecordForm(request.form)
         return {
             'status' : status, 
             'form'   : request.form,

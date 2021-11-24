@@ -1,7 +1,9 @@
 .animation{
     transition: .2s;   
 }
-
+.animation.blur-screen{
+    animation : blurScreen .5s cubic-bezier(0,.52,1,.45) forwards;
+}
 .animation.popup{
     opacity: 0;
     animation : popup 1s cubic-bezier(0.075, 0.82, 0.165, 1) forwards;
@@ -49,6 +51,17 @@
 .type-img-box.animation.popup{
     animation-duration: 1.25s;
     animation-delay: 2s;
+}
+
+@keyframes blurScreen { 
+    0%{
+        filter: blur(0px) !important;
+        background-color: none !important;  
+    }
+    100%{
+        filter: blur(2px) !important;
+        background-color: rgba(0, 0, 0, .5) !important;  
+    }
 }
 
 @keyframes slidetoRight { 

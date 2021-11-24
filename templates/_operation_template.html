@@ -181,8 +181,8 @@
           </tbody>
         </table>
       </div>
-      <div class="form-box">
-        <form class="typing-form" action="" method="POST">
+      <div class="form-box ">
+        <form class="typing-form animation" method="POST">
           <h1>Typing Form</h1>
           {% if message %}
           <h3 style="color: red">{{message}}</h3>
@@ -192,7 +192,7 @@
             <input
               type="text"
               name="domain"
-              placeholder=" Type domain ex: dai.com "
+              placeholder=" Type your domain ex: dai.com "
               pattern="^[a-zA-Z0-9][a-zA-Z0-9-_]{0,61}[a-zA-Z0-9]{0,1}\.([a-zA-Z]{1,6}|[a-zA-Z0-9-]{1,30}\.[a-zA-Z]{2,3})$"
               required
             />
@@ -202,23 +202,63 @@
             <div class="form-oneline-group soa-inputs-group">
               <div class="group">
                 <div class="label" for="soa_mname">Mname</div>
-                <input type="text" class="error" name="soa_mname" />
+                <input
+                  type="text"
+                  name="soa_mname"
+                  placeholder="Auto-gen or custom"
+                  pattern="^[a-zA-Z0-9][a-zA-Z0-9-_]{0,61}[a-zA-Z0-9]{0,1}\.([a-zA-Z]{1,6}|[a-zA-Z0-9-]{1,30}\.[a-zA-Z]{2,3})$"
+                  required
+                />
               </div>
               <div class="group">
                 <div class="label" for="soa_rname">Rname</div>
-                <input type="text" name="soa_rname" />
+                <input
+                  type="text"
+                  name="soa_rname"
+                  placeholder="Auto-gen or custom"
+                  pattern="^[a-zA-Z0-9][a-zA-Z0-9-_]{0,61}[a-zA-Z0-9]{0,1}\.([a-zA-Z]{1,6}|[a-zA-Z0-9-]{1,30}\.[a-zA-Z]{2,3})$"
+                  required
+                />
               </div>
               <div class="group">
                 <div class="label" for="soa_refresh">Refresh</div>
-                <input type="number" name="soa_rname" />
-                <div class="label" for="soa_serial">Serial</div>
-                <input type="number" name="soa_rname" />
+                <input
+                  type="number"
+                  name="soa_refresh"
+                  min="1000"
+                  max="4800"
+                  value="3600"
+                  required
+                />
+                <div class="label" for="soa_retry">Retry</div>
+                <input
+                  type="number"
+                  name="soa_retry"
+                  min="600"
+                  max="1000"
+                  value="600"
+                  required
+                />
               </div>
               <div class="group">
                 <div class="label" class="label" for="soa_expire">Expire</div>
-                <input type="number" name="soa_expire" />
+                <input
+                  type="number"
+                  name="soa_expire"
+                  min="30"
+                  max="50"
+                  value="30"
+                  required
+                />
                 <div class="label" for="soa_minimum">Minimum</div>
-                <input type="number" name="soa_minimum" />
+                <input
+                  type="number"
+                  name="soa_minimum"
+                  min="60000"
+                  max="86400"
+                  value="86400"
+                  required
+                />
               </div>
             </div>
           </div>
@@ -227,11 +267,23 @@
             <div class="form-oneline-group ns-inputs-group">
               <div class="group">
                 <div class="label" for="ns_host1">Host 1</div>
-                <input type="text" name="ns_host1" />
+                <input
+                  type="text"
+                  name="ns_host1"
+                  placeholder="Auto-gen or custom"
+                  pattern="^[a-zA-Z0-9][a-zA-Z0-9-_]{0,61}[a-zA-Z0-9]{0,1}\.([a-zA-Z]{1,6}|[a-zA-Z0-9-]{1,30}\.[a-zA-Z]{2,3})$"
+                  required
+                />
               </div>
               <div class="group">
                 <div class="label" for="ns_host2">Host 2</div>
-                <input type="text" name="ns_host2" />
+                <input
+                  type="text"
+                  name="ns_host2"
+                  placeholder="Auto-gen or custom"
+                  pattern="^[a-zA-Z0-9][a-zA-Z0-9-_]{0,61}[a-zA-Z0-9]{0,1}\.([a-zA-Z]{1,6}|[a-zA-Z0-9-]{1,30}\.[a-zA-Z]{2,3})$"
+                  required
+                />
               </div>
             </div>
           </div>
@@ -239,28 +291,77 @@
             <h5 for="a">A Record</h5>
             <div class="form-oneline-group a-inputs-group">
               <div class="group">
-                <div class="label" for="name">Name</div>
-                <input type="text" name="a_name_1" />
-                <div class="label" for="ns_host2">Value</div>
-                <input type="text" name="a_value_1" />
-                <div class="label" for="name">TTL</div>
-                <input type="number" name="a_ttl_1" />
+                <div class="label" for="a_name_1">Name</div>
+                <input
+                  type="text"
+                  name="a_name_1"
+                  placeholder="Same as domain name"
+                  readonly
+                  required
+                />
+                <div class="label" for="a_value_1">Value</div>
+                <input
+                  type="text"
+                  name="a_value_1"
+                  placeholder="Type domain IP ex: 1.1.1.1"
+                  pattern="^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+                  required
+                />
+                <div class="label" for="a_ttl_1">TTL</div>
+                <input
+                  type="number"
+                  name="a_ttl_1"
+                  min="100"
+                  max="400"
+                  value="400"
+                  required
+                />
               </div>
               <div class="group">
-                <div class="label" for="name">Name</div>
-                <input type="text" name="a_name_2" />
-                <div class="label" for="ns_host2">Value</div>
-                <input type="text" name="a_value_2" />
-                <div class="label" for="name">TTL</div>
-                <input type="number" name="a_ttl_2" />
+                <div class="label" for="a_name_2">Name</div>
+                <input
+                  type="text"
+                  name="a_name_2"
+                  placeholder="Same as domain name"
+                  readonly
+                />
+                <div class="label" for="a_value_2">Value</div>
+                <input
+                  type="text"
+                  name="a_value_2"
+                  placeholder="Type domain IP ex: 1.1.1.1"
+                />
+                <div class="label" for="a_ttl_2">TTL</div>
+                <input
+                  type="number"
+                  name="a_ttl_2"
+                  min="100"
+                  max="400"
+                  value="400"
+                />
               </div>
               <div class="group">
-                <div class="label" for="name">Name</div>
-                <input type="text" name="a_name_3" />
-                <div class="label" for="ns_host2">Value</div>
-                <input type="text" name="a_value_3" />
-                <div class="label" for="name">TTL</div>
-                <input type="number" name="a_ttl_3" />
+                <div class="label" for="a_name_3">Name</div>
+                <input
+                  type="text"
+                  name="a_name_3"
+                  placeholder="Same as domain name"
+                  readonly
+                />
+                <div class="label" for="a_value_3">Value</div>
+                <input
+                  type="text"
+                  name="a_value_3"
+                  placeholder="Type domain IP ex: 1.1.1.1"
+                />
+                <div class="label" for="a_ttl_3">TTL</div>
+                <input
+                  type="number"
+                  name="a_ttl_3"
+                  min="100"
+                  max="400"
+                  value="400"
+                />
               </div>
             </div>
           </div>
@@ -271,8 +372,7 @@
         </form>
 
         <form
-          class="files-form"
-          action=""
+          class="files-form animation blur-screen"
           method="POST"
           enctype="multipart/form-data"
         >
@@ -293,4 +393,5 @@
   </div>
 </div>
 <script src="{{url_for('static',filename='js/dashboard-helper.js')}}"></script>
+<script src="{{url_for('static',filename='js/operation-helper.js')}}"></script>
 {% endblock %}
