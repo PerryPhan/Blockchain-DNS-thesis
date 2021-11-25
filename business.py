@@ -321,6 +321,7 @@ class Blockchain:
 
 class TransactionBusiness:
     def __init__(self):
+        self.TIME_TO_LIVE = 3600
         self.current_transactions = []
     # New ---------------------------------
 
@@ -415,30 +416,30 @@ class TransactionBusiness:
             
         checked['a'] = all([spec for spec in checked['a']])
         
-        print(f"CHECKING domain : ",checked['domain'])
-        print(f"CHECKING soa : ",checked['soa'])
-        print(f"CHECKING ns : ",checked['ns'])
-        print(f"CHECKING a : ",checked['a'])
-
+        # print("CHECKING domain : ",checked['domain'])
+        # print("CHECKING soa : ",checked['soa'])
+        # print("CHECKING ns : ",checked['ns'])
+        # print("CHECKING a : ",checked['a'])
         return all([checked[key] for key in checked.keys()])
 
-    def newTransaction(self, request_form, convertToObj = False):
+    def newTransaction(self, request_form, account_id, fe ,convertToObj = False):
         
         if convertToObj == True:  
             obj = self.convertRequestToTransactionObj( request_form )
         if self.checkTransactionFormat(obj) == True:
-        #  Add serial & ttl to SOA 
-            # tran =  Transactions(
-            #     domain = domain,
-            #     a = a,
-            #     soa = soa,
-            #     ns = ns,
-            #     account_id = account_id,
-            #     block_id = None,
-            #     action = action,
-            #     timestamp = time.time(),
-            #     ttl = ttl
-            # )
+            #  Add serial & ttl to SOA 
+            obj['soa']['serial'] = time.time()
+            obj['ttl'] = self.TIME_TO_LIVE
+            tran =  Transactions(
+                domain = obj['domain'],
+                action = '',
+                soa    = obj['soa'],
+                ns     = obj['ns'],
+                a      = obj['a'],
+                ttl    = obj['ttl'],
+                timestamp = time.time(),
+
+            )
             # tran.hash = tran._hash()
             return None, 200
         return None, 500
