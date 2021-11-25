@@ -1,292 +1,208 @@
-{% extends 'template.html' %} {% block title %} {{ title or '' }} {% endblock %}
-{% block body %}
-<div class="dashboard container">
-  {% if account_id %}
-  <div class="add-tx-button-group modal">
-    <a href="./operation">
-      <div class="call-to-action">
-        <div class="img-box">
-          <img
-            src="{{url_for('static',filename='img/add-icon.png')}}"
-            alt="add-icon"
-          />
-        </div>
-        <div class="text">Adding more Domain</div>
-      </div>
-    </a>
+{% extends 'template2.html' %} {% block main %}
+<div class="main">
+  <div class="aside animation asideSlidetoRight">
+    <div class="tab-title {% if type == 1 %} active {% endif %}">
+      <a href="{% if type != 1 %}./transactions{% else %}#{% endif %}"
+        ><h3>Transaction List</h3></a
+      >
+    </div>
+    <div class="sub-tab tab-title {% if type == 1 %} active {% endif %}">
+      <a href="./transactions/detail"><h3>Recent transaction detail</h3> </a>
+    </div>
+    <div class="tab-title {% if type == 2 %} active {% endif %}">
+      <a href="{% if type != 2 %}./domains{% else %}#{% endif %}"
+        ><h3>Domain List</h3></a
+      >
+    </div>
+    <div class="sub-tab tab-title {% if type == 2 %} active {% endif %}">
+      <a href="./domains/detail"><h3>Recent domain detail</h3> </a>
+    </div>
+    {% if account_id %}
+    <div class="tab-title {% if type == 3 %} active {% endif %}">
+      <a href="./operation"><h3>Operation</h3></a>
+    </div>
+    {% endif %}
   </div>
-  {% endif %}
-  <div class="header">
-    <div class="left">
-      <div class="menu-btn">
-        <button id="menu-toggler">
-          <img
-            src="{{url_for('static',filename='img/menu-icon.png')}}"
-            alt="btn-menu-img"
-          />
-        </button>
+  <div class="table-side">
+    <div class="titles">
+      <div class="title-left">
+        <h1>{{ title or '' }}</h1>
+        <h4>Total <span> {{ count or '0'}} </span> {{ unit or ''}}</h4>
       </div>
-      <div class="logo">
-        <a href="#">
-          <div class="logo-link">
-            <div class="img-box">
-              <img
-                src="{{url_for('static',filename='img/dnschain-logo-last.png')}}"
-                alt="logo"
-              />
-            </div>
-            <h1>dnschain</h1>
-          </div>
-        </a>
-      </div>
-      <div class="search">
-        <img
-          src="{{url_for('static',filename='img/search-icon.png')}}"
-          alt="search-icon"
-        />
-        <input type="text" placeholder="Search infromation in profile" />
+      <div class="title-right">
+        <div class="sort-btn-box">
+          <button>
+            <h3>Sort</h3>
+            <img
+              src="{{url_for('static',filename='img/sort-icon.png')}}"
+              alt="sort-icon"
+            />
+          </button>
+        </div>
       </div>
     </div>
-    <div class="right">
-      <div class="user">
-        <div class="hello">
-          Hi. {% if account_id %}
-          <div class="name">{{ account_fullname or ''}}</div>
-          <div class="type hoster">Hoster</div>
+    <div class="table-box">
+      <table>
+        <thead>
+          {% if type == 1 %}
+          <tr>
+            <th class="index-field"></th>
+            <th class="id-field">ID</th>
+            <th class="transaction-hash-field">Transaction Hash</th>
+            <th class="action-field">Action</th>
+            <th class="block-field">Block</th>
+            <th class="time-field">Datetime</th>
+            <th class="status-field">Status</th>
+            <th class="from-field">From</th>
+            <th class="to-field">To</th>
+          </tr>
           {% else %}
-          <div class="name">Guest</div>
-          <div class="type client">Client</div>
+          <tr>
+            <th class="index-field"></th>
+            <th class="domain-field">Domain</th>
+            <th class="a-field">A record</th>
+            <th class="soa-field">Soa</th>
+            <th class="ns-field">NS</th>
+            <th class="account-field">Account ID</th>
+            <th class="ttl-field">TTL</th>
+          </tr>
           {% endif %}
-        </div>
-        {% if account_id %}
-        <a href="/logout">
-          <div class="img-box">
-            Logout
-            <img
-              src="{{url_for('static',filename='img/logout-icon.png')}}"
-              alt="logout-icon"
-            />
-          </div>
-        </a>
-        {% else %}
-        <a href="/login">
-          <div class="img-box">
-            Login
-            <img
-              src="{{url_for('static',filename='img/logout-icon.png')}}"
-              alt="login-icon"
-            />
-          </div>
-        </a>
-        {% endif %}
-      </div>
+        </thead>
+        <tbody>
+          {% if type == 1 %} {% if list %} {% for transaction in list %}
+          <tr>
+            <td class="index-field">
+              <svg
+                style="
+                  fill: rgb(34, 34, 34);
+                  background-color: rgb(211, 211, 211);
+                  border-radius: 10px;
+                  padding: 1px;
+                "
+                viewBox="0 0 24 24"
+                width="20"
+                height="20"
+              >
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M3.106 11.553a1 1 0 011.341-.447L12 14.882l7.553-3.776a1 1 0 11.894 1.788l-8 4a1 1 0 01-.894 0l-8-4a1 1 0 01-.447-1.341z"
+                  fill=""
+                ></path>
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M3.106 15.553a1 1 0 011.341-.447L12 18.882l7.553-3.776a1 1 0 11.894 1.788l-8 4a1 1 0 01-.894 0l-8-4a1 1 0 01-.447-1.341z"
+                  fill=""
+                ></path>
+                <path
+                  d="M12 13c-.2 0-.3 0-.4-.1l-8-4C3.2 8.7 3 8.4 3 8s.2-.7.6-.9l8-4c.2-.1.6-.1.8 0l8 4c.4.2.6.5.6.9s-.2.7-.6.9l-8 4c-.1.1-.2.1-.4.1z"
+                  fill=""
+                ></path>
+              </svg>
+            </td>
+            <th class="id-field">{{ transaction.id or '' }}</th>
+            <td class="transaction-hash-field">
+              <a href="./transactions/detail?id={{transaction.id}}"
+                >{{transaction.hash or ''}}</a
+              >
+            </td>
+            <td class="action-field">{{transaction.action or ''}}</td>
+            <td class="block-field">{{transaction.block_id or ''}}</td>
+            <td class="time-field">{{transaction.timestamp or ''}}</td>
+            <td class="status-field">
+              <div class="status success">Success</div>
+            </td>
+            <td class="from-field">{{transaction.account_id or ''}}</td>
+            <td class="to-field">Here</td>
+          </tr>
+          {% endfor %} {% endif %} {% else %} {% for domain in list %}
+          <tr>
+            <td class="index-field">
+              <svg
+                style="
+                  fill: rgb(221, 87, 47);
+                  background-color: rgb(211, 211, 211);
+                  border-radius: 10px;
+                  padding: 1px;
+                "
+                viewBox="0 0 24 24"
+                width="20"
+                height="20"
+              >
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M3.106 11.553a1 1 0 011.341-.447L12 14.882l7.553-3.776a1 1 0 11.894 1.788l-8 4a1 1 0 01-.894 0l-8-4a1 1 0 01-.447-1.341z"
+                  fill=""
+                ></path>
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M3.106 15.553a1 1 0 011.341-.447L12 18.882l7.553-3.776a1 1 0 11.894 1.788l-8 4a1 1 0 01-.894 0l-8-4a1 1 0 01-.447-1.341z"
+                  fill=""
+                ></path>
+                <path
+                  d="M12 13c-.2 0-.3 0-.4-.1l-8-4C3.2 8.7 3 8.4 3 8s.2-.7.6-.9l8-4c.2-.1.6-.1.8 0l8 4c.4.2.6.5.6.9s-.2.7-.6.9l-8 4c-.1.1-.2.1-.4.1z"
+                  fill=""
+                ></path>
+              </svg>
+            </td>
+            <td class="domain-field">
+              <a href="./domains/detail?domain={{domain.domain}}"
+                >{{domain.domain or ''}}</a
+              >
+            </td>
+            <td class="a-field">{{ domain.a[0]['value'] or '' }}</td>
+            <td class="soa-field">{{ domain.soa or ''}}</td>
+            <td class="ns-field">{{ domain.ns_count or ''}}</td>
+            <td class="account-field">{{ domain.account_id or ''}}</td>
+            <td class="ttl-field">{{ domain.ttl or '' }}</td>
+          </tr>
+          {% endfor %} {% endif %}
+        </tbody>
+      </table>
     </div>
-  </div>
-  <div class="main">
-    <div class="aside animation asideSlidetoRight">
-      <div class="tab-title {% if type == 1 %} active {% endif %}">
-        <a href="{% if type != 1 %}./transactions{% else %}#{% endif %}"
-          ><h3>Transaction List</h3></a
-        >
-      </div>
-      <div class="sub-tab tab-title {% if type == 1 %} active {% endif %}">
-        <a href="./transactions/detail"><h3>Recent transaction detail</h3> </a>
-      </div>
-      <div class="tab-title {% if type == 2 %} active {% endif %}">
-        <a href="{% if type != 2 %}./domains{% else %}#{% endif %}"
-          ><h3>Domain List</h3></a
-        >
-      </div>
-      <div class="sub-tab tab-title {% if type == 2 %} active {% endif %}">
-        <a href="./domains/detail"><h3>Recent domain detail</h3> </a>
-      </div>
-      {% if account_id %}
-      <div class="tab-title {% if type == 3 %} active {% endif %}">
-        <a href="./operation"><h3>Operation</h3></a>
-      </div>
-      {% endif %}
-    </div>
-    <div class="table-side">
-      <div class="titles">
-        <div class="title-left">
-          <h1>{{ title or '' }}</h1>
-          <h4>Total <span> {{ count or '0'}} </span> {{ unit or ''}}</h4>
+    <div class="pagination">
+      <div class="btn-box">
+        <div class="first-side">
+          <span>
+            <a href="/table">First</a>
+          </span>
+          <span>
+            <a href="#" id="a-table-previous" class="nohref"
+              ><img
+                src="{{url_for('static',filename='img/arrow-left-icon.png')}}"
+                alt="left-icon" /></a
+          ></span>
         </div>
-        <div class="title-right">
-          <div class="sort-btn-box">
-            <button>
-              <h3>Sort</h3>
+        <div class="index-side">
+          <span id="span-table-index-page"></span>
+          <span>/</span>
+          <span id="span-table-total-page"></span>
+        </div>
+        <div class="last-side">
+          <span>
+            <a href="#" id="a-table-next">
               <img
-                src="{{url_for('static',filename='img/sort-icon.png')}}"
-                alt="sort-icon"
-              />
-            </button>
-          </div>
+                src="{{url_for('static',filename='img/arrow-right-icon.png')}}"
+                alt="right-icon"
+            /></a>
+          </span>
+          <span>
+            <a href="/table">Last</a>
+          </span>
         </div>
       </div>
-      <div class="table-box">
-        <table>
-          <thead>
-            {% if type == 1 %}
-            <tr>
-              <th class="index-field"></th>
-              <th class="id-field">ID</th>
-              <th class="transaction-hash-field">Transaction Hash</th>
-              <th class="action-field">Action</th>
-              <th class="block-field">Block</th>
-              <th class="time-field">Datetime</th>
-              <th class="status-field">Status</th>
-              <th class="from-field">From</th>
-              <th class="to-field">To</th>
-            </tr>
-            {% else %}
-            <tr>
-              <th class="index-field"></th>
-              <th class="domain-field">Domain</th>
-              <th class="a-field">A record</th>
-              <th class="soa-field">Soa</th>
-              <th class="ns-field">NS</th>
-              <th class="account-field">Account ID</th>
-              <th class="ttl-field">TTL</th>
-            </tr>
-            {% endif %}
-          </thead>
-          <tbody>
-            {% if type == 1 %} {% if list %} {% for transaction in list %}
-            <tr>
-              <td class="index-field">
-                <svg
-                  style="
-                    fill: rgb(34, 34, 34);
-                    background-color: rgb(211, 211, 211);
-                    border-radius: 10px;
-                    padding: 1px;
-                  "
-                  viewBox="0 0 24 24"
-                  width="20"
-                  height="20"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M3.106 11.553a1 1 0 011.341-.447L12 14.882l7.553-3.776a1 1 0 11.894 1.788l-8 4a1 1 0 01-.894 0l-8-4a1 1 0 01-.447-1.341z"
-                    fill=""
-                  ></path>
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M3.106 15.553a1 1 0 011.341-.447L12 18.882l7.553-3.776a1 1 0 11.894 1.788l-8 4a1 1 0 01-.894 0l-8-4a1 1 0 01-.447-1.341z"
-                    fill=""
-                  ></path>
-                  <path
-                    d="M12 13c-.2 0-.3 0-.4-.1l-8-4C3.2 8.7 3 8.4 3 8s.2-.7.6-.9l8-4c.2-.1.6-.1.8 0l8 4c.4.2.6.5.6.9s-.2.7-.6.9l-8 4c-.1.1-.2.1-.4.1z"
-                    fill=""
-                  ></path>
-                </svg>
-              </td>
-              <th class="id-field">{{ transaction.id or '' }}</th>
-              <td class="transaction-hash-field">
-                <a href="./transactions/detail?id={{transaction.id}}"
-                  >{{transaction.hash or ''}}</a
-                >
-              </td>
-              <td class="action-field">{{transaction.action or ''}}</td>
-              <td class="block-field">{{transaction.block_id or ''}}</td>
-              <td class="time-field">{{transaction.timestamp or ''}}</td>
-              <td class="status-field">
-                <div class="status success">Success</div>
-              </td>
-              <td class="from-field">{{transaction.account_id or ''}}</td>
-              <td class="to-field">Here</td>
-            </tr>
-            {% endfor %} {% endif %} {% else %} {% for domain in list %}
-            <tr>
-              <td class="index-field">
-                <svg
-                  style="
-                    fill: rgb(221, 87, 47);
-                    background-color: rgb(211, 211, 211);
-                    border-radius: 10px;
-                    padding: 1px;
-                  "
-                  viewBox="0 0 24 24"
-                  width="20"
-                  height="20"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M3.106 11.553a1 1 0 011.341-.447L12 14.882l7.553-3.776a1 1 0 11.894 1.788l-8 4a1 1 0 01-.894 0l-8-4a1 1 0 01-.447-1.341z"
-                    fill=""
-                  ></path>
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M3.106 15.553a1 1 0 011.341-.447L12 18.882l7.553-3.776a1 1 0 11.894 1.788l-8 4a1 1 0 01-.894 0l-8-4a1 1 0 01-.447-1.341z"
-                    fill=""
-                  ></path>
-                  <path
-                    d="M12 13c-.2 0-.3 0-.4-.1l-8-4C3.2 8.7 3 8.4 3 8s.2-.7.6-.9l8-4c.2-.1.6-.1.8 0l8 4c.4.2.6.5.6.9s-.2.7-.6.9l-8 4c-.1.1-.2.1-.4.1z"
-                    fill=""
-                  ></path>
-                </svg>
-              </td>
-              <td class="domain-field">
-                <a href="./domains/detail?domain={{domain.domain}}"
-                  >{{domain.domain or ''}}</a
-                >
-              </td>
-              <td class="a-field">{{ domain.a[0]['value'] or '' }}</td>
-              <td class="soa-field">{{ domain.soa or ''}}</td>
-              <td class="ns-field">{{ domain.ns_count or ''}}</td>
-              <td class="account-field">{{ domain.account_id or ''}}</td>
-              <td class="ttl-field">{{ domain.ttl or '' }}</td>
-            </tr>
-            {% endfor %} {% endif %}
-          </tbody>
-        </table>
-      </div>
-      <div class="pagination">
-        <div class="btn-box">
-          <div class="first-side">
-            <span>
-              <a href="/table">First</a>
-            </span>
-            <span>
-              <a href="#" id="a-table-previous" class="nohref"
-                ><img
-                  src="{{url_for('static',filename='img/arrow-left-icon.png')}}"
-                  alt="left-icon" /></a
-            ></span>
-          </div>
-          <div class="index-side">
-            <span id="span-table-index-page"></span>
-            <span>/</span>
-            <span id="span-table-total-page"></span>
-          </div>
-          <div class="last-side">
-            <span>
-              <a href="#" id="a-table-next">
-                <img
-                  src="{{url_for('static',filename='img/arrow-right-icon.png')}}"
-                  alt="right-icon"
-              /></a>
-            </span>
-            <span>
-              <a href="/table">Last</a>
-            </span>
-          </div>
-        </div>
-      </div>
-      <p class="createdby">
-        This project is made by Phan Dai
-        <img
-          src="{{url_for('static',filename='img/dai-brand-icon.png')}}"
-          alt="pd-icon"
-        />
-      </p>
     </div>
+    <p class="createdby">
+      This project is made by Phan Dai
+      <img
+        src="{{url_for('static',filename='img/dai-brand-icon.png')}}"
+        alt="pd-icon"
+      />
+    </p>
   </div>
 </div>
-<script src="{{url_for('static',filename='js/dashboard-helper.js')}}"></script>
+
 {% endblock %}

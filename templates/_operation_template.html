@@ -163,7 +163,9 @@
               <td class="status-field">
                 <div class="status success">Success</div>
               </td>
-              <td class="from-field">{{transaction.account_id or ''}}</td>
+              <td class="from-field">
+                <a href="#">{{transaction.owner.fullname or ''}}</a>
+              </td>
               <td class="to-field">Here</td>
             </tr>
             {% endfor %}

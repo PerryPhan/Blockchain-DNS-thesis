@@ -65,14 +65,16 @@ def admin():
 
 @app.route('/dashboard/transactions')
 def dashboardTransactions():
-    list = dns.blockchain.transactions.getTransactionsPool()
-        
+    list = dns.blockchain.transactions.getAllTransactions()
+    noblocklist = dns.blockchain.transactions.getNoBlockTransactions()
     html_options = {
         'type' : 1,
         'title': 'Transaction Dashboard ',
         'count': len(list) if list else 0,
         'unit' : 'tx',
         'list' : list,
+        'no_block_list_count': len(noblocklist),
+        'node' : dns.blockchain.nodes.node,
     }
     if session:
         if 'account' in session:
@@ -114,6 +116,7 @@ def dashboardDomains():
         'count': len(list) if list else 0,
         'unit' : 'domains',
         'list' : list,
+        'node_id' : dns.blockchain.node_id,
     }
     
     if session :
@@ -169,12 +172,12 @@ def dashboard_operation():
     def handleOneRecordForm(form):
         # New transaction
         tran, status = transactionsBusiness.newTransaction(
-           form, True
+           form, session['account']['id'], 'add', True
         )
         # Add single Transaction 
-        # status = transactionsBusiness.addTransactionPool(tran)
+        status = transactionsBusiness.addTransactionPool(tran)
         
-        return {'status': status, 'tran': tran.as_dict() if tran else None}
+        return tran, status
     
     def handleMultipleRecordsForm(file):
         filename, status = checkFileNameFormat(file.filename)
@@ -208,7 +211,7 @@ def dashboard_operation():
     if request.method == 'POST':
         status = 0
         if 'file' in request.files:
-            status = handleMultipleRecordsForm(request.files['file'])
+            status  = handleMultipleRecordsForm(request.files['file'])
             
             return {
             'status' : status, 
@@ -216,15 +219,20 @@ def dashboard_operation():
             'file'  :  request.files['file'].filename
             }
         
-        status = handleOneRecordForm(request.form)
+        tran, status = handleOneRecordForm(request.form)
         return {
             'status' : status, 
-            'form'   : request.form,
+            'transaction'   : tran.as_dict() if tran else None,
         }
             
     return render_template('_operation_template.html', **html_options)
     
-
+@app.route('/block')
+def block_manager():
+    html_options = {
+        'title': 'Block Manager ',
+    }
+    return render_template('_block_manager_template.html', **html_options)
 
 @app.route('/logout')
 def logout():
@@ -318,8 +326,8 @@ def register():
     return render_template('_login_template.html', **html_options)
 
 
-# BACK ------------------------------------------------
 
+# BACK ------------------------------------------------
 
 @app.route('/blockchain/transactions')
 def showTransactionsBuffer():
@@ -414,25 +422,26 @@ def addNewBlock():
 
 @app.route('/blockchain/mine')
 def mineBlock():
-    block, status = dns.blockchain.mineBlock()
-    if status == 200:
-        # 1. here . Don't work
-        block, status = dns.blockchain.addBlock(block)
-        dns.blockchain.broadcastNewBlock()
-        # 2. here . Don't work
-    elif status == 500:
-        message = f'Don\'t have enough {dns.blockchain.BUFFER_MAX_LEN} transactions to start mining'
+    # block, status = dns.blockchain.mineBlock()
+    # if status == 200:
+    #     # 1. here . Don't work
+    #     block, status = dns.blockchain.addBlock(block)
+    #     dns.blockchain.broadcastNewBlock()
+    #     # 2. here . Don't work
+    # elif status == 500:
+    #     message = f'Don\'t have enough {dns.blockchain.BUFFER_MAX_LEN} transactions to start mining'
 
-    if status == 200:
-        message = 'Mine block successfully'
-    else:
-        message = 'Something goes wrong with adding progress in mining'
+    # if status == 200:
+    #     message = 'Mine block successfully'
+    # else:
+    #     message = 'Something goes wrong with adding progress in mining'
 
-    return jsonify({
-        'status': status,
-        'message': message,
-        'block_id': block.id if block else None
-    })
+    # return jsonify({
+    #     'status': status,
+    #     'message': message,
+    #     'block_id': block.id if block else None
+    # })
+    return 'Step 1: Check condition -> Step 2: Mine '
 
 
 @app.route('/blockchain/pow', methods=["POST"])
@@ -520,9 +529,10 @@ if __name__ == "__main__":
         print('  WELCOME NODE ', node.id[:-25] + '..xxx')
         print('//----------------------------------------//')
         try:
+            dns.initBlockchain(node)
             app.run(host=node.ip, port=node.port,
                     debug=True, use_reloader=False)
-            dns.initBlockchain(node)
+            
         except:
             print('\n !!: Program is suddenly paused -> Turning off...')
     elif code == 201:
@@ -530,9 +540,9 @@ if __name__ == "__main__":
         print('  WELCOME BACK NODE ', node.id[:-20] + '..xxx')
         print('//----------------------------------------//')
         try:
+            dns.initBlockchain(node)
             app.run(host=node.ip, port=node.port,
                     debug=True, use_reloader=False)
-            dns.initBlockchain(node)
         except:
             print(' Program is suddenly paused ! Turning off... ')
     else:
@@ -540,5 +550,5 @@ if __name__ == "__main__":
             f"Return code #{code}: WRONG INFORMATION OR NOT FOUND ARGUMENT \n")
         print("Please try again with 2 options bellow :")
         print("1. Append '-p' option to access program \n")
-        print("2. -p (port) must be from [ 5000, 5999 ]")
-        print("   -h (host) must be same as IPv4 format")
+        print("2. -p <port> ( port : must be from [ 5000, 5999 ] )")
+        print("   -h <host> ( host : must be same as IPv4 format )")

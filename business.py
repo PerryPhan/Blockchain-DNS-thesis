@@ -68,7 +68,8 @@ class Blockchain:
 
     @property
     def node_id(self):
-        return self.nodes.getNode().id
+        node = self.nodes.getNode()
+        return node.id if node else None
 
     @property
     def ledger(self):
@@ -324,8 +325,10 @@ class TransactionBusiness:
         self.TIME_TO_LIVE = 3600
         self.current_transactions = []
     # New ---------------------------------
-
-    def getTransactionsPool(self):
+    def getNoBlockTransactions(self):
+        return Transactions.query.filter(Transactions.block_id == None).all()
+    
+    def getAllTransactions(self):
         return Transactions.query.all()
 
     def getDomainList(self):
@@ -422,26 +425,26 @@ class TransactionBusiness:
         # print("CHECKING a : ",checked['a'])
         return all([checked[key] for key in checked.keys()])
 
-    def newTransaction(self, request_form, account_id, fe ,convertToObj = False):
-        
+    def newTransaction(self, request_form, account_id, action, convertToObj = False):
+        obj = request_form
         if convertToObj == True:  
-            obj = self.convertRequestToTransactionObj( request_form )
+            obj = self.convertRequestToTransactionObj( obj )
         if self.checkTransactionFormat(obj) == True:
             #  Add serial & ttl to SOA 
             obj['soa']['serial'] = time.time()
             obj['ttl'] = self.TIME_TO_LIVE
             tran =  Transactions(
                 domain = obj['domain'],
-                action = '',
+                action = action,
                 soa    = obj['soa'],
                 ns     = obj['ns'],
                 a      = obj['a'],
                 ttl    = obj['ttl'],
                 timestamp = time.time(),
-
+                account_id = account_id,
             )
-            # tran.hash = tran._hash()
-            return None, 200
+            tran.hash = tran._hash()
+            return tran, 200
         return None, 500
 
     def addTransactionPool(self, transaction):

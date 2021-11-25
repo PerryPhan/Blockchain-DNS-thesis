@@ -925,6 +925,10 @@ body {
 .dashboard.container .main .table-side .titles .title-left h4 span {
   font-weight: 600;
 }
+.dashboard.container .main .table-side .titles .title-left h3 {
+  padding: 10px 0;
+  color: #b3702e;
+}
 .dashboard.container .main .table-side .titles .title-right {
   margin-right: 50px;
   display: flex;
@@ -971,6 +975,10 @@ body {
   font-weight: 500;
   padding: 10px;
 }
+.dashboard.container .main .table-side .table-box table tbody tr a {
+  color: #235ece;
+  text-decoration: none;
+}
 .dashboard.container .main .table-side .table-box table .index-field {
   width: 1%;
 }
@@ -988,16 +996,17 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.dashboard.container .main .table-side .table-box table .transaction-hash-field a {
-  color: #235ece;
-  text-decoration: none;
-}
 .dashboard.container .main .table-side .table-box table .action-field {
-  width: 14%;
+  width: 10%;
   max-width: 250px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+.dashboard.container .main .table-side .table-box table .action-field.add {
+  color: rgba(223, 124, 43, 0.801);
 }
 .dashboard.container .main .table-side .table-box table .block-field {
   width: 14%;
@@ -1022,20 +1031,20 @@ body {
   background-color: #13aa61;
 }
 .dashboard.container .main .table-side .table-box table .status-field .status.new {
-  background-color: #d33f3f;
+  background-color: #f1b22a;
 }
 .dashboard.container .main .table-side .table-box table .time-field {
   width: 14%;
 }
 .dashboard.container .main .table-side .table-box table .from-field {
-  width: 14%;
+  width: auto;
   max-width: 200px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .dashboard.container .main .table-side .table-box table .to-field {
-  width: 14%;
+  width: auto;
   max-width: 200px;
   white-space: nowrap;
   overflow: hidden;
@@ -1124,7 +1133,7 @@ body {
   align-items: center;
 }
 .dashboard.container .main .table-side .createdby {
-  margin-top: 30px;
+  margin-top: 10px;
   width: 100%;
   text-align: center;
   justify-content: center;
@@ -1306,7 +1315,7 @@ body {
   margin-left: 5px;
 }
 .detail.container .main .aside .tab-title.sub-tab.select {
-  background-color: #34627B;
+  background-color: #34627b;
 }
 .detail.container .main .aside .tab-title.sub-tab a h3 {
   font-size: 15px;
@@ -1354,6 +1363,10 @@ body {
 .detail.container .main .table-side .titles .title-left h4 span {
   font-weight: 600;
 }
+.detail.container .main .table-side .titles .title-left h3 {
+  padding: 10px 0;
+  color: #b3702e;
+}
 .detail.container .main .table-side .titles .title-right {
   margin-right: 50px;
   display: flex;
@@ -1391,7 +1404,6 @@ body {
   font-size: 18px;
 }
 .detail.container .main .table-side .table-box table tbody tr {
-  cursor: pointer;
   height: 50px;
   border-bottom: 1px solid #adadad;
 }
@@ -1401,6 +1413,10 @@ body {
 .detail.container .main .table-side .table-box table tbody tr td {
   font-weight: 500;
   padding: 10px;
+}
+.detail.container .main .table-side .table-box table tbody tr a {
+  color: #235ece;
+  text-decoration: none;
 }
 .detail.container .main .table-side .table-box table .index-field {
   width: 1%;
@@ -1420,11 +1436,16 @@ body {
   text-overflow: ellipsis;
 }
 .detail.container .main .table-side .table-box table .action-field {
-  width: 14%;
+  width: 10%;
   max-width: 250px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+.detail.container .main .table-side .table-box table .action-field.add {
+  color: rgba(223, 124, 43, 0.801);
 }
 .detail.container .main .table-side .table-box table .block-field {
   width: 14%;
@@ -1449,20 +1470,20 @@ body {
   background-color: #13aa61;
 }
 .detail.container .main .table-side .table-box table .status-field .status.new {
-  background-color: #d33f3f;
+  background-color: #f1b22a;
 }
 .detail.container .main .table-side .table-box table .time-field {
-  width: 10%;
+  width: 14%;
 }
 .detail.container .main .table-side .table-box table .from-field {
-  width: 14%;
+  width: auto;
   max-width: 200px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .detail.container .main .table-side .table-box table .to-field {
-  width: 14%;
+  width: auto;
   max-width: 200px;
   white-space: nowrap;
   overflow: hidden;
@@ -1474,6 +1495,10 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.detail.container .main .table-side .table-box table .domain-field a {
+  color: #235ece;
+  text-decoration: none;
 }
 .detail.container .main .table-side .table-box table .a-field {
   width: 16%;
@@ -1565,6 +1590,48 @@ body {
 }
 .detail.container .main .table-side .detail-box .detail .row .value {
   font-size: 16px;
+}
+.detail.container .main .table-side .pagination .btn-box {
+  display: flex;
+  flex: 1 0 auto;
+  justify-content: center;
+  align-items: center;
+}
+.detail.container .main .table-side .pagination .btn-box a {
+  text-decoration: none;
+}
+.detail.container .main .table-side .pagination .btn-box .first-side span {
+  font-weight: 600;
+  color: #1A89C9;
+  margin: 0 15px;
+}
+.detail.container .main .table-side .pagination .btn-box .first-side span a {
+  color: #1A89C9;
+}
+.detail.container .main .table-side .pagination .btn-box .index-side span {
+  margin: 0 5px;
+  color: grey;
+}
+.detail.container .main .table-side .pagination .btn-box .index-side span:first-child {
+  color: #1A89C9;
+}
+.detail.container .main .table-side .pagination .btn-box .last-side span {
+  color: #1A89C9;
+  margin: 0 15px;
+  font-weight: 600;
+}
+.detail.container .main .table-side .pagination .btn-box .last-side span a {
+  color: #1A89C9;
+}
+.detail.container .main .table-side .pagination > div {
+  display: flex;
+  align-items: center;
+}
+.detail.container .main .table-side .createdby {
+  margin-top: 10px;
+  width: 100%;
+  text-align: center;
+  justify-content: center;
 }
 
 .operation.container {
@@ -1791,6 +1858,10 @@ body {
 .operation.container .main .table-side .titles .title-left h4 span {
   font-weight: 600;
 }
+.operation.container .main .table-side .titles .title-left h3 {
+  padding: 10px 0;
+  color: #b3702e;
+}
 .operation.container .main .table-side .titles .title-right {
   margin-right: 50px;
   display: flex;
@@ -1828,7 +1899,6 @@ body {
   font-size: 18px;
 }
 .operation.container .main .table-side .table-box table tbody tr {
-  cursor: pointer;
   height: 50px;
   border-bottom: 1px solid #adadad;
 }
@@ -1838,6 +1908,10 @@ body {
 .operation.container .main .table-side .table-box table tbody tr td {
   font-weight: 500;
   padding: 10px;
+}
+.operation.container .main .table-side .table-box table tbody tr a {
+  color: #235ece;
+  text-decoration: none;
 }
 .operation.container .main .table-side .table-box table .index-field {
   width: 1%;
@@ -1857,11 +1931,16 @@ body {
   text-overflow: ellipsis;
 }
 .operation.container .main .table-side .table-box table .action-field {
-  width: 14%;
+  width: 10%;
   max-width: 250px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+.operation.container .main .table-side .table-box table .action-field.add {
+  color: rgba(223, 124, 43, 0.801);
 }
 .operation.container .main .table-side .table-box table .block-field {
   width: 14%;
@@ -1886,20 +1965,20 @@ body {
   background-color: #13aa61;
 }
 .operation.container .main .table-side .table-box table .status-field .status.new {
-  background-color: #d33f3f;
+  background-color: #f1b22a;
 }
 .operation.container .main .table-side .table-box table .time-field {
   width: 14%;
 }
 .operation.container .main .table-side .table-box table .from-field {
-  width: 14%;
+  width: auto;
   max-width: 200px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .operation.container .main .table-side .table-box table .to-field {
-  width: 14%;
+  width: auto;
   max-width: 200px;
   white-space: nowrap;
   overflow: hidden;
@@ -1911,6 +1990,10 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.operation.container .main .table-side .table-box table .domain-field a {
+  color: #235ece;
+  text-decoration: none;
 }
 .operation.container .main .table-side .table-box table .a-field {
   width: 16%;
@@ -2031,6 +2114,48 @@ body {
   height: 75%;
   margin: 5px 0;
   background-color: #dddddda2;
+}
+.operation.container .main .table-side .pagination .btn-box {
+  display: flex;
+  flex: 1 0 auto;
+  justify-content: center;
+  align-items: center;
+}
+.operation.container .main .table-side .pagination .btn-box a {
+  text-decoration: none;
+}
+.operation.container .main .table-side .pagination .btn-box .first-side span {
+  font-weight: 600;
+  color: #1A89C9;
+  margin: 0 15px;
+}
+.operation.container .main .table-side .pagination .btn-box .first-side span a {
+  color: #1A89C9;
+}
+.operation.container .main .table-side .pagination .btn-box .index-side span {
+  margin: 0 5px;
+  color: grey;
+}
+.operation.container .main .table-side .pagination .btn-box .index-side span:first-child {
+  color: #1A89C9;
+}
+.operation.container .main .table-side .pagination .btn-box .last-side span {
+  color: #1A89C9;
+  margin: 0 15px;
+  font-weight: 600;
+}
+.operation.container .main .table-side .pagination .btn-box .last-side span a {
+  color: #1A89C9;
+}
+.operation.container .main .table-side .pagination > div {
+  display: flex;
+  align-items: center;
+}
+.operation.container .main .table-side .createdby {
+  margin-top: 10px;
+  width: 100%;
+  text-align: center;
+  justify-content: center;
 }
 
 /*# sourceMappingURL=index.css.map */
