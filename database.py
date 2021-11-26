@@ -173,8 +173,10 @@ class Transactions(db.Model):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
     
     def hash(self):
+        dict = self.as_dict()
+        dict['block_id'] = None
         block_string = json.dumps(
-            self.as_dict(), sort_keys=True
+            dict, sort_keys=True
         ).encode()
         hash = hashlib.sha256(block_string).hexdigest()
         return hash

@@ -64,3 +64,7 @@ ACCOUNT_FORMAT = {
 
 COMMENT_CHAR  = '#' 
 SPECIAL_CHARS = "''!@#$%^&*()-+?_=,<>/"""
+
+MINE_REWARD = 10
+BUFFER_MAX_LEN = 2
+DIFFICULTY = 1

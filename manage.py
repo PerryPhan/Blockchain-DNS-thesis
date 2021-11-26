@@ -245,8 +245,7 @@ def login():
             session['account'] = account
 
         response = {'status': status, 'message': message}
-        # return render_template('_login_template.html', **html_options, **response)
-        return redirect('/dashboard/transactions')
+        return render_template('_login_template.html', **html_options, **response) if status != 200 else redirect('/dashboard/transactions')
 
     regis_email = ''
     if session and session.get('regis_email'):
@@ -306,18 +305,6 @@ def showTransactionsBuffer():
     return jsonify({
         'status': 200,
         'message': 'Show transaction successfully',
-        'len': len(tranList),
-        'trans': tranList,
-    })
-
-
-@app.route('/blockchain/transactions/clear')
-def clearTransactionsBuffer():
-    dns.blockchain.transactions.clearTransaction()
-    tranList = dns.blockchain.current_transaction
-    return jsonify({
-        'status': 200,
-        'message': 'Clearing transaction successfully',
         'len': len(tranList),
         'trans': tranList,
     })
@@ -403,8 +390,8 @@ def mineBlock():
     
     if block:
         block, status = dns.blockchain.addBlock(block)
+        dns.blockchain.transactions.setCurrentTxsBlockID(block.id)
         dns.blockchain.broadcastNewBlock()
-
     message = Message.getMessage('BlockMining', status or 501)
 
     return jsonify({

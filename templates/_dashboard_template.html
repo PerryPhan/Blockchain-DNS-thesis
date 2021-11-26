@@ -107,7 +107,7 @@
             <th class="id-field">{{ transaction.id or '' }}</th>
             <td class="transaction-hash-field">
               <a href="./transactions/detail?id={{transaction.id}}"
-                >{{transaction.hash or ''}}</a
+                >{{transaction.hash() or ''}}</a
               >
             </td>
             <td class="action-field {{transaction.action or ''}}">

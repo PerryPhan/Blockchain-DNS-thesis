@@ -154,12 +154,14 @@
               <th class="id-field">{{ transaction.id or '' }}</th>
               <td class="transaction-hash-field">
                 <a href="./transactions/detail?id={{transaction.id}}"
-                  >{{transaction.hash or ''}}</a
+                  >{{transaction.hash() or ''}}</a
                 >
               </td>
               <td class="action-field">{{transaction.action or ''}}</td>
               <td class="block-field">{{transaction.block_id or ''}}</td>
-              <td class="time-field">{{transaction.timestamp or ''}}</td>
+              <td class="time-field">
+                {{transaction.datetime_format() or ''}}
+              </td>
               <td class="status-field">
                 <div class="status success">Success</div>
               </td>

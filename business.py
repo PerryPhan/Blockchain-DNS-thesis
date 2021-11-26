@@ -45,9 +45,9 @@ class Blockchain:
         self.nodes = NodesBusiness()
         self.transactions = TransactionBusiness()
         self.chain = []
-        self.MINE_REWARD = 10
-        self.BUFFER_MAX_LEN = 2
-        self.DIFFICULTY = 1
+        self.MINE_REWARD = MINE_REWARD
+        self.BUFFER_MAX_LEN = BUFFER_MAX_LEN
+        self.DIFFICULTY = DIFFICULTY
     
     #  EXTRA PROPERTIES ----------------------------------------------------------
     @property
@@ -147,7 +147,6 @@ class Blockchain:
         responses = self.launchNetworkProofOfWork(transactions)
 
         fastestBlockResponse = self.findFastestBlockResponse(responses)
-        print("FASTEST BLOCK: ", fastestBlockResponse)
         block = Blocks(
             id= fastestBlockResponse['id'],
             timestamp=float(fastestBlockResponse['timestamp']),
@@ -382,10 +381,6 @@ class TransactionBusiness:
             
         checked['a'] = all([spec for spec in checked['a']])
         
-        # print("CHECKING domain : ",checked['domain'])
-        # print("CHECKING soa : ",checked['soa'])
-        # print("CHECKING ns : ",checked['ns'])
-        # print("CHECKING a : ",checked['a'])
         return all([checked[key] for key in checked.keys()])
 
     def newTransaction(self, request_form, account_id, action, convertToObj = False):
@@ -418,18 +413,24 @@ class TransactionBusiness:
             db.session.rollback()
             return 401
 
-    def updateTransaction(self, oldtransaction, transaction):
+    def updateTransaction(self, transaction):
         try:
             db.session.query(Transactions).filter(
-                Transactions.id == oldtransaction.id,
+                Transactions.id == transaction.id,
             ).update({
-
+                'block_id' : transaction.block_id
             })
             db.session.commit()
             return transaction, 200
         except:
-            return oldtransaction, 404
+            return transaction, 404
 
+    def setCurrentTxsBlockID(self, block_id):
+        no_block_txs_list = self.getNoBlockTransactions()
+        for transaction in no_block_txs_list:
+            transaction.block_id = block_id
+            self.updateTransaction( transaction )
+    
     def getNoBlockTransactions(self):
         return Transactions.query.filter(Transactions.block_id == None).all()
     
@@ -491,17 +492,15 @@ class NodesBusiness:
         ).first()
 
     def activeNode(self, node):
-        oldNode = node
         if node.is_active != True:
             node.is_active = True
-            return self.updateNode(oldNode, node)
+            return self.updateNode( node)
         return node
 
     def inActiveNode(self, node):
-        oldNode = node
         if node.is_active != False:
             node.is_active = False
-            return self.updateNode(oldNode, node)
+            return self.updateNode( node)
         return node
 
     def handleNodeInformation(self, ip: str, port: int, nodename=''):
@@ -555,12 +554,10 @@ class NodesBusiness:
                     )
                 else:  # This node has same IP, different port and haven't used yet
                     self.activeNode(anotherNode[0])
-                    anotherNode[0].is_active = True
                     return anotherNode[0], 201
 
             else:  # 5. This node is not used by anyone
                 self.activeNode(nodeIPPort)
-                nodeIPPort.is_active = True
                 return nodeIPPort, 201
 
     def validateNode(self, node, noCheckDuplicate=False):
@@ -607,9 +604,9 @@ class NodesBusiness:
         except:
             return node, 404
 
-    def updateNode(self, oldNode, node):
-        if not self.validateNode(oldNode):
-            return oldNode, 403
+    def updateNode(self, node):
+        if not self.validateNode(node):
+            return node, 403
 
         try:
             db.session.query(Nodes).filter(
@@ -621,7 +618,7 @@ class NodesBusiness:
             db.session.commit()
             return node, 200
         except:
-            return oldNode, 404
+            return node, 404
 
     def deleteNode(self, node):
         node = db.session.query(Nodes).filter(
