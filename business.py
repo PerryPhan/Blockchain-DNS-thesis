@@ -46,16 +46,17 @@ class Blockchain:
         self.transactions = TransactionBusiness()
         self.chain = []
         self.MINE_REWARD = 10
-        self.BUFFER_MAX_LEN = 20
+        self.BUFFER_MAX_LEN = 2
         self.DIFFICULTY = 1
-
+    
+    #  EXTRA PROPERTIES ----------------------------------------------------------
     @property
     def last_block(self):
         return self.chain[-1]
 
     @property
     def current_transactions(self):
-        return self.transactions.current_transactions
+        return self.transactions.getNoBlockTransactions()
 
     @property
     def all_transactions(self):
@@ -91,7 +92,8 @@ class Blockchain:
 
     def dumpChain(self):
         return [block.as_dict() for block in self.chain]
-
+    
+    # GET & SHOW CHAIN ----------------------------------------------------------
     def getGenesisBlock(self):
         return Blocks(
             id='0',
@@ -125,30 +127,40 @@ class Blockchain:
         except:
             print(' Error : something go wrong with Query')
             return 404
+    # TODO : check intergity of chain 
 
-    def findFastestBlockResponse(self, responses):
-        minSpeedtime = sys.float_info.max
-        fastestBlockResponse = None
+    #  STEPS OF MINE BLOCK ----------------------------------------------------------
+    def prepareMiningBlockTransactions(self):
+        trans = self.current_transactions
+        trans_len = len(trans)
 
-        if len(responses) == 1:
-            minSpeedtime = responses[0]['speedtime']
-            fastestBlockResponse = responses[0]['block']
-            return fastestBlockResponse
+        if trans_len >= self.BUFFER_MAX_LEN:
+            return trans, 200
         else:
-            for response in responses:
-                if response['speedtime'] < minSpeedtime:
-                    minSpeedtime = response['speedtime']
-                    fastestBlockResponse = response['block']
+            return trans, 500  
 
-        return fastestBlockResponse
+    def mineBlock(self, transactions):
+        '''
+            This function will use current_transaction
+        '''
+        # Mining with Proof of work
+        responses = self.launchNetworkProofOfWork(transactions)
 
+        fastestBlockResponse = self.findFastestBlockResponse(responses)
+        print("FASTEST BLOCK: ", fastestBlockResponse)
+        block = Blocks(
+            id= fastestBlockResponse['id'],
+            timestamp=float(fastestBlockResponse['timestamp']),
+            nonce=int(fastestBlockResponse['nonce']),
+            transactions=fastestBlockResponse['transactions'],
+            previous_hash=fastestBlockResponse['previous_hash'],
+            node_id=fastestBlockResponse['node_id'],
+            add_by_node_id=fastestBlockResponse['add_by_node_id'] if 'add_by_node_id' in fastestBlockResponse else None
+        )
+        return block
+
+    #  STEP #1 : POW CONTEST ----------------------------------------------------------
     def launchNetworkProofOfWork(self, transactions):
-        def sendRequestAndReturn(url, data):
-            rep = requests.post(
-                url=url,
-                data=data,
-            )
-            responses.append(rep.json())
         '''
             Process step : 
             1. Building request with current transaction
@@ -157,65 +169,34 @@ class Blockchain:
             4. Loop to any nodes that active in network -> Send request to any nodes active in network by thread
                 4.1. Add Thread here 
         '''
-        neighbours = self.nodes.getActiveNetwork()
-
-        # 1
         responses = []
 
-        # 2
-        compress_trans = [self.transactions.toString(
-            tran) for tran in transactions]
-
-        # 3
-        request_block = merge_obj(
-            dict(
-                {str(i): item for i, item in enumerate(compress_trans)}
-            ),
-            getModelDict(self.newBlock(len(compress_trans)))
-        )
-        # print('Neighbours length: ', len(neighbours), " : Neighbours ",neighbours )
-        # 4
+        def sendRequestAndReturn(url, data):
+            rep = requests.post(
+                url=url,
+                data=data,
+            )
+            responses.append(rep.json())
+        # ----------------------------------------
+        neighbours = self.nodes.getActiveNetwork()
+        
+        transactions = [ tran.block_tx_format() for tran in transactions]
+        request_block = self.newBlock(transactions).as_dict()
+        # ----------------------------------------
         for node in neighbours:
             request_url = f'http://{node.ip}:{node.port}/blockchain/pow'
             # 4.1
-            x = threading.Thread(target=sendRequestAndReturn, args=[
-                                 request_url, request_block])
+            x = threading.Thread(
+                target=sendRequestAndReturn,
+                args=[ request_url, request_block ]
+            )
             x.start()
 
         for node in neighbours:
             x.join()
-
+        # ----------------------------------------
+        
         return responses
-
-    def returnProofOfWorkOutput(self, block_request):
-        '''
-            Process step : 
-                1. From request ,convert array of transactions
-                2. Create new Block, add field ['add_by_node_id'] 
-                3. Run Proof of work -> return block, speedtest 
-        '''
-        #   1.
-        numbered_transactions = [self.transactions.formatRecord(block_request[prop]) if re.match(
-            '^\d+$', prop) else None for prop in block_request.keys()]
-        transactions = []
-        for transaction in numbered_transactions:
-            if transaction:
-                transactions.append(transaction)
-
-        #   2.
-        block_request['transactions'] = transactions
-        block_request['add_by_node_id'] = self.node_id
-        #   3.
-        block = Blocks(
-            id=block_request['id'],
-            timestamp=float(block_request['timestamp']),
-            nonce=int(block_request['nonce']),
-            transactions=block_request['transactions'],
-            previous_hash=block_request['previous_hash'],
-            node_id=block_request['node_id'],
-            add_by_node_id=block_request['add_by_node_id'] if 'add_by_node_id' in block_request else None
-        )
-        return self.proofOfWork(block)
 
     def proofOfWork(self, block):
         '''
@@ -232,6 +213,42 @@ class Blockchain:
         end = time.perf_counter()
         return block, float(end-start)
 
+    def findFastestBlockResponse(self, responses):
+        minSpeedtime = sys.float_info.max
+        fastestBlockResponse = None
+        if len(responses) == 1:
+            minSpeedtime = responses[0]['speedtime']
+            fastestBlockResponse = responses[0]['block']
+            return fastestBlockResponse
+        else:
+            for response in responses:
+                if response['speedtime'] < minSpeedtime:
+                    minSpeedtime = response['speedtime']
+                    fastestBlockResponse = response['block']
+
+        return fastestBlockResponse
+    
+    def returnProofOfWorkOutput(self, request_form_dict):
+        '''
+            Process step : 
+                1 Create new Block, add field ['add_by_node_id'] 
+                2 Run Proof of work -> return block, speedtest 
+        '''
+        request_form_dict['add_by_node_id'] = self.node_id
+
+        block = Blocks(
+            id= int(request_form_dict['id'][0]),
+            timestamp= float(request_form_dict['timestamp'][0]),
+            nonce= int(request_form_dict['nonce'][0]),
+            transactions= request_form_dict['transactions'],
+            previous_hash= request_form_dict['previous_hash'][0],
+            node_id= request_form_dict['node_id'][0],
+            add_by_node_id=request_form_dict['add_by_node_id'] if 'add_by_node_id' in request_form_dict else None
+        )
+
+        return self.proofOfWork(block)
+
+    #  STEP #2 : FORGE, ADD AND BROADCAST BLOCK ----------------------------------------------------------
     def newBlock(self, transactions):
         '''
             Return new block when provide informations
@@ -257,43 +274,6 @@ class Blockchain:
             db.session.rollback()
             return block, 404
 
-    def prepareMiningBlockTransactions(self):
-        trans = self.current_transactions
-        trans_len = len(trans)
-
-        if trans_len >= self.BUFFER_MAX_LEN:  # and create_block_countdown end
-            return self.transactions.subTransaction(start=0, length=self.BUFFER_MAX_LEN), 200
-        else:
-            return trans, 500  # not enough transactions
-
-    def mineBlock(self):
-        '''
-            This function will use current_transaction
-        '''
-        # self.transactions.createSampleTransactions(20)
-
-        # Init and check transactions status
-        transactions, status = self.prepareMiningBlockTransactions()
-        if status != 200:
-            return None, status
-
-        # Mining with Proof of work
-        responses = self.launchNetworkProofOfWork(transactions)
-        fastestBlockResponse = self.findFastestBlockResponse(responses)
-        block = Blocks(
-            id=fastestBlockResponse['id'],
-            timestamp=float(fastestBlockResponse['timestamp']),
-            nonce=int(fastestBlockResponse['nonce']),
-            transactions=fastestBlockResponse['transactions'],
-            previous_hash=fastestBlockResponse['previous_hash'],
-            node_id=fastestBlockResponse['node_id'],
-            add_by_node_id=fastestBlockResponse['add_by_node_id'] if 'add_by_node_id' in fastestBlockResponse else None)
-
-        return block, status
-
-    def addTransaction(self, tran):
-        return self.transactions.addTransaction(tran)
-
     def broadcastNewBlock(self):
         '''
             Send request to each machine in active network
@@ -309,6 +289,7 @@ class Blockchain:
         '''
         return self.loadChain()
 
+    # GENERAL FUNCTION ----------------------------------------------------------
     def searchTransactionMatchObj(self, obj):
         for transaction in self.all_transactions:
             for key, value in transaction.items():
@@ -323,25 +304,7 @@ class Blockchain:
 class TransactionBusiness:
     def __init__(self):
         self.TIME_TO_LIVE = 3600
-        self.current_transactions = []
-    # New ---------------------------------
-    def getNoBlockTransactions(self):
-        return Transactions.query.filter(Transactions.block_id == None).all()
-    
-    def getAllTransactions(self):
-        return Transactions.query.all()
-
-    def getDomainList(self):
-        # TODO : Pool + Blockchain
-        records = []
-        for transaction in self.getTransactionsPool():
-            # TODO : Add + Update Tx
-            if transaction.action == 'Add':
-                records.append(Records(transaction))
-            elif transaction.action == 'Update':
-                pass
-        return records
-
+   
     def convertRequestToTransactionObj(self, request_form):
         return {
             "domain": request_form['domain'],
@@ -443,11 +406,10 @@ class TransactionBusiness:
                 timestamp = time.time(),
                 account_id = account_id,
             )
-            tran.hash = tran._hash()
             return tran, 200
         return None, 500
 
-    def addTransactionPool(self, transaction):
+    def addTransaction(self, transaction):
         try:
             db.session.add(transaction)
             db.session.commit()
@@ -457,7 +419,6 @@ class TransactionBusiness:
             return 401
 
     def updateTransaction(self, oldtransaction, transaction):
-
         try:
             db.session.query(Transactions).filter(
                 Transactions.id == oldtransaction.id,
@@ -469,82 +430,25 @@ class TransactionBusiness:
         except:
             return oldtransaction, 404
 
-    # Old ---------------------------------
-    def addTransaction(self, tran):
-        if self.checkRecordFormat(tran) == False:
-            return 500  # wrong format
+    def getNoBlockTransactions(self):
+        return Transactions.query.filter(Transactions.block_id == None).all()
+    
+    def getAllTransactions(self):
+        return Transactions.query.all()
 
-        if type(tran) == str:
-            tran = self.formatRecord(tran)
+    def getDomainList(self):
+        # TODO : Pool + Blockchain
+        records = []
+        for transaction in self.getAllTransactions():
+            # TODO : Add + Update Tx
+            if transaction.action == 'add':
+                records.append(Records(transaction))
+            elif transaction.action == 'Update':
+                pass
+        return records
 
-        if self.isExisted(tran) == False:
-            self.current_transactions.append(tran)
-        else:
-            return 501  # duplicate
-
-        return 200
-
-    def createSampleTransactions(self, number):
-        chain = []
-        for i in range(number):
-            chain.append({
-                'domain': f'sample{i}.com',
-                'type': 'A',
-                'ip': f'{i}.{i}.{i}.{i}',
-                'port': 80,
-                'ttl': '14400'
-            })
-
-        self.current_transactions = chain
-
-    def isExisted(self, tran):
-        try:
-            return self.current_transactions.index(tran)
-        except:
-            return False
-
-    def convertRecordsFromBlockRequest(self, obj):
-        pass
-
-    def toString(self, tran):
-        return f"{tran['domain']} {tran['type']} {tran['ip']} {tran['port']} {tran['ttl']}"
-
-    def formatRecord(self, str, final=True):
-        props = str.split()
-        return {
-            'domain': props[0],
-            'type': props[1],
-            'ip': props[2],
-            'port': props[3] if final == False else int(props[3]),
-            'ttl': props[4] if final == False else int(props[4])
-        }
-
-    def checkRecordFormat(self, tran):
-        checked = copy(RECORD_FORMAT)
-        if type(tran) == str:
-            tran = tran.strip()
-            tran = self.formatRecord(tran, False)
-        # Check if tran has the same key and ammount of keys as checked
-        if tran.keys() == checked.keys():
-            for key in checked.keys():
-                checked[str(key)] = True if re.match(
-                    checked[str(key)], tran[str(key)]) else False
-                if checked[str(key)] == False:
-                    return False
-        return True
-
-    def subTransaction(self,  start=None, length=None):
-        used_block_transactions = self.current_transactions[start: length]
-        self.current_transactions = self.current_transactions[length:]
-        return used_block_transactions
-
-    def clearTransaction(self,):
-        self.current_transactions = []
-        return self.current_transactions
-
-    def setTransaction(self, trans):
-        self.current_transactions = trans
-
+    def getTransactionById(self, id):
+        return Transactions.query.filter(Transactions.id == id).first()
 # NodeBusiness  -----------------------------------
 
 

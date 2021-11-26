@@ -90,10 +90,6 @@ def merge_obj(obj, merge_obj):
     return obj
 
 
-def getModelDict(model):
-    return dict((column.name, getattr(model, column.name))
-                for column in model.__table__.columns)
-
 class Accounts(db.Model):
     __tablename__ = 'accounts'
     __table_args__ = {'extend_existing': True}
@@ -136,6 +132,7 @@ class Blocks(db.Model):
     # ===============
     node_id = db.Column(db.String(64), db.ForeignKey('nodes.id'))
     add_by_node_id = db.Column(db.String(64), nullable=True)
+    mined_transactions = db.relationship('Transactions', backref="block")
     hash = None
     
     def as_dict(self):
@@ -161,7 +158,6 @@ class Transactions(db.Model):
     __tablename__ = 'transactions'
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer(), primary_key=True)
-    hash = db.Column(db.String(255), nullable=False)
     action = db.Column(db.String(64), nullable=False)
     domain = db.Column(db.String(64), nullable=False)
     soa = db.Column(db.JSON, nullable=True)
@@ -171,19 +167,22 @@ class Transactions(db.Model):
     timestamp = db.Column(db.Float, nullable=False)
     # ===============
     account_id = db.Column(db.Integer(), db.ForeignKey('accounts.id'), nullable=True)
-    block_id  = db.Column(db.Integer(), nullable=True)
+    block_id  = db.Column(db.Integer(), db.ForeignKey('blocks.id'), nullable=True)
     
     def as_dict(self):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
     
-    def _hash(self):
+    def hash(self):
         block_string = json.dumps(
-            self.as_dict(), sort_keys=True).encode()
+            self.as_dict(), sort_keys=True
+        ).encode()
         hash = hashlib.sha256(block_string).hexdigest()
         return hash
     
-    def datetime_format(self):
+    def block_tx_format(self):
+        return  self.hash() + '|' + str(self.id) 
 
+    def datetime_format(self):
         return datetime.fromtimestamp(self.timestamp).strftime("%d/%m/%Y, %H:%M:%S") if self.timestamp else None
 
 class Records :
@@ -211,20 +210,27 @@ class Records :
 
 class Message:
     @staticmethod
-    def getMessage( action, status ):
+    def getMessage( action, status, inserted_value = None ):
         messages = {
             'AccountLogin' : {
-                '403': 'Wrong email or password',
-                '404': 'This account haven\'t registered yet',
-                '200': 'Sign in successfully',
+                403: 'Wrong email or password',
+                404: 'This account haven\'t registered yet',
+                200: 'Sign in successfully',
             },
             'AccountRegister' : {
-                '501': 'Please choose another email. This one is taken',
-                '500': 'Wrong format input',
-                '404': 'Already have had this email',
-                '401': 'Sorry ! There is error in database',
-                '200': 'Sign up successfully',
+                501: 'Please choose another email. This one is taken',
+                500: 'Wrong format input',
+                404: 'Already have had this email',
+                401: 'Sorry ! There is error in database',
+                200: 'Sign up successfully',
+            },
+            'BlockMining' :{
+                501: 'Mining block didn\'t return value',
+                500: f'Don\'t have enough {inserted_value} transactions to start mining',
+                404: 'Something goes wrong with adding progress in mining',
+                200: 'Mine block successfully',
             }
         }
-        return messages[action][status] if messages[action].get(status) else 'Unexpected problem'
-# recreate()
+        if action and action in messages :
+            return messages[action][status] if messages[action].get(status) else 'Unexpected problem'
+        return 'Message not found'

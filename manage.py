@@ -1,34 +1,10 @@
 from werkzeug.wrappers import response
 from include import *
 from business import *
-'''
-  Run file 
-  # TODO: Làm Blockchain ở file business DOING 
-        * Làm add 2/2                     OK
-        * Làm resolve conflict            OK
-        * Show chain                      OK 
-        * Test bằng route 
-            # 1. Turn 2 nodes on          OK
-            # 2. Back route: new block    OK
-            # 3. Show chain all node      OK
-  # TODO: Check duplicate Transaction khi thêm nhiều từ file, ghép xử lý add transactions khi POST       OK
-  # TODO: Làm Proof of work chạy trên mọi node bằng Thread -> rồi xét thời gian nhỏ nhất                 OK    
-  # TODO: Xử lý lấy wallet và ledger ở Blockchain                                                        OK 
-  # TODO: Làm xử lý chia transaction khi add Block                                                       OK
-        Số transactions cho UI
-        # 1 : Nhỏ hơn LEN -> Không đủ nên không làm 
-        # 2 : Bằng LEN    -> Làm như bình thường 
-        # 3 : Lớn hơn LEN -> Làm như bình thường và cắt giữ lại phần dư
-            Số transactions dư : cho UI 
-            # 1 : Nhỏ hơn LEN -> Không đủ nên không làm 
-            # 2 : Bằng LEN    -> Đợi thời gian 10p 
-            # 3 : Lớn hơn LEN -> Đợi thời gian 10p
-  # TODO: Cleaning code và stress test                                                                   OK
-'''
+
 # Declare -------------------------------------------------
-dns = DNSResolver()
 accountBusiness = AccountBusiness()
-transactionsBusiness = TransactionBusiness()
+dns = DNSResolver()
 # FRONT --------------------------------------------------
 
 
@@ -61,7 +37,6 @@ def admin():
         }
 
     return render_template('_admin_template.html', **html_options)
-
 
 @app.route('/dashboard/transactions')
 def dashboardTransactions():
@@ -116,7 +91,6 @@ def dashboardDomains():
         'count': len(list) if list else 0,
         'unit' : 'domains',
         'list' : list,
-        'node_id' : dns.blockchain.node_id,
     }
     
     if session :
@@ -159,11 +133,11 @@ def dashboard_operation():
     def checkFileNameFormat(filename):
         # Check file name
         if filename == '':
-            return render_template('_dnsform_template.html', error_message=MESSAGE['FileError02']), 404
+            return render_template('_operation_dashboard_template.html', error_message=MESSAGE['FileError02']), 404
 
         # Check file extension
         if checkFileExtension(filename) == False:
-            return render_template('_dnsform_template.html', error_message=MESSAGE['FileError03']), 404
+            return render_template('_operation_dashboard_template.html', error_message=MESSAGE['FileError03']), 404
 
         # Format that filename can store any where
         filename = secure_filename(filename)
@@ -171,11 +145,11 @@ def dashboard_operation():
 
     def handleOneRecordForm(form):
         # New transaction
-        tran, status = transactionsBusiness.newTransaction(
+        tran, status = dns.blockchain.transactions.newTransaction(
            form, session['account']['id'], 'add', True
         )
         # Add single Transaction 
-        status = transactionsBusiness.addTransactionPool(tran)
+        status = dns.blockchain.transactions.addTransaction(tran)
         
         return tran, status
     
@@ -225,7 +199,7 @@ def dashboard_operation():
             'transaction'   : tran.as_dict() if tran else None,
         }
             
-    return render_template('_operation_template.html', **html_options)
+    return render_template('_operation_dashboard_template.html', **html_options)
     
 @app.route('/block')
 def block_manager():
@@ -238,7 +212,6 @@ def block_manager():
 def logout():
     session.pop('account', None)
     return redirect('/')
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -261,7 +234,7 @@ def login():
 
         account, status = accountBusiness.authenticateAccount(email, password)
         # Return message
-        message = Message.getMessage('AccountLogin', str(status))
+        message = Message.getMessage('AccountLogin', status)
         if account:
             account = account.as_dict()
             # TODO : create safe as_dict function
@@ -281,7 +254,6 @@ def login():
         session.pop('regis_email', None)
 
     return render_template('_login_template.html', **html_options, regis_email=regis_email)
-
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -312,7 +284,7 @@ def register():
             status = accountBusiness.addAccount(account)
 
         # Return message
-        message = Message.getMessage('AccountRegister', str(status))
+        message = Message.getMessage('AccountRegister', status)
         response = {'status': status, 'message': message}
 
         if status == 200:
@@ -326,12 +298,11 @@ def register():
     return render_template('_login_template.html', **html_options)
 
 
-
 # BACK ------------------------------------------------
 
 @app.route('/blockchain/transactions')
 def showTransactionsBuffer():
-    tranList = dns.blockchain.current_transactions
+    tranList = [ tran.as_dict() for tran in dns.blockchain.current_transactions ]
     return jsonify({
         'status': 200,
         'message': 'Show transaction successfully',
@@ -422,32 +393,31 @@ def addNewBlock():
 
 @app.route('/blockchain/mine')
 def mineBlock():
-    # block, status = dns.blockchain.mineBlock()
-    # if status == 200:
-    #     # 1. here . Don't work
-    #     block, status = dns.blockchain.addBlock(block)
-    #     dns.blockchain.broadcastNewBlock()
-    #     # 2. here . Don't work
-    # elif status == 500:
-    #     message = f'Don\'t have enough {dns.blockchain.BUFFER_MAX_LEN} transactions to start mining'
+    # Pre mining
+    transactions, status = dns.blockchain.prepareMiningBlockTransactions()
+    if status == 500:
+        return Message.getMessage('BlockMining', status, dns.blockchain.BUFFER_MAX_LEN) 
+    
+    # Mining
+    block = dns.blockchain.mineBlock(transactions)
+    
+    if block:
+        block, status = dns.blockchain.addBlock(block)
+        dns.blockchain.broadcastNewBlock()
 
-    # if status == 200:
-    #     message = 'Mine block successfully'
-    # else:
-    #     message = 'Something goes wrong with adding progress in mining'
+    message = Message.getMessage('BlockMining', status or 501)
 
-    # return jsonify({
-    #     'status': status,
-    #     'message': message,
-    #     'block_id': block.id if block else None
-    # })
-    return 'Step 1: Check condition -> Step 2: Mine '
+    return jsonify({
+        'status': status,
+        'message': message,
+        'block_id': block.id if block else None
+    })
 
 
 @app.route('/blockchain/pow', methods=["POST"])
 def proofOfWork():
-    block_request = request.form.to_dict(flat=True)
-    block, speedtime = dns.blockchain.returnProofOfWorkOutput(block_request)
+    request_form_dict = request.form.to_dict(flat=False)
+    block, speedtime = dns.blockchain.returnProofOfWorkOutput(request_form_dict)
 
     return jsonify({
         'status': 200,

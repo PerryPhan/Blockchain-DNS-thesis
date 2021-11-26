@@ -1,125 +1,72 @@
-.detail.container {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  position: relative;
-
-  .add-tx-button-group {
-    @include dashb-add-tx-button-group;
-  }
-
-  .header {
-    @include dashb-header;
-  }
-
-  .main {
-    height: 100%;
-    display: flex;
-
-    .aside{
-      @include dashb-aside;
-    }
-
-    .table-side {
-      display: flex;
-      flex-direction: column;
-      padding: 20px 30px;
-      width: 100%;
-
-      .titles {
-        @include dashb-table-side-titles;
-      }
-
-      .table-box {
-        height: 20%;
-        overflow: auto;
-        overflow-x: hidden;
-        table {
-          @include dashb-table;
+@mixin dashbdetail-detail-box {
+  height: 520px;
+  padding: 10px;
+  border: 5px solid rgba(0, 0, 0, 0.445);
+  .detail {
+    &.transaction-detail {
+      .row {
+        padding: 15px 0;
+        &.timestamp-row {
+          .value {
+            span {
+              margin-left: 5px;
+              color: rgb(124, 124, 124);
+            }
+          }
         }
-      }
-
-      .detail-box {
-        height: 520px;
-        padding: 10px;
-        border: 5px solid rgba(0, 0, 0, 0.445);
-        .detail {
-          &.transaction-detail {
-            .row {
-              padding: 15px 0;
-              &.timestamp-row {
-                .value {
-                  span {
-                    margin-left: 5px;
-                    color: rgb(124, 124, 124);
-                  }
-                }
-              }
-              &.action-row {
-                .value {
-                  &.add {
-                    width: fit-content;
-                    padding: 10px;
-                    background-color: springgreen;
-                    font-weight: bold;
-                    border-radius: 10px;
-                  }
-                }
-              }
-              .value {
-                display: flex;
-                align-items: center;
-                span {
-                  &.img-box {
-                    margin-right: 10px;
-                  }
-                }
-              }
-            }
-          }
-          &.domain-detail {
-            .row {
-              padding: 15px 0 10px;
-              align-items: flex-start;
-              .value {
-                padding: 5px 0;
-                .subrow {
-                  display: flex;
-                  padding-bottom: 20px;
-                  .sublabel {
-                    width: 100px;
-                  }
-                  .subvalue {
-                    width: 100px;
-                    margin-right: 10px;
-                  }
-                }
-              }
-            }
-          }
-          .row {
-            display: flex;
-            align-items: center;
-            .label {
-              font-size: 20px;
+        &.action-row {
+          .value {
+            &.add {
+              width: fit-content;
+              padding: 10px;
+              background-color: springgreen;
               font-weight: bold;
-              width: 150px;
+              border-radius: 10px;
             }
-            .value {
-              font-size: 16px;
+          }
+        }
+        .value {
+          display: flex;
+          align-items: center;
+          span {
+            &.img-box {
+              margin-right: 10px;
             }
           }
         }
       }
-
-      .pagination {
-        @include dashb-pagination;
+    }
+    &.domain-detail {
+      .row {
+        padding: 15px 0 10px;
+        align-items: flex-start;
+        .value {
+          padding: 5px 0;
+          .subrow {
+            display: flex;
+            padding-bottom: 20px;
+            .sublabel {
+              width: 100px;
+            }
+            .subvalue {
+              width: 100px;
+              margin-right: 10px;
+            }
+          }
+        }
       }
-
-      .createdby {
-        @include dashb-created-by;
+    }
+    .row {
+      display: flex;
+      align-items: center;
+      .label {
+        font-size: 20px;
+        font-weight: bold;
+        width: 150px;
       }
-      
+      .value {
+        font-size: 16px;
+      }
     }
   }
 }

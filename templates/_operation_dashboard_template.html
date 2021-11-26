@@ -1,6 +1,6 @@
 {% extends 'template.html' %} {% block title %} {{ title or '' }} {% endblock %}
 {% block body %}
-<div class="operation container">
+<div class="dashboard container">
   <div class="header">
     <div class="left">
       <div class="menu-btn">
@@ -67,7 +67,7 @@
       </div>
     </div>
   </div>
-  <div class="main">
+  <div class="operation main">
     <div class="aside animation asideSlidetoRight">
       <div class="tab-title {% if type == 1 %} active {% endif %}">
         <a href="./transactions"><h3>Transaction List</h3></a>
@@ -183,7 +183,7 @@
           </tbody>
         </table>
       </div>
-      <div class="form-box ">
+      <div class="operation-box ">
         <form class="typing-form animation" method="POST">
           <h1>Typing Form</h1>
           {% if message %}
