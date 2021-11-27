@@ -209,5 +209,8 @@ def testUpdate():
         tran.id = '123123123'
         tx.updateTransaction( old_tran, tran)
 
-testUpdate()
-    
+# testUpdate()
+
+
+import os 
+os.system('run_server.sh')

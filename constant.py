@@ -52,6 +52,13 @@ RECORD_FORMAT = {
         },
     ],
 }
+ZONE_FORMAT = {
+	"$origin": "",
+	"$ttl": 3600,
+	"soa": {},
+	"ns": [],
+	"a": []
+}
 
 ACCOUNT_FORMAT = {
     'fullname'  : '^[a-zA-Z]+[ a-zA-Z]*$',

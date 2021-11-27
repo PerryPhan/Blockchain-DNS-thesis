@@ -1,0 +1,36 @@
+{
+ "$origin": "dai.com",
+ "$ttl": 3600, 
+
+ "soa": {
+      "mname": "ns1.dai.com", 
+      "rname": "admin.dai.com", 
+      "serial": "{time}",
+      "refresh": 3600, 
+      "retry": 600, 
+      "expire": 30, 
+      "minimum": 86400 
+  },
+  
+  "ns": [
+      {"host": "ns1.dai.com"}, 
+      {"host": "ns2.dai.com"}
+  ],
+  
+  "a": [
+      { "name": "@",
+        "ttl": 400, 
+        "value": "192.168.1.7"
+      }, 
+      {"name": "@", 
+        "ttl": 400, 
+        "value": "0.0.0.0"
+      }, 
+      {"name": "@",
+        "ttl": 400, 
+        "value": "0.0.0.0"
+      }
+  
+  ]
+  
+}

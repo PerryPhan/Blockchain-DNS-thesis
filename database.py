@@ -1,4 +1,5 @@
-from include import db, json, hashlib, datetime
+from constant import ZONE_FORMAT
+from include import db, json, hashlib, datetime, copy
 import time
 ''' 
     This file stores what is necessary in Database PgSQL 
@@ -88,7 +89,6 @@ def merge_obj(obj, merge_obj):
     for property in merge_obj:
         obj[property] = merge_obj[property]
     return obj
-
 
 class Accounts(db.Model):
     __tablename__ = 'accounts'
@@ -186,6 +186,15 @@ class Transactions(db.Model):
 
     def datetime_format(self):
         return datetime.fromtimestamp(self.timestamp).strftime("%d/%m/%Y, %H:%M:%S") if self.timestamp else None
+
+    def zone_format(self):
+        return {
+            "$origin": self.domain,
+            "$ttl": 3600,
+            "soa": self.soa,
+            "ns": self.ns,
+            "a": self.a
+        }
 
 class Records :
     def __init__(self, transaction = None) :

@@ -1,0 +1,26 @@
+{
+    "$origin": "abc.com", 
+    "$ttl": 3600, 
+
+    "soa": {
+        "expire": 30, 
+        "minimum": 86400, 
+        "mname": "ns1.abc.com", 
+        "refresh": 3600, 
+        "retry": 600, 
+        "rname": "admin.abc.com", 
+        "serial": "{time}"
+        },
+    
+    "a": [
+        {"name": "@", "ttl": 400, "value": "192.168.1.7"}, 
+        {"name": "@", "ttl": 400, "value": "0.0.0.0"}, 
+        {"name": "@", "ttl": 400, "value": "0.0.0.0"}
+        ], 
+    
+    "ns": [
+        {"host": "ns1.abc.com"}, 
+        {"host": "ns2.abc.com"}
+        ] 
+    
+}

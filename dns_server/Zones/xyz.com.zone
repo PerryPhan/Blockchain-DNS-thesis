@@ -1,0 +1,36 @@
+{
+	"$origin": "daidns1.com",
+	"$ttl": 3600,
+
+	"soa": {
+		"mname": "ns1.daidns1.com",
+		"rname": "admin.daidns1.com",
+		"serial": "{time}",
+		"refresh": 3600,
+		"retry": 600,
+		"expire": 30,
+		"minimum": 86400
+	},
+
+	"ns": [
+		{"host": "ns1.daidns1.com"},
+		{"host": "ns2.daidns1.com"}
+	],
+
+	"a": [
+		{"name": "@",
+		  "ttl": 400,
+		  "value": "192.168.1.7"
+		},
+		{"name": "@",
+		  "ttl": 400,
+		  "value": "11.0.0.2"
+		},
+		{"name": "@",
+		  "ttl": 400,
+		  "value": "11.0.0.3"
+		}
+
+	]
+
+}

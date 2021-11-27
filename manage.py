@@ -12,6 +12,7 @@ dns = DNSResolver()
 def home():
     return redirect('/dashboard/transactions')
 
+
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
     # How to know that is his first time => This onl IP was his computer and don't have this email in DB
@@ -38,18 +39,19 @@ def admin():
 
     return render_template('_admin_template.html', **html_options)
 
+
 @app.route('/dashboard/transactions')
 def dashboardTransactions():
     list = dns.blockchain.transactions.getAllTransactions()
     noblocklist = dns.blockchain.transactions.getNoBlockTransactions()
     html_options = {
-        'type' : 1,
+        'type': 1,
         'title': 'Transaction Dashboard ',
         'count': len(list) if list else 0,
-        'unit' : 'tx',
-        'list' : list,
+        'unit': 'tx',
+        'list': list,
         'no_block_list_count': len(noblocklist),
-        'node' : dns.blockchain.nodes.node,
+        'node': dns.blockchain.nodes.node,
     }
     if session:
         if 'account' in session:
@@ -58,19 +60,20 @@ def dashboardTransactions():
                 'account_fullname': session['account']['fullname']
             }
             return render_template('_dashboard_template.html', **html_options, **account_options)
-    
+
     return render_template('_dashboard_template.html', **html_options)
+
 
 @app.route('/dashboard/transactions/detail')
 def detailDashboardTransactions():
-    id = request.args.get('id', default = 1, type = int)
-    
+    id = request.args.get('id', default=1, type=int)
+
     html_options = {
-        'type' : 1,
+        'type': 1,
         'title': 'Transaction Detail',
-        'unit' : 'tx',
+        'unit': 'tx',
     }
-    
+
     if session:
         if 'account' in session:
             account_options = {
@@ -78,41 +81,43 @@ def detailDashboardTransactions():
                 'account_fullname': session['account']['fullname']
             }
             return render_template('_detail_dashboard_template.html', **html_options, **account_options)
-    
+
     return render_template('_detail_dashboard_template.html', **html_options)
+
 
 @app.route('/dashboard/domains')
 def dashboardDomains():
     list = dns.blockchain.transactions.getDomainList()
-    
+
     html_options = {
-        'type' : 2,
+        'type': 2,
         'title': 'Domains Dashboard ',
         'count': len(list) if list else 0,
-        'unit' : 'domains',
-        'list' : list,
+        'unit': 'domains',
+        'list': list,
     }
-    
-    if session :
+
+    if session:
         if 'account' in session:
             account_options = {
                 'account_id': session['account']['id'],
                 'account_fullname': session['account']['fullname']
             }
             return render_template('_dashboard_template.html', **html_options, **account_options)
-    
+
     return render_template('_dashboard_template.html', **html_options)
+
 
 @app.route('/dashboard/domains/detail')
 def detailDashboardDomains():
-    domain = request.args.get('domain', default = '', type = str)
-    
+    domain = request.args.get('domain', default='', type=str)
+
     html_options = {
-        'type' : 2,
+        'type': 2,
         'title': 'Domains Detail',
-        'unit' : 'domains',
+        'unit': 'domains',
     }
-    
+
     if session:
         if 'account' in session:
             account_options = {
@@ -120,13 +125,14 @@ def detailDashboardDomains():
                 'account_fullname': session['account']['fullname']
             }
             return render_template('_detail_dashboard_template.html', **html_options, **account_options)
-    
+
     return render_template('_detail_dashboard_template.html', **html_options)
 
-@app.route('/dashboard/operation', methods=['GET','POST'])
+
+@app.route('/dashboard/operation', methods=['GET', 'POST'])
 def dashboard_operation():
     ALLOWED_EXTS = {"txt"}
-    
+
     def checkFileExtension(file):
         return '.' in file and len(file.rsplit('.')) == 2 and file.rsplit('.', 1)[1].lower() in ALLOWED_EXTS
 
@@ -146,13 +152,13 @@ def dashboard_operation():
     def handleOneRecordForm(form):
         # New transaction
         tran, status = dns.blockchain.transactions.newTransaction(
-           form, session['account']['id'], 'add', True
+            form, session['account']['id'], 'add', True
         )
-        # Add single Transaction 
+        # Add single Transaction
         status = dns.blockchain.transactions.addTransaction(tran)
-        
+
         return tran, status
-    
+
     def handleMultipleRecordsForm(file):
         filename, status = checkFileNameFormat(file.filename)
         if status != 200:
@@ -164,43 +170,44 @@ def dashboard_operation():
 
         # Open file and add the content to TRANSACTION
         with open(file_path, "r", encoding="utf-8") as f:
-        #    Do like 1 form
+            #    Do like 1 form
             return 200
-    
-    # Check account 
-    if not session or not 'account' in session :
+
+    # Check account
+    if not session or not 'account' in session:
         return redirect('/login')
-        
+
     account_options = {
         'account_id': session['account']['id'],
         'account_fullname': session['account']['fullname'],
     }
-    
+
     html_options = {
         'title': 'Operation',
-        'type' : 3,
+        'type': 3,
         **account_options,
     }
-    
+
     if request.method == 'POST':
         status = 0
         if 'file' in request.files:
-            status  = handleMultipleRecordsForm(request.files['file'])
-            
+            status = handleMultipleRecordsForm(request.files['file'])
+
             return {
-            'status' : status, 
-            'form'   : request.form,
-            'file'  :  request.files['file'].filename
+                'status': status,
+                'form': request.form,
+                'file':  request.files['file'].filename
             }
-        
+
         tran, status = handleOneRecordForm(request.form)
         return {
-            'status' : status, 
-            'transaction'   : tran.as_dict() if tran else None,
+            'status': status,
+            'transaction': tran.as_dict() if tran else None,
         }
-            
+
     return render_template('_operation_dashboard_template.html', **html_options)
-    
+
+
 @app.route('/block')
 def block_manager():
     html_options = {
@@ -208,10 +215,12 @@ def block_manager():
     }
     return render_template('_block_manager_template.html', **html_options)
 
+
 @app.route('/logout')
 def logout():
     session.pop('account', None)
     return redirect('/')
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -241,7 +250,7 @@ def login():
             # account.pop('password', None):
             account['password'] = ''
             # account.pop('id', None):
-            
+
             session['account'] = account
 
         response = {'status': status, 'message': message}
@@ -253,6 +262,7 @@ def login():
         session.pop('regis_email', None)
 
     return render_template('_login_template.html', **html_options, regis_email=regis_email)
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -298,10 +308,43 @@ def register():
 
 
 # BACK ------------------------------------------------
+@app.route('/dns')
+def dns_server():
+    def run():
+        os.system('run_server.sh')
+    
+    content = 'Generated run file'
+    try: 
+        node = dns.blockchain.nodes.getNode() 
+        if not node : return 
+    except:
+        return
+    
+    with open("run_server.sh", "w") as file :
+        file.write("cd dns_server \n")
+        file.write(f"python Server.py -ip {node.ip} -p {node.port}")
+    
+    x = threading.Thread(
+        target=run,
+    )
+    
+    x.start()
+    x.join()
+    
+    return content
+
+
+@app.route('/dns/load')
+def load_domain_list():
+    return {
+        'status': 200,
+        'data': dns.blockchain.transactions.getRawDomainData()
+    }
+
 
 @app.route('/blockchain/transactions')
 def showTransactionsBuffer():
-    tranList = [ tran.as_dict() for tran in dns.blockchain.current_transactions ]
+    tranList = [tran.as_dict() for tran in dns.blockchain.current_transactions]
     return jsonify({
         'status': 200,
         'message': 'Show transaction successfully',
@@ -383,11 +426,11 @@ def mineBlock():
     # Pre mining
     transactions, status = dns.blockchain.prepareMiningBlockTransactions()
     if status == 500:
-        return Message.getMessage('BlockMining', status, dns.blockchain.BUFFER_MAX_LEN) 
-    
+        return Message.getMessage('BlockMining', status, dns.blockchain.BUFFER_MAX_LEN)
+
     # Mining
     block = dns.blockchain.mineBlock(transactions)
-    
+
     if block:
         block, status = dns.blockchain.addBlock(block)
         dns.blockchain.transactions.setCurrentTxsBlockID(block.id)
@@ -404,7 +447,8 @@ def mineBlock():
 @app.route('/blockchain/pow', methods=["POST"])
 def proofOfWork():
     request_form_dict = request.form.to_dict(flat=False)
-    block, speedtime = dns.blockchain.returnProofOfWorkOutput(request_form_dict)
+    block, speedtime = dns.blockchain.returnProofOfWorkOutput(
+        request_form_dict)
 
     return jsonify({
         'status': 200,
@@ -489,7 +533,7 @@ if __name__ == "__main__":
             dns.initBlockchain(node)
             app.run(host=node.ip, port=node.port,
                     debug=True, use_reloader=False)
-            
+
         except:
             print('\n !!: Program is suddenly paused -> Turning off...')
     elif code == 201:

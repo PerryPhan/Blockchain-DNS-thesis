@@ -448,6 +448,9 @@ class TransactionBusiness:
                 pass
         return records
 
+    def getRawDomainData(self):
+        return [ transaction.zone_format() for transaction in self.getAllTransactions() ]
+    
     def getTransactionById(self, id):
         return Transactions.query.filter(Transactions.id == id).first()
 # NodeBusiness  -----------------------------------
