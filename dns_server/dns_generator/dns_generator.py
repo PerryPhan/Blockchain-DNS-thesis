@@ -22,7 +22,7 @@ class DNSGen(object):
         self.ARCOUNT = b"\x00\x00"  # Additional records
         self.format_error = 0       # 1=Error in trying to parse domain parts
         self.domain = ""
-        self.ZONES = ZONES if ZONES else self.load_zones()
+        self.ZONES = ZONES 
     
     def get_zone(self, domain):
         zone_name = ".".join(domain)
@@ -36,7 +36,6 @@ class DNSGen(object):
             return None
         return zone
     
-        
     def _get_transaction_id(self):
         return self.data[0:2]  # first 2 bytes have transaction ID
 
@@ -158,7 +157,6 @@ class DNSGen(object):
         return transaction_id + flags + self.QDCOUNT + ancount + self.NSCOUNT + self.ARCOUNT
 
     def _make_question(self, records_length, record_type, domain_name):
-        
         resp = b""
         if self.format_error == 1:
             return resp

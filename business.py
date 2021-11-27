@@ -48,7 +48,7 @@ class Blockchain:
         self.MINE_REWARD = MINE_REWARD
         self.BUFFER_MAX_LEN = BUFFER_MAX_LEN
         self.DIFFICULTY = DIFFICULTY
-    
+
     #  EXTRA PROPERTIES ----------------------------------------------------------
     @property
     def last_block(self):
@@ -92,7 +92,7 @@ class Blockchain:
 
     def dumpChain(self):
         return [block.as_dict() for block in self.chain]
-    
+
     # GET & SHOW CHAIN ----------------------------------------------------------
     def getGenesisBlock(self):
         return Blocks(
@@ -127,7 +127,7 @@ class Blockchain:
         except:
             print(' Error : something go wrong with Query')
             return 404
-    # TODO : check intergity of chain 
+    # TODO : check intergity of chain
 
     #  STEPS OF MINE BLOCK ----------------------------------------------------------
     def prepareMiningBlockTransactions(self):
@@ -137,7 +137,7 @@ class Blockchain:
         if trans_len >= self.BUFFER_MAX_LEN:
             return trans, 200
         else:
-            return trans, 500  
+            return trans, 500
 
     def mineBlock(self, transactions):
         '''
@@ -148,7 +148,7 @@ class Blockchain:
 
         fastestBlockResponse = self.findFastestBlockResponse(responses)
         block = Blocks(
-            id= fastestBlockResponse['id'],
+            id=fastestBlockResponse['id'],
             timestamp=float(fastestBlockResponse['timestamp']),
             nonce=int(fastestBlockResponse['nonce']),
             transactions=fastestBlockResponse['transactions'],
@@ -178,8 +178,8 @@ class Blockchain:
             responses.append(rep.json())
         # ----------------------------------------
         neighbours = self.nodes.getActiveNetwork()
-        
-        transactions = [ tran.block_tx_format() for tran in transactions]
+
+        transactions = [tran.block_tx_format() for tran in transactions]
         request_block = self.newBlock(transactions).as_dict()
         # ----------------------------------------
         for node in neighbours:
@@ -187,14 +187,14 @@ class Blockchain:
             # 4.1
             x = threading.Thread(
                 target=sendRequestAndReturn,
-                args=[ request_url, request_block ]
+                args=[request_url, request_block]
             )
             x.start()
 
         for node in neighbours:
             x.join()
         # ----------------------------------------
-        
+
         return responses
 
     def proofOfWork(self, block):
@@ -226,7 +226,7 @@ class Blockchain:
                     fastestBlockResponse = response['block']
 
         return fastestBlockResponse
-    
+
     def returnProofOfWorkOutput(self, request_form_dict):
         '''
             Process step : 
@@ -236,12 +236,12 @@ class Blockchain:
         request_form_dict['add_by_node_id'] = self.node_id
 
         block = Blocks(
-            id= int(request_form_dict['id'][0]),
-            timestamp= float(request_form_dict['timestamp'][0]),
-            nonce= int(request_form_dict['nonce'][0]),
-            transactions= request_form_dict['transactions'],
-            previous_hash= request_form_dict['previous_hash'][0],
-            node_id= request_form_dict['node_id'][0],
+            id=int(request_form_dict['id'][0]),
+            timestamp=float(request_form_dict['timestamp'][0]),
+            nonce=int(request_form_dict['nonce'][0]),
+            transactions=request_form_dict['transactions'],
+            previous_hash=request_form_dict['previous_hash'][0],
+            node_id=request_form_dict['node_id'][0],
             add_by_node_id=request_form_dict['add_by_node_id'] if 'add_by_node_id' in request_form_dict else None
         )
 
@@ -303,7 +303,7 @@ class Blockchain:
 class TransactionBusiness:
     def __init__(self):
         self.TIME_TO_LIVE = 3600
-   
+
     def convertRequestToTransactionObj(self, request_form):
         return {
             "domain": request_form['domain'],
@@ -344,62 +344,85 @@ class TransactionBusiness:
     def checkTransactionFormat(self, obj):
         checked = copy(RECORD_FORMAT)
         if 'domain' in obj:
-            if obj['domain'] :
+            if obj['domain']:
                 checked['domain'] = copy(checked['domain'])
-                checked['domain'] = True if re.match( checked['domain'], obj['domain']) else False
-        
+                checked['domain'] = True if re.match(
+                    checked['domain'], obj['domain']) else False
+
         checked['soa'] = copy(checked['soa'])
         if 'soa' in obj:
-            if obj['soa'] :
+            if obj['soa']:
                 for key in obj['soa'].keys():
-                    checked['soa'][key] = True if obj['soa'][key] and re.match( checked['soa'][key], obj['soa'][key]) else False
-        
-        checked['soa'] = all([ checked['soa'][key] for key in checked['soa'].keys() ])
-        
+                    checked['soa'][key] = True if obj['soa'][key] and re.match(
+                        checked['soa'][key], obj['soa'][key]) else False
+
+        checked['soa'] = all([checked['soa'][key]
+                             for key in checked['soa'].keys()])
+
         checked['ns'] = copy(checked['ns'])
         if 'ns' in obj:
-            if obj['ns'] :
+            if obj['ns']:
                 for i in range(len(obj['ns'])):
                     checked['ns'][i] = copy(checked['ns'][i])
                     checked['ns'][i]['host'] = copy(checked['ns'][i]['host'])
-                    checked['ns'][i]['host'] = True if obj['ns'][i]['host'] and re.match( checked['ns'][i]['host'], obj['ns'][i]['host']) else False
-        
-        checked['ns'] = all([ ns['host'] for ns in checked['ns'] ])
-        
-        checked['a'] = copy(checked['a']) 
+                    checked['ns'][i]['host'] = True if obj['ns'][i]['host'] and re.match(
+                        checked['ns'][i]['host'], obj['ns'][i]['host']) else False
+
+        checked['ns'] = all([ns['host'] for ns in checked['ns']])
+
+        checked['a'] = copy(checked['a'])
         if 'a' in obj:
-            if obj['a'] :
+            if obj['a']:
                 for i in range(len(obj['a'])):
                     if obj['a'][i]['value'] != "":
                         for key in obj['a'][i].keys():
                             checked['a'][i] = copy(checked['a'][i])
                             checked['a'][i][key] = copy(checked['a'][i][key])
-                            checked['a'][i][key] = True if obj['a'][i][key] and re.match( checked['a'][i][key], obj['a'][i][key]) else False
-            
+                            checked['a'][i][key] = True if obj['a'][i][key] and re.match(
+                                checked['a'][i][key], obj['a'][i][key]) else False
+
         for spec in checked['a']:
-            spec = all([ spec[key] for key in spec.keys() ])
-            
+            spec = all([spec[key] for key in spec.keys()])
+
         checked['a'] = all([spec for spec in checked['a']])
-        
+
         return all([checked[key] for key in checked.keys()])
 
-    def newTransaction(self, request_form, account_id, action, convertToObj = False):
+    def correctFormat(self, obj):
+        obj['soa']['refresh'] = int(obj['soa']['refresh']) if type(
+            obj['soa']['refresh']) != int else obj['soa']['refresh']
+        obj['soa']['retry'] = int(obj['soa']['retry']) if type(
+            obj['soa']['retry']) != int else obj['soa']['retry']
+        obj['soa']['expire'] = int(obj['soa']['expire']) if type(
+            obj['soa']['expire']) != int else obj['soa']['expire']
+        obj['soa']['minimum'] = int(obj['soa']['minimum']) if type(
+            obj['soa']['minimum']) != int else obj['soa']['minimum']
+        obj['soa']['serial'] = str(time.time())
+
+        obj['ttl'] = self.TIME_TO_LIVE
+
+        for a in obj['a']:
+            a['ttl'] = int(a['ttl']) if type(a['ttl']) != int else a['ttl']
+            a['value'] = a['value'] if a['value'] != '' else '0.0.0.0'
+
+        return obj
+
+    def newTransaction(self, request_form, account_id, action, convertToObj=False):
         obj = request_form
-        if convertToObj == True:  
-            obj = self.convertRequestToTransactionObj( obj )
+        if convertToObj == True:
+            obj = self.convertRequestToTransactionObj(obj)
         if self.checkTransactionFormat(obj) == True:
-            #  Add serial & ttl to SOA 
-            obj['soa']['serial'] = time.time()
-            obj['ttl'] = self.TIME_TO_LIVE
-            tran =  Transactions(
-                domain = obj['domain'],
-                action = action,
-                soa    = obj['soa'],
-                ns     = obj['ns'],
-                a      = obj['a'],
-                ttl    = obj['ttl'],
-                timestamp = time.time(),
-                account_id = account_id,
+            #  Add serial & ttl to SOA
+            obj = self.correctFormat(obj)
+            tran = Transactions(
+                domain=obj['domain'],
+                action=action,
+                soa=obj['soa'],
+                ns=obj['ns'],
+                a=obj['a'],
+                ttl=obj['ttl'],
+                timestamp=time.time(),
+                account_id=account_id,
             )
             return tran, 200
         return None, 500
@@ -418,7 +441,7 @@ class TransactionBusiness:
             db.session.query(Transactions).filter(
                 Transactions.id == transaction.id,
             ).update({
-                'block_id' : transaction.block_id
+                'block_id': transaction.block_id
             })
             db.session.commit()
             return transaction, 200
@@ -429,11 +452,11 @@ class TransactionBusiness:
         no_block_txs_list = self.getNoBlockTransactions()
         for transaction in no_block_txs_list:
             transaction.block_id = block_id
-            self.updateTransaction( transaction )
-    
+            self.updateTransaction(transaction)
+
     def getNoBlockTransactions(self):
         return Transactions.query.filter(Transactions.block_id == None).all()
-    
+
     def getAllTransactions(self):
         return Transactions.query.all()
 
@@ -449,8 +472,8 @@ class TransactionBusiness:
         return records
 
     def getRawDomainData(self):
-        return [ transaction.zone_format() for transaction in self.getAllTransactions() ]
-    
+        return [transaction.zone_format() for transaction in self.getAllTransactions()]
+
     def getTransactionById(self, id):
         return Transactions.query.filter(Transactions.id == id).first()
 # NodeBusiness  -----------------------------------
@@ -497,13 +520,13 @@ class NodesBusiness:
     def activeNode(self, node):
         if node.is_active != True:
             node.is_active = True
-            return self.updateNode( node)
+            return self.updateNode(node)
         return node
 
     def inActiveNode(self, node):
         if node.is_active != False:
             node.is_active = False
-            return self.updateNode( node)
+            return self.updateNode(node)
         return node
 
     def handleNodeInformation(self, ip: str, port: int, nodename=''):

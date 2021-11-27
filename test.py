@@ -177,40 +177,56 @@ def checkTransactionFormat( domain, a, soa = None, ns = None, account_id = None)
     print('After all, checked will be: ',checked)
     return all( [ checked[key] for key in checked.keys() ] )
 
-record = {
-    'domain': 'example.com',
-    'a' : [{
-        'ip': '1.1.1.a',
-        'port': '80',
-        'ttl': '14400',
-    },{
-        'ip': '1.1.1.2',
-        'port': '80',
-        'ttl': '14400',
-    },
-    # {
-    #     'ip': '1.1.1.3',
-    #     'port': '80',
-    #     'ttl': '0',
-    # }
-    ]
-}
+# record = {
+#     'domain': 'example.com',
+#     'a' : [{
+#         'ip': '1.1.1.a',
+#         'port': '80',
+#         'ttl': '14400',
+#     },{
+#         'ip': '1.1.1.2',
+#         'port': '80',
+#         'ttl': '14400',
+#     },
+#     # {
+#     #     'ip': '1.1.1.3',
+#     #     'port': '80',
+#     #     'ttl': '0',
+#     # }
+#     ]
+# }
 
 # print ('CHECKED : ', checkTransactionFormat(
 #     **record
 # ))
 
-def testUpdate():
-    tx = TransactionBusiness()
-    tran_list = tx.getTransactionsPool()
-    if tran_list :
-        old_tran = tran_list[0]
-        tran = copy(old_tran) 
-        tran.id = '123123123'
-        tx.updateTransaction( old_tran, tran)
+# def testUpdate():
+#     tx = TransactionBusiness()
+#     tran_list = tx.getTransactionsPool()
+#     if tran_list :
+#         old_tran = tran_list[0]
+#         tran = copy(old_tran) 
+#         tran.id = '123123123'
+#         tx.updateTransaction( old_tran, tran)
 
 # testUpdate()
 
 
 import os 
-os.system('run_server.sh')
+# os.system('run_server.sh')
+
+food = 0 
+import threading
+
+def setInterval(func,time):
+    e = threading.Event()
+    while not e.wait(time):
+        func()
+
+def foo():
+    global food
+    food += 2
+    print( food )
+
+# using
+setInterval(foo,2)
