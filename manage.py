@@ -18,7 +18,7 @@ def admin():
     # How to know that is his first time => This onl IP was his computer and don't have this email in DB
     # If he try to log again will be email and password empty
     html_options = {
-        'title': 'Admin',
+        'title': 'Blocks and Txs manager',
     }
     if request.method == 'POST':
         # If the first time login in
@@ -37,7 +37,7 @@ def admin():
             'account': account.as_dict() if account else None,
         }
 
-    return render_template('admin_template.html', **html_options)
+    return render_template('_admin_blocktx_manager_template.html', **html_options)
 
 
 @app.route('/dashboard/transactions')

@@ -470,6 +470,190 @@ body {
   padding: 0;
   margin: 0;
 }
+.admin.container .section.section-center main.block_and_trans {
+  padding: 20px;
+}
+.admin.container .section.section-center main.block_and_trans .top {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.admin.container .section.section-center main.block_and_trans .top h3 {
+  width: fit-content;
+}
+.admin.container .section.section-center main.block_and_trans .top .right {
+  flex: 1 0 auto;
+  display: flex;
+  justify-content: flex-end;
+}
+.admin.container .section.section-center main.block_and_trans .top .right .paginator .btn-box {
+  display: flex;
+}
+.admin.container .section.section-center main.block_and_trans .top .right .paginator .btn-box a {
+  text-decoration: none !important;
+}
+.admin.container .section.section-center main.block_and_trans .top .right .paginator .btn-box .first-side {
+  display: flex;
+  align-items: center;
+}
+.admin.container .section.section-center main.block_and_trans .top .right .paginator .btn-box .first-side span {
+  font-weight: 600;
+  color: #1A89C9;
+  margin: 0 15px;
+}
+.admin.container .section.section-center main.block_and_trans .top .right .paginator .btn-box .first-side span a {
+  color: #1A89C9;
+}
+.admin.container .section.section-center main.block_and_trans .top .right .paginator .btn-box .index-side span {
+  margin: 0 5px;
+  color: grey;
+}
+.admin.container .section.section-center main.block_and_trans .top .right .paginator .btn-box .index-side span:first-child {
+  color: #1A89C9;
+}
+.admin.container .section.section-center main.block_and_trans .top .right .paginator .btn-box .last-side {
+  display: flex;
+  align-items: center;
+}
+.admin.container .section.section-center main.block_and_trans .top .right .paginator .btn-box .last-side span {
+  color: #1A89C9;
+  margin: 0 15px;
+  font-weight: 600;
+}
+.admin.container .section.section-center main.block_and_trans .top .right .paginator .btn-box .last-side span a {
+  color: #1A89C9;
+}
+.admin.container .section.section-center main.block_and_trans .top .right .paginator > div {
+  display: flex;
+  align-items: center;
+}
+.admin.container .section.section-center main.block_and_trans .blocks {
+  margin-bottom: 30px;
+}
+.admin.container .section.section-center main.block_and_trans .blocks .content {
+  display: flex;
+  box-sizing: border-box;
+  height: 180px;
+}
+.admin.container .section.section-center main.block_and_trans .blocks .content .block {
+  box-sizing: border-box;
+  border-radius: 20px;
+  margin-right: 35px;
+  width: 30%;
+  height: 100%;
+  background-color: #ffffff;
+  padding: 20px 30px;
+  box-shadow: 0px 5px 10px #9193A7;
+}
+.admin.container .section.section-center main.block_and_trans .blocks .content .block .flex {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.admin.container .section.section-center main.block_and_trans .blocks .content .block .flex.created-by {
+  width: 100%;
+  justify-content: flex-end;
+  color: #707070;
+  letter-spacing: 4.5%;
+  font-size: 12px;
+}
+.admin.container .section.section-center main.block_and_trans .blocks .content .block .flex.created-by span {
+  margin-left: 10px;
+}
+.admin.container .section.section-center main.block_and_trans .blocks .content .block .flex.id {
+  font-size: 20px;
+  color: #8165FF;
+}
+.admin.container .section.section-center main.block_and_trans .blocks .content .block .flex.id label {
+  font-weight: bold;
+  width: fit-content;
+  text-transform: uppercase;
+}
+.admin.container .section.section-center main.block_and_trans .blocks .content .block .flex.id .value {
+  font-weight: bold;
+  color: #8165FF;
+  width: fit-content;
+}
+.admin.container .section.section-center main.block_and_trans .blocks .content .block .flex.id .datetime {
+  flex: 1 0 auto;
+  text-align: right;
+  font-size: 13px;
+  font-weight: bold;
+  color: #707070;
+}
+.admin.container .section.section-center main.block_and_trans .blocks .content .block .flex.add-by .value {
+  color: #147112;
+}
+.admin.container .section.section-center main.block_and_trans .blocks .content .block .flex label {
+  width: 60%;
+  max-width: 250px;
+  font-weight: 600;
+}
+.admin.container .section.section-center main.block_and_trans .blocks .content .block .flex .value {
+  font-weight: bold;
+  width: 40%;
+  color: #9F38A7;
+  max-width: 250px;
+  text-align: right;
+}
+.admin.container .section.section-center .common .content {
+  width: 100%;
+  height: 420px;
+  background-color: white;
+  box-shadow: 0px 5px 10px #9193A7;
+  border-radius: 20px;
+  padding: 20px;
+  background-color: #f6f6f6;
+}
+.admin.container .section.section-center .common .content .items {
+  padding: 10px;
+  box-sizing: border-box;
+}
+.admin.container .section.section-center .common .content .items .flex {
+  display: flex;
+  font-size: 16px;
+}
+.admin.container .section.section-center .common .content .items .flex .label {
+  font-weight: bold;
+}
+.admin.container .section.section-center .common .content .items.transaction {
+  background-color: white;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+  padding: 20px 40px 10px;
+}
+.admin.container .section.section-center .common .content .items.transaction .flex {
+  margin-bottom: 10px;
+}
+.admin.container .section.section-center .common .content .items.transaction .flex .label {
+  width: 10%;
+  max-width: 100px;
+}
+.admin.container .section.section-center .common .content .items.transaction .flex .value {
+  width: 80%;
+  max-width: 800px;
+  color: #8165FF;
+}
+.admin.container .section.section-center .common .content .items.transaction .flex .value span {
+  font-weight: 500;
+  color: black;
+  margin-right: 40px;
+}
+.admin.container .section.section-center .common .content .items.transaction .flex .action {
+  flex: 1 0 auto;
+  text-align: right;
+  font-weight: 600;
+}
+.admin.container .section.section-center .common .content .items.transaction .flex .action.add {
+  color: #147112;
+}
+.admin.container .section.section-center .common .content .items.transaction .flex .datetime {
+  flex: 1 0 auto;
+  text-align: right;
+  font-size: 14px;
+  letter-spacing: 4.5%;
+}
+
 .createdby {
   display: flex;
   align-items: center;

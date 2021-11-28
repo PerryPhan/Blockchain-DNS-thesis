@@ -1,0 +1,161 @@
+@mixin paginator {
+    .btn-box {
+        display: flex;
+
+        a {
+            text-decoration: none !important;
+        }
+
+        .first-side {
+            display: flex;
+            align-items: center;
+
+            span {
+                font-weight: 600;
+                color: ($dashboard-hovered-tab-title-after-bgcolor);
+                margin: 0 15px;
+
+                a {
+                    color: ($dashboard-hovered-tab-title-after-bgcolor);
+                }
+            }
+        }
+
+        .index-side {
+            span {
+                margin: 0 5px;
+                color: grey;
+
+                &:first-child {
+                    color: ($dashboard-hovered-tab-title-after-bgcolor);
+                }
+            }
+        }
+
+        .last-side {
+            display: flex;
+            align-items: center;
+
+            span {
+                color: ($dashboard-hovered-tab-title-after-bgcolor);
+                margin: 0 15px;
+                font-weight: 600;
+
+                a {
+                    color: ($dashboard-hovered-tab-title-after-bgcolor);
+                }
+            }
+        }
+    }
+
+    &>div {
+        display: flex;
+        align-items: center;
+    }
+}
+
+main.block_and_trans {
+    padding: 20px;
+    .top {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        h3 {
+            width: fit-content;
+        }
+
+        .right {
+            flex: 1 0 auto;
+            display: flex;
+            justify-content: flex-end;
+
+            .paginator {
+                @include paginator;
+            }
+        }
+    }
+
+    .blocks {
+        .content {
+            display: flex;
+            box-sizing: border-box;
+            height: 180px;
+
+            .block {
+                box-sizing: border-box;
+                border-radius: 20px;
+                margin-right: 35px;
+                width: 30%;
+                height: 100%;
+                background-color: #ffffff;
+                padding: 20px 30px;
+                box-shadow: 0px 5px 10px #9193A7;
+
+                .flex {
+                    display: flex;
+                    align-items: center;
+                    margin-bottom: 10px;
+
+                    &.created-by {
+                        width: 100%;
+                        justify-content: flex-end;
+                        color: $admin-datetime-text-color;
+                        letter-spacing: 4.5%;
+                        font-size: 12px;
+
+                        span {
+                            margin-left: 10px;
+                        }
+                    }
+
+                    &.id {
+                        font-size: 20px;
+                        color: $admin-navigator-hovered-text-color;
+
+                        label {
+                            font-weight: bold;
+                            width: fit-content;
+                            text-transform: uppercase;
+                        }
+
+                        .value {
+                            font-weight: bold;
+                            color: $admin-navigator-hovered-text-color;
+                            width: fit-content;
+                        }
+
+                        .datetime {
+                            flex: 1 0 auto;
+                            text-align: right;
+                            font-size: 13px;
+                            font-weight: bold;
+                            color: $admin-datetime-text-color;
+                        }
+                    }
+
+                    &.add-by {
+                        .value {
+                            color: #147112;
+                        }
+                    }
+
+                    label {
+                        width: 60%;
+                        max-width: 250px;
+                        font-weight: 600;
+                    }
+
+                    .value {
+                        font-weight: bold;
+                        width: 40%;
+                        color: $admin-right-genesis-h4-text-color;
+                        max-width: 250px;
+                        text-align: right;
+                    }
+                }
+            }
+        }
+        margin-bottom: 30px;
+    }
+}
+
