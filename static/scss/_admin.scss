@@ -1,265 +1,249 @@
-.admin.container {
+.admin.container{
     width: 100%;
     height: 100%;
     border-radius: 20px;
     color: black;
     overflow: hidden;
-    display: flex;
-    align-items: center;
-    position: relative;
+    display: grid;
 
-    .heading-text-color {
-        color: ($admin-main-heading-text-color);
-    }
+    grid-template-rows: 1fr;
+    grid-template-columns: .15fr .6fr .25fr;
 
-    .sub-heading-text-color {
-        color: ($admin-main-sub-heading-text-color);
-    }
+    background-image: url('/static/img/admin-background.png');
+    background-size: cover;
 
-    .disabled-text-color {
-        color: ($admin-main-disabled-text-color);
-    }
-
-    &>div {
-        padding-top: ($admin-padding-top);
-    }
-
-    .tab-navigator {
-        display: flex;
-        align-items: center;
-        flex-direction: column;
-        width: 15%;
-        height: 100%;
-        background-color: ($admin-tab-bgcolor);
-
-        .logo-side {
-            width: 150px;
-            height: 150px;
-
-            img {
-                width: 100%;
-                height: 100%;
-                object-fit: contain;
-            }
-        }
-    }
-
-    .main {
-        background-color: ($admin-main-bgcolor);
-        flex: 1 0 auto;
-        height: 100%;
-        padding-left: 100px;
-        padding-right: 100px;
-
-        .top-side {
-            margin-bottom: 50px;
-
-            * {
-                font-family: Roboto Slab;
-                font-weight: 600;
-            }
-        }
-
-        .center-side {
-            width: 100%;
-
-            .part {
-                width: 100%;
-                margin-bottom: 30px;
-            }
-
-            .calendar {
-                margin-top: 10px;
-                width: 100%;
-                height: 120px;
-                background-color: white;
-                border-radius: 30px;
-            }
-
-            .report-part {
-                .report-title {
-                    display: flex;
-                    align-items: center;
-                    margin-bottom: 20px;
-
-                    h3 {
-                        flex: 1 0 auto;
-                    }
-
-                    .report-type {
-                        display: flex;
-                        align-items: center;
-
-                        &>div {
-                            margin-left: 40px;
-                            font-weight: 600;
-                        }
-                    }
-                }
-
-                .reports {
-                    width: 100%;
-                    height: 200px;
-                    display: flex;
-
-                    .report {
-                        width: 32%;
-                        height: 200px;
-                        background-color: white;
-                        margin-right: 40px;
-                        border-radius: 30px;
-
-                        &:last-child {
-                            margin-right: 0;
-                        }
-                    }
-                }
-            }
-        }
-
-        h4.grey-h4 {
-            font-weight: 550;
-            color: ($admin-notificator-about-h4-text);
-        }
-
-    }
-
-    .notificator {
-        background-color: white;
-        width: 25%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-
-        .top {
-            width: 100%;
-            height: 50%;
-            padding: 0 30px;
-
-            .search-side {
-                width: 100%;
-                position: relative;
-                margin-bottom: 70px;
+    .section {
+        padding: 60px 0;
+        margin: 0;
+        &.section-left{
+            .part{
                 display: flex;
+                flex-direction: row;
                 justify-content: center;
+                padding: 0;
+                margin-bottom: 30px;
 
-                input {
-                    width: calc(100% - 30px);
-                    padding: 18px 0;
-                    padding-left: 60px;
-                    border-radius: 15px;
-                    outline: none;
-                    border: 0;
-                    font-size: 16px;
-                    background-color: ($admin-notificator-input-bgcolor);
-                }
-
-                img {
-                    position: absolute;
-                    width: 24px;
-                    height: 24px;
-                    top: 15px;
-                    left: 35px;
-                }
-            }
-
-            .about-side {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                margin-bottom: 40px;
-
-                &>div {
-                    margin-bottom: 5px;
-                }
-
-                .ava-box {
-                    width: 140px;
-                    height: 140px;
-                    border-radius: 50%;
-                    overflow: hidden;
-
-                    img {
-                        width: 100%;
-                        object-fit: cover;
+                &.logo-part{
+                    .logo{
+                        text-align: center;
+                        img{
+                            width: 110px;
+                            height: 80px;
+                            margin: 0;
+                        }
+                        div{
+                            font-size: 30px;
+                            color: $admin-logo-text-color;
+                            text-transform: uppercase;
+                            font-weight: bold;
+                        }
                     }
                 }
-            }
-
-            .more-infomation-box {
-                display: flex;
-                margin: 0 30px;
-                margin-bottom: 50px;
-
-                .guider-box {
-                    flex: 1 0 auto;
-                    text-align: center;
+                &.datetime-part{
+                    align-items: center;
+                    div{
+                        margin-left: 15px;
+                        span{
+                            font-size: 16px;
+                            letter-spacing: 4.5%;
+                            color: $admin-datetime-text-color;
+                        }
+                    }
                 }
+                &.navigator-part{
+                    display: block;
+                    a{
+                        text-decoration: none;
+                        color: black;
+                        .navigation{
+                            display: flex;
+                            align-items: center;
+                            max-width: 280px;
+                            padding: 20px 0;
+                            padding-left: 50px;
+                            border-top-right-radius: 20px;
+                            border-bottom-right-radius: 20px;
+                            
+                            font-size: 20px;
+                            letter-spacing: 2%;
+                            margin-bottom: 30px;
+                            font-weight: 600;
+                            span{
+                                padding-left: 20px;
+                                line-height: 19px;
+                            }
+                            transition: .3s;
+
+                            &.active,
+                            &:hover{
+                                background-color: $admin-navigator-hovered-bg-color;
+                                color: $admin-navigator-hovered-text-color;
+                                svg{
+                                    path{fill: $admin-navigator-hovered-text-color;}
+                                }
+                            }
+                        }
+                    }
+                }
+
             }
         }
-
-        .bottom {
-            color: white;
-            width: 100%;
-            height: 100%;
-            background-color: ($admin-notificator-noti-bgcolor);
-            padding: 30px 40px;
-
-            .notification-side {
-                height: 500px;
-                overflow: hidden;
-
-                .notification-title {
+        &.section-right{
+            padding-left: 30px;
+            padding-right: 30px;
+            position: relative;
+            .part{
+                margin-bottom: 30px;
+                
+                &.information-part{
                     display: flex;
+                    flex-direction: column;
                     align-items: center;
-                    margin-bottom: 25px;
-
-                    h1 {
-                        flex: 1 0 auto;
-                    }
-
-                    a {
-                        color: orange;
-                        text-decoration: none;
-                    }
-                }
-
-                .notification-content {
-                    .notification {
+                    .avatar-box{
                         display: flex;
+                        flex-direction: column;
                         align-items: center;
-                        margin-bottom: 20px;
-
-                        .icon {
-                            margin-right: 10px;
-                            width: 40px;
-                            height: 40px;
+                        margin-bottom: 40px;
+                        .avatar{
+                            width: 120px;
+                            height: 120px;
+                            border-radius: 50%;
                             overflow: hidden;
-
-                            img {
+                            border: 5px solid black;
+                            img{
                                 width: 100%;
                                 height: 100%;
-                                object-fit: contain;
+                                object-fit: cover;
                             }
                         }
-
-                        .text {
-                            width: 100%;
-
-                            h4 {
-                                margin-bottom: 5px;
+                        .text{
+                            margin-top: 20px;
+                            text-align: center;
+                            h3{
+                                font-size: 22px;
+                                letter-spacing: 2%;
+                                padding: 0;
+                                margin: 0;  
                             }
+                            h5{
+                                font-size: 16px;
+                                letter-spacing: 2%;
+                                color: $admin-right-sub-text-color;
+                                padding: 0;
+                                margin: 0;
+                            }
+                        }
+                    }
+                    .avatar-sub-box{
+                        display: flex;
+                        h5{
+                            font-size: 15px;
+                            color: $admin-right-sub-text-color;
+                            padding: 0;
+                            margin: 0;
+                            margin-bottom: 10px;
+                        }
+                        h4{
+                            margin: 0;
+                            margin-left: -10px;
+                            font-size: 18px;
+                            span{
+                                margin-left: 5px;
+                            }
+                            &.activated{
+                                color: $admin-right-activated-text-color;   
+                            }
+                        }
+                        .right{
+                            margin-left: 200px;
+                        }
+                    }
+                }
 
-                            h5 {
-                                font-weight: 400;
-                                color: ($admin-notificator-noti-text-color);
+                &.common-part,
+                &.genesis-part{
+                    h4{
+                        max-width: 100px;
+                        margin: 0;
+                        margin-bottom: 40px;
+                        padding: 0;
+                        font-size: 26px;
+                        letter-spacing: 2%;
+                        color: $admin-right-genesis-h4-text-color;
+                    }
+                    .common,
+                    .genesis-block{
+                        padding: 20px;
+                        padding-top: 30px;
+                        overflow: hidden;
+                        background: linear-gradient(248.49deg, rgba(120, 96, 213, 0.17) 12.3%, rgba(197, 41, 200, 0.17) 46.93%, rgba(247, 224, 244, 0.17) 85.56%);
+                        box-shadow: 0px 5px 10px #9193A7;
+                        border-radius: 20px;
+                        .flex{
+                            display: flex;
+                            font-size: 18px;
+                            height: 30px;
+                            margin-bottom: 25px;
+                            label{
+                                width: 25%;
+                                max-width: 80px;
+                                font-weight: 600;
+                            }
+                            .value{
+                                
+                                width: 75%;
+                                max-width: 280px;
+                                text-align: right;
+                                color: $admin-right-genesis-value-text-color;
+                                .sub-value{
+                                    color: $admin-right-genesis-sub-value-text-color;
+                                    font-size: 13px;
+                                    font-weight: 600;
+                                }
                             }
                         }
                     }
                 }
+
+                &.createdby-part{
+                    position: absolute;
+                    bottom: 0;
+                    right: 50%;
+                    width: fit-content;
+                    transform: translateX(50%);
+                }
+            }
+        }
+        &.section-center{
+            padding-left: 20px;
+            padding-right: 20px;
+            .part{
+                &.welcome-line-part{
+                    h1{
+                        padding: 0;
+                        margin: 0;
+                        margin-bottom: 10px;
+                        font-size: 50px;
+                        letter-spacing: 4.5%;
+                    }
+                    h3{
+                        font-size: 20px;
+                        color: $admin-center-welcome-h3-text-color;
+                        padding: 0;
+                        margin: 0;
+                    }
+                }
+            }
+            main{
             }
         }
     }
-
+}
+.createdby{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    svg{
+        margin-left: 10px;
+    }
 }

@@ -4,6 +4,7 @@
     margin: 0;
     box-sizing: border-box;
     font-family: Roboto !important;
+    transition: .2s;
 }
 
 h1 {
@@ -28,6 +29,9 @@ h5 {
 
 body {
     height: 100vh;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
 }
 
 .d-none {

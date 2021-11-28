@@ -37,7 +37,7 @@ def admin():
             'account': account.as_dict() if account else None,
         }
 
-    return render_template('_admin_template.html', **html_options)
+    return render_template('admin_template.html', **html_options)
 
 
 @app.route('/dashboard/transactions')
@@ -308,32 +308,6 @@ def register():
 
 
 # BACK ------------------------------------------------
-@app.route('/dns')
-def dns_server():
-    def run():
-        os.system('run_server.sh')
-    
-    content = 'Generated run file'
-    try: 
-        node = dns.blockchain.nodes.getNode() 
-        if not node : return 
-    except:
-        return
-    
-    with open("run_server.sh", "w") as file :
-        file.write("cd dns_server \n")
-        file.write(f"python Server.py -ip {node.ip} -p {node.port}")
-    
-    x = threading.Thread(
-        target=run,
-    )
-    
-    x.start()
-    x.join()
-    
-    return content
-
-
 @app.route('/dns/load')
 def load_domain_list():
     return {

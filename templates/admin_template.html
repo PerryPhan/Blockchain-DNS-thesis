@@ -1,0 +1,154 @@
+{% extends 'template.html' %} {% block title %} {{ title or '' }} {% endblock %}
+{% block body %}
+<div class="admin container">
+  <!-- SECTION LEFT -->
+  <div class="section section-left">
+    <div class="part logo-part">
+      <div class="logo">
+        <img src="{{url_for('static',filename='img/dnschain-logo-last.png')}}" alt="dnschain-logo" />
+        <div>dnschain</div>
+      </div>
+    </div>
+    <div class="part datetime-part">
+      <svg
+        width="21"
+        height="20"
+        viewBox="0 0 21 20"
+        fill="none"
+      >
+        <path
+          d="M18.9 1.81818H17.85V0H15.75V1.81818H5.25V0H3.15V1.81818H2.1C0.945 1.81818 0 2.63636 0 3.63636V18.1818C0 19.1818 0.945 20 2.1 20H18.9C20.055 20 21 19.1818 21 18.1818V3.63636C21 2.63636 20.055 1.81818 18.9 1.81818ZM18.9 18.1818H2.1V6.36364H18.9V18.1818Z"
+          fill="#616161"
+        />
+      </svg>
+      <div>
+        <span>28th</span>
+        <span>November</span>,
+        <span>2021</span>
+      </div>
+    </div>
+    <!-- VAR -->
+    {% block left %}
+    <div class="part navigator-part">
+      <a href="#">
+        <div class="navigation blocks_and_trans active">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 20 20"
+            fill="none"
+          >
+            <path
+              d="M0 11.1111H8.88889V0H0V11.1111ZM0 20H8.88889V13.3333H0V20ZM11.1111 20H20V8.88889H11.1111V20ZM11.1111 0V6.66667H20V0H11.1111Z"
+              fill="black"
+            />
+          </svg>
+          <span>Blocks and trans</span>
+        </div>
+      </a>
+      <a href="#">
+        <div class="navigation accounts">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 20 20"
+            fill="none"
+          >
+            <path
+              d="M0 2.22222V17.7778C0 19 0.988889 20 2.22222 20H17.7778C19 20 20 19 20 17.7778V2.22222C20 1 19 0 17.7778 0H2.22222C0.988889 0 0 1 0 2.22222ZM13.3333 6.66667C13.3333 8.51111 11.8444 10 10 10C8.15556 10 6.66667 8.51111 6.66667 6.66667C6.66667 4.82222 8.15556 3.33333 10 3.33333C11.8444 3.33333 13.3333 4.82222 13.3333 6.66667ZM3.33333 15.5556C3.33333 13.3333 7.77778 12.1111 10 12.1111C12.2222 12.1111 16.6667 13.3333 16.6667 15.5556V16.6667H3.33333V15.5556Z"
+              fill="black"
+            />
+          </svg>
+
+          <span>Accounts</span>
+        </div>
+      </a>
+      <a href="#">
+        <div class="navigation">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 20 20"
+            fill="none"
+          >
+            <path
+              d="M1.11111 0C0.496667 0 0 0.497778 0 1.11111V18.8889C0 19.5022 0.496667 20 1.11111 20H8.88889C9.50333 20 10 19.5022 10 18.8889V15V5V1.11111C10 0.497778 9.50333 0 8.88889 0H1.11111ZM10 5C10 7.75667 12.2433 10 15 10C17.7567 10 20 7.75667 20 5C20 2.24333 17.7567 0 15 0C12.2433 0 10 2.24333 10 5ZM15 10C12.2433 10 10 12.2433 10 15C10 17.7567 12.2433 20 15 20C17.7567 20 20 17.7567 20 15C20 12.2433 17.7567 10 15 10Z"
+              fill="black"
+            />
+          </svg>
+
+          <span>Nodes</span>
+        </div>
+      </a>
+    </div>
+    {% endblock %}
+  </div>
+  <!-- END LEFT  -->
+
+  <!-- SECTION CENTER -->
+  <div class="section section-center">
+    <!-- CONST -->
+    <div class="part welcome-line-part">
+      <h1>Welcome Administrator</h1>
+      <h3>Control all, manage all</h3>
+    </div>
+    <!-- VAR -->
+    {% block main %}
+    {% endblock %}
+  </div>
+  <!-- END CENTER  -->
+
+  <!-- SECTION RIGHT -->
+  <div class="section section-right">
+    <div class="part information-part">
+      <div class="avatar-box">
+        <div class="avatar">
+          <img src="{{url_for('static',filename='img/avatar.jpg')}}" alt="avatar" />
+        </div>
+        <div class="text">
+          <h3>Node VN Admin</h3>
+          <h5>admin@nodevn.dnschain</h5>
+        </div>
+      </div>
+      <div class="avatar-sub-box">
+        <div class="field left">
+          <h5>Wallet</h5>
+          <h4>$<span>10,00</span></h4>
+        </div>
+        <div class="field right">
+          <h5>Status</h5>
+          <h4 class="activated">Activated</h4>
+          <h4 class="inactivated d-none">Activated</h4>
+        </div>
+      </div>
+    </div>
+    <!-- VAR  -->
+    {% block right %}
+    {% endblock %}
+    <div class="part createdby-part">
+      <p class="createdby">
+        This project is made by Phan Dai
+        <svg
+          width="27"
+          height="24"
+          viewBox="0 0 27 24"
+          fill="none"
+        >
+          <rect
+            x="0.604492"
+            width="25.4788"
+            height="24"
+            rx="5"
+            fill="#8165FF"
+          />
+          <path
+            d="M7.2832 8.95898V18.0521C7.2832 18.5856 7.59499 19.0698 8.08063 19.2906C8.98144 19.7002 10.0042 19.0416 10.0042 18.0521V10.7622C10.0042 8.50801 11.8316 6.68063 14.0858 6.68063C15.6937 6.68063 17.0542 8.41259 17.0542 10.392C17.0542 11.1303 16.819 11.708 16.4577 12.1636C15.5928 13.2542 14.0858 12.1829 14.0858 10.791V10.2396C14.0858 9.73388 13.7779 9.27911 13.3084 9.09125C12.496 8.7662 11.6121 9.36453 11.6121 10.2396V13.2814C11.6121 15.1018 13.0878 16.5775 14.9082 16.5775H15.2954C15.5602 16.5775 15.826 16.5555 16.0755 16.4671C17.4628 15.9752 19.6516 14.2679 19.6516 10.392C19.6516 6.74893 17.718 4.9009 16.3337 4.21151C15.9239 4.00745 15.4616 3.95898 15.0038 3.95898H12.2832C9.52178 3.95898 7.2832 6.19756 7.2832 8.95898Z"
+            stroke="white"
+          />
+        </svg>
+      </p>
+    </div>
+  </div>
+  <!-- END RIGHT  -->
+</div>
+{% endblock %}
