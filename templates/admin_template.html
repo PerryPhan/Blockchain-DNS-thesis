@@ -88,8 +88,8 @@
   <!-- SECTION CENTER -->
   <div class="section section-center">
     <!-- CONST -->
-    <div class="part welcome-line-part">
-      <h1>Welcome Administrator</h1>
+    <div class="part welcome-line-part animation popup">
+      <h1>Welcome to {{ title or '' }}</h1>
       <h3>Control all, manage all</h3>
     </div>
     <!-- VAR -->
@@ -109,18 +109,11 @@
           <h3>Node VN Admin</h3>
           <h5>admin@nodevn.dnschain</h5>
         </div>
-      </div>
-      <div class="avatar-sub-box">
-        <div class="field left">
-          <h5>Wallet</h5>
-          <h4>$<span>10,00</span></h4>
-        </div>
-        <div class="field right">
-          <h5>Status</h5>
-          <h4 class="activated">Activated</h4>
-          <h4 class="inactivated d-none">Activated</h4>
-        </div>
-      </div>
+      </div>  
+      {% block right_sub_information %}
+
+      {% endblock %}
+      
     </div>
     <!-- VAR  -->
     {% block right %}
@@ -151,4 +144,5 @@
   </div>
   <!-- END RIGHT  -->
 </div>
+<script src="{{url_for('static',filename='js/admin-helper.js')}}"></script>
 {% endblock %}

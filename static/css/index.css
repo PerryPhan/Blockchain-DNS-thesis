@@ -143,6 +143,10 @@ body {
   animation: asideSlidetoLeft 1s cubic-bezier(0.23, 1, 0.32, 1) forwards;
 }
 
+.animation.goup {
+  animation: goup 0.6s cubic-bezier(0.22, 0.59, 0.73, 0.51) forwards;
+}
+
 /*  Login  */
 .animation.slidetoLeft:nth-child(1) {
   animation-delay: 0.5s;
@@ -168,6 +172,10 @@ body {
   animation-delay: 1.75s;
 }
 
+.animation.slidetoLeft:nth-child(7) {
+  animation-delay: 2s;
+}
+
 .submit.animation.popup:last-child {
   animation-delay: 1s;
 }
@@ -181,6 +189,17 @@ body {
   animation-delay: 2s;
 }
 
+@keyframes goup {
+  0% {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  100% {
+    font-weight: 400;
+    opacity: 1;
+    transform: translateY(0px);
+  }
+}
 @keyframes blurScreen {
   0% {
     filter: blur(0px) !important;
@@ -253,7 +272,7 @@ body {
   overflow: hidden;
   display: grid;
   grid-template-rows: 1fr;
-  grid-template-columns: 0.15fr 0.6fr 0.25fr;
+  grid-template-columns: minmax(200px, 0.15fr) minmax(800px, 0.6fr) 0.25fr;
   background-image: url("/static/img/admin-background.png");
   background-size: cover;
 }
@@ -397,8 +416,8 @@ body {
 .admin.container .section.section-right .part.information-part .avatar-sub-box .right {
   margin-left: 200px;
 }
-.admin.container .section.section-right .part.common-part h4, .admin.container .section.section-right .part.genesis-part h4 {
-  max-width: 100px;
+.admin.container .section.section-right .part.common-part h4 {
+  max-width: 200px;
   margin: 0;
   margin-bottom: 40px;
   padding: 0;
@@ -406,61 +425,116 @@ body {
   letter-spacing: 2%;
   color: #9F38A7;
 }
-.admin.container .section.section-right .part.common-part .common,
-.admin.container .section.section-right .part.common-part .genesis-block, .admin.container .section.section-right .part.genesis-part .common,
-.admin.container .section.section-right .part.genesis-part .genesis-block {
+.admin.container .section.section-right .part.common-part .common {
   padding: 20px;
   padding-top: 30px;
   overflow: hidden;
   background: linear-gradient(248.49deg, rgba(120, 96, 213, 0.17) 12.3%, rgba(197, 41, 200, 0.17) 46.93%, rgba(247, 224, 244, 0.17) 85.56%);
-  box-shadow: 0px 5px 10px #9193A7;
+  box-shadow: 0px 5px 10px #9193a7;
   border-radius: 20px;
 }
-.admin.container .section.section-right .part.common-part .common .flex,
-.admin.container .section.section-right .part.common-part .genesis-block .flex, .admin.container .section.section-right .part.genesis-part .common .flex,
-.admin.container .section.section-right .part.genesis-part .genesis-block .flex {
+.admin.container .section.section-right .part.common-part .common .flex {
   display: flex;
   font-size: 18px;
   height: 30px;
   margin-bottom: 25px;
 }
-.admin.container .section.section-right .part.common-part .common .flex label,
-.admin.container .section.section-right .part.common-part .genesis-block .flex label, .admin.container .section.section-right .part.genesis-part .common .flex label,
-.admin.container .section.section-right .part.genesis-part .genesis-block .flex label {
+.admin.container .section.section-right .part.common-part .common .flex label {
   width: 25%;
   max-width: 80px;
   font-weight: 600;
 }
-.admin.container .section.section-right .part.common-part .common .flex .value,
-.admin.container .section.section-right .part.common-part .genesis-block .flex .value, .admin.container .section.section-right .part.genesis-part .common .flex .value,
-.admin.container .section.section-right .part.genesis-part .genesis-block .flex .value {
+.admin.container .section.section-right .part.common-part .common .flex .value {
   width: 75%;
   max-width: 280px;
+}
+.admin.container .section.section-right .part.common-part .common .flex .value .sub-value {
+  font-weight: 600;
+}
+.admin.container .section.section-right .part.genesis-part h4 {
+  max-width: 100px;
+}
+.admin.container .section.section-right .part.genesis-part .genesis-block .flex .value {
   text-align: right;
   color: #8165FF;
 }
-.admin.container .section.section-right .part.common-part .common .flex .value .sub-value,
-.admin.container .section.section-right .part.common-part .genesis-block .flex .value .sub-value, .admin.container .section.section-right .part.genesis-part .common .flex .value .sub-value,
 .admin.container .section.section-right .part.genesis-part .genesis-block .flex .value .sub-value {
   color: #AB98FF;
   font-size: 13px;
+}
+.admin.container .section.section-right .part.node-info-part .node-info {
+  margin-bottom: 20px;
+}
+.admin.container .section.section-right .part.node-info-part .node-info .flex {
+  display: flex;
+  font-size: 19px;
+  height: 30px;
+  margin-bottom: 10px;
+}
+.admin.container .section.section-right .part.node-info-part .node-info .flex.id-hash label {
+  text-transform: uppercase;
+  width: fit-content;
+}
+.admin.container .section.section-right .part.node-info-part .node-info .flex.id-hash .value {
+  font-weight: 600;
+  width: max-content;
+  max-width: 330px;
+  margin-left: 10px;
+  color: #8165FF;
+}
+.admin.container .section.section-right .part.node-info-part .node-info .flex.time .value, .admin.container .section.section-right .part.node-info-part .node-info .flex.name .value {
+  color: #8165FF;
+}
+.admin.container .section.section-right .part.node-info-part .node-info .flex.ipport .value {
+  font-weight: 400;
+}
+.admin.container .section.section-right .part.node-info-part .node-info .flex.status .green {
+  color: #147112;
+}
+.admin.container .section.section-right .part.node-info-part .node-info .flex.status .grey {
+  color: #9F9F9F;
+}
+.admin.container .section.section-right .part.node-info-part .node-info .flex label {
+  text-transform: capitalize;
+  width: 25%;
+  max-width: 80px;
+  font-weight: 600;
+}
+.admin.container .section.section-right .part.node-info-part .node-info .flex .value {
+  overflow: hidden;
+  height: 100%;
+  text-align: right;
+}
+.admin.container .section.section-right .part.node-info-part .node-info .flex .value .sub-value {
+  color: #AB98FF;
+}
+.admin.container .section.section-right .part.node-info-part .back-node {
+  width: 100%;
+  text-align: right;
+}
+.admin.container .section.section-right .part.node-info-part .back-node a {
+  text-decoration: none;
+  color: #5890d2;
   font-weight: 600;
 }
 .admin.container .section.section-right .part.createdby-part {
   position: absolute;
-  bottom: 0;
+  bottom: 15px;
   right: 50%;
   width: fit-content;
-  transform: translateX(50%);
+  transform: translate(50%, 0);
 }
 .admin.container .section.section-center {
   padding-left: 20px;
   padding-right: 20px;
 }
+.admin.container .section.section-center .part.welcome-line-part {
+  margin-bottom: 5px;
+}
 .admin.container .section.section-center .part.welcome-line-part h1 {
   padding: 0;
   margin: 0;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   font-size: 50px;
   letter-spacing: 4.5%;
 }
@@ -470,62 +544,75 @@ body {
   padding: 0;
   margin: 0;
 }
-.admin.container .section.section-center main.block_and_trans {
-  padding: 20px;
-}
-.admin.container .section.section-center main.block_and_trans .top {
+.admin.container .section.section-center main .top {
   display: flex;
   align-items: center;
   margin-bottom: 20px;
 }
-.admin.container .section.section-center main.block_and_trans .top h3 {
+.admin.container .section.section-center main .top h3 {
   width: fit-content;
 }
-.admin.container .section.section-center main.block_and_trans .top .right {
+.admin.container .section.section-center main .top .right {
   flex: 1 0 auto;
   display: flex;
+  align-items: center;
   justify-content: flex-end;
 }
-.admin.container .section.section-center main.block_and_trans .top .right .paginator .btn-box {
+.admin.container .section.section-center main .top .right .paginator {
+  margin-right: 20px;
+}
+.admin.container .section.section-center main .top .right .paginator .btn-box {
   display: flex;
 }
-.admin.container .section.section-center main.block_and_trans .top .right .paginator .btn-box a {
+.admin.container .section.section-center main .top .right .paginator .btn-box a {
   text-decoration: none !important;
 }
-.admin.container .section.section-center main.block_and_trans .top .right .paginator .btn-box .first-side {
+.admin.container .section.section-center main .top .right .paginator .btn-box .first-side {
   display: flex;
   align-items: center;
 }
-.admin.container .section.section-center main.block_and_trans .top .right .paginator .btn-box .first-side span {
+.admin.container .section.section-center main .top .right .paginator .btn-box .first-side span {
   font-weight: 600;
   color: #1A89C9;
   margin: 0 15px;
 }
-.admin.container .section.section-center main.block_and_trans .top .right .paginator .btn-box .first-side span a {
+.admin.container .section.section-center main .top .right .paginator .btn-box .first-side span a {
   color: #1A89C9;
 }
-.admin.container .section.section-center main.block_and_trans .top .right .paginator .btn-box .index-side span {
+.admin.container .section.section-center main .top .right .paginator .btn-box .index-side span {
   margin: 0 5px;
   color: grey;
 }
-.admin.container .section.section-center main.block_and_trans .top .right .paginator .btn-box .index-side span:first-child {
+.admin.container .section.section-center main .top .right .paginator .btn-box .index-side span:first-child {
   color: #1A89C9;
 }
-.admin.container .section.section-center main.block_and_trans .top .right .paginator .btn-box .last-side {
+.admin.container .section.section-center main .top .right .paginator .btn-box .last-side {
   display: flex;
   align-items: center;
 }
-.admin.container .section.section-center main.block_and_trans .top .right .paginator .btn-box .last-side span {
+.admin.container .section.section-center main .top .right .paginator .btn-box .last-side span {
   color: #1A89C9;
   margin: 0 15px;
   font-weight: 600;
 }
-.admin.container .section.section-center main.block_and_trans .top .right .paginator .btn-box .last-side span a {
+.admin.container .section.section-center main .top .right .paginator .btn-box .last-side span a {
   color: #1A89C9;
 }
-.admin.container .section.section-center main.block_and_trans .top .right .paginator > div {
+.admin.container .section.section-center main .top .right .paginator > div {
   display: flex;
   align-items: center;
+}
+.admin.container .section.section-center main .top .right .sort button {
+  border: none;
+  display: flex;
+  align-items: center;
+  padding: 5px 15px;
+  background-color: #e3edff;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.admin.container .section.section-center main.block_and_trans {
+  padding: 20px;
 }
 .admin.container .section.section-center main.block_and_trans .blocks {
   margin-bottom: 30px;
@@ -596,58 +683,66 @@ body {
   max-width: 250px;
   text-align: right;
 }
-.admin.container .section.section-center .common .content {
+.admin.container .section.section-center main .common .content {
   width: 100%;
   height: 420px;
   background-color: white;
-  box-shadow: 0px 5px 10px #9193A7;
+  box-shadow: 0px 5px 10px #9193a7;
   border-radius: 20px;
   padding: 20px;
-  background-color: #f6f6f6;
 }
-.admin.container .section.section-center .common .content .items {
-  padding: 10px;
+.admin.container .section.section-center main .common .content.full-page {
+  height: 700px;
+}
+.admin.container .section.section-center main .common .content .items {
   box-sizing: border-box;
+  margin-bottom: 15px;
 }
-.admin.container .section.section-center .common .content .items .flex {
+.admin.container .section.section-center main .common .content .items .flex {
   display: flex;
   font-size: 16px;
 }
-.admin.container .section.section-center .common .content .items .flex .label {
+.admin.container .section.section-center main .common .content .items .flex .label {
   font-weight: bold;
 }
-.admin.container .section.section-center .common .content .items.transaction {
-  background-color: white;
+.admin.container .section.section-center main .common .content .items.transaction, .admin.container .section.section-center main .common .content .items.common {
+  background-color: #f4f4f4;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 10px;
-  padding: 20px 40px 10px;
+  padding: 15px 40px 5px;
 }
-.admin.container .section.section-center .common .content .items.transaction .flex {
+.admin.container .section.section-center main .common .content .items.transaction.active, .admin.container .section.section-center main .common .content .items.common.active {
+  background-color: #e9ffee;
+}
+.admin.container .section.section-center main .common .content .items.transaction .flex, .admin.container .section.section-center main .common .content .items.common .flex {
   margin-bottom: 10px;
 }
-.admin.container .section.section-center .common .content .items.transaction .flex .label {
+.admin.container .section.section-center main .common .content .items.transaction .flex.id-hash .value, .admin.container .section.section-center main .common .content .items.common .flex.id-hash .value {
+  cursor: pointer;
+}
+.admin.container .section.section-center main .common .content .items.transaction .flex .label, .admin.container .section.section-center main .common .content .items.common .flex .label {
   width: 10%;
   max-width: 100px;
 }
-.admin.container .section.section-center .common .content .items.transaction .flex .value {
+.admin.container .section.section-center main .common .content .items.transaction .flex .value, .admin.container .section.section-center main .common .content .items.common .flex .value {
   width: 80%;
   max-width: 800px;
-  color: #8165FF;
+  color: #9F38A7;
 }
-.admin.container .section.section-center .common .content .items.transaction .flex .value span {
+.admin.container .section.section-center main .common .content .items.transaction .flex .value span, .admin.container .section.section-center main .common .content .items.common .flex .value span {
   font-weight: 500;
   color: black;
   margin-right: 40px;
 }
-.admin.container .section.section-center .common .content .items.transaction .flex .action {
+.admin.container .section.section-center main .common .content .items.transaction .flex .status, .admin.container .section.section-center main .common .content .items.common .flex .status {
   flex: 1 0 auto;
   text-align: right;
   font-weight: 600;
 }
-.admin.container .section.section-center .common .content .items.transaction .flex .action.add {
+.admin.container .section.section-center main .common .content .items.transaction .flex .status.green, .admin.container .section.section-center main .common .content .items.common .flex .status.green {
   color: #147112;
 }
-.admin.container .section.section-center .common .content .items.transaction .flex .datetime {
+.admin.container .section.section-center main .common .content .items.transaction .flex .datetime, .admin.container .section.section-center main .common .content .items.common .flex .datetime {
   flex: 1 0 auto;
   text-align: right;
   font-size: 14px;

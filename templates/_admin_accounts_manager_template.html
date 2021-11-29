@@ -1,0 +1,115 @@
+{% extends 'admin_template.html' %} {% block left %}
+<div class="part navigator-part">
+  <a href="./blocktxs">
+    <div class="navigation blocks_and_trans">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path
+          d="M0 11.1111H8.88889V0H0V11.1111ZM0 20H8.88889V13.3333H0V20ZM11.1111 20H20V8.88889H11.1111V20ZM11.1111 0V6.66667H20V0H11.1111Z"
+          fill="black"
+        />
+      </svg>
+      <span>Blocks and trans</span>
+    </div>
+  </a>
+  <a href="#">
+    <div class="navigation accounts active">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path
+          d="M0 2.22222V17.7778C0 19 0.988889 20 2.22222 20H17.7778C19 20 20 19 20 17.7778V2.22222C20 1 19 0 17.7778 0H2.22222C0.988889 0 0 1 0 2.22222ZM13.3333 6.66667C13.3333 8.51111 11.8444 10 10 10C8.15556 10 6.66667 8.51111 6.66667 6.66667C6.66667 4.82222 8.15556 3.33333 10 3.33333C11.8444 3.33333 13.3333 4.82222 13.3333 6.66667ZM3.33333 15.5556C3.33333 13.3333 7.77778 12.1111 10 12.1111C12.2222 12.1111 16.6667 13.3333 16.6667 15.5556V16.6667H3.33333V15.5556Z"
+          fill="black"
+        />
+      </svg>
+
+      <span>Accounts</span>
+    </div>
+  </a>
+  <a href="./nodes">
+    <div class="navigation">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path
+          d="M1.11111 0C0.496667 0 0 0.497778 0 1.11111V18.8889C0 19.5022 0.496667 20 1.11111 20H8.88889C9.50333 20 10 19.5022 10 18.8889V15V5V1.11111C10 0.497778 9.50333 0 8.88889 0H1.11111ZM10 5C10 7.75667 12.2433 10 15 10C17.7567 10 20 7.75667 20 5C20 2.24333 17.7567 0 15 0C12.2433 0 10 2.24333 10 5ZM15 10C12.2433 10 10 12.2433 10 15C10 17.7567 12.2433 20 15 20C17.7567 20 20 17.7567 20 15C20 12.2433 17.7567 10 15 10Z"
+          fill="black"
+        />
+      </svg>
+
+      <span>Nodes</span>
+    </div>
+  </a>
+</div>
+{% endblock %} {% block center %}
+<main class="accounts">
+  <div class="common">
+    <div class="top">
+      <h3>Accounts</h3>
+      <div class="right">
+        <div class="paginator">
+          <div class="btn-box">
+            <div class="first-side">
+              <span>
+                <a href="#">First</a>
+              </span>
+              <span>
+                <a href="#" id="a-table-previous" class="nohref"
+                  ><img src="{{url_for('static',filename='img/arrow-left-icon.png')}}" alt="left-icon" /></a
+              ></span>
+            </div>
+            <div class="index-side">
+              <span id="span-table-index-page">1</span>
+              <span>/</span>
+              <span id="span-table-total-page">10</span>
+            </div>
+            <div class="last-side">
+              <span>
+                <a href="#" id="a-table-next">
+                  <img src="{{url_for('static',filename='img/arrow-right-icon.png')}}" alt="right-icon"
+                /></a>
+              </span>
+              <span>
+                <a href="#">Last</a>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="sort">
+          <div class="sort-btn-box">
+            <button>
+              <h3>Sort</h3>
+              <img
+                src="{{url_for('static',filename='img/sort-icon.png')}}"
+                alt="sort-icon"
+              />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="content full-page">
+      <div class="items transaction">
+        <div class="flex id-hash">
+          <div class="label">ID Hash:</div>
+          <div class="value">
+            2d9783223ce2a1112e1ba5f59c543d989c058c72e1f40d9dd79982e3ab5dc4f9|3
+          </div>
+          <div class="action add">Add</div>
+        </div>
+        <div class="flex data">
+          <div class="label">Data:</div>
+          <div class="value">
+            <span>Domain: abc.com</span>
+            <span>SOA & NS Record : default</span>
+            <span>A Record : 1 ( 192.168.1.7 ) </span>
+          </div>
+          <div class="datetime">Nov 20th, 2021</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %} {% block right %}
+<div class="part common-part ">
+  <h4>This Account</h4>
+  <div class="common">
+    This account information
+  </div>
+</div>
+{% endblock %}

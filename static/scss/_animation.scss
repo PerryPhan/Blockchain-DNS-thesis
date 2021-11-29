@@ -21,7 +21,9 @@
 }
 .animation.asideSlidetoLeft{
     animation : asideSlidetoLeft 1s cubic-bezier(0.23, 1, 0.320, 1) forwards;
-
+}
+.animation.goup{
+    animation : goup .6s cubic-bezier(.22,.59,.73,.51) forwards;
 }
 /*  Login  */
 .animation.slidetoLeft:nth-child(1){
@@ -42,6 +44,9 @@
 .animation.slidetoLeft:nth-child(6){
     animation-delay: 1.75s;
 }
+.animation.slidetoLeft:nth-child(7){
+    animation-delay: 2s;
+}
 .submit.animation.popup:last-child{
     animation-delay: 1s;
 }
@@ -51,6 +56,19 @@
 .type-img-box.animation.popup{
     animation-duration: 1.25s;
     animation-delay: 2s;
+}
+
+@keyframes goup { 
+    0%{
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    
+    100%{ 
+        font-weight: 400;
+        opacity: 1;
+        transform: translateY(0px);
+    }
 }
 
 @keyframes blurScreen { 

@@ -2,6 +2,7 @@ from werkzeug.wrappers import response
 from include import *
 from business import *
 
+
 # Declare -------------------------------------------------
 accountBusiness = AccountBusiness()
 dns = DNSResolver()
@@ -12,9 +13,12 @@ dns = DNSResolver()
 def home():
     return redirect('/dashboard/transactions')
 
+@app.route('/admin')
+def manager():
+    return redirect('/admin/blocktxs')
 
-@app.route('/admin', methods=['GET', 'POST'])
-def admin():
+@app.route('/admin/blocktxs', methods=['GET', 'POST'])
+def blocks_txs_manager():
     # How to know that is his first time => This onl IP was his computer and don't have this email in DB
     # If he try to log again will be email and password empty
     html_options = {
@@ -38,6 +42,63 @@ def admin():
         }
 
     return render_template('_admin_blocktx_manager_template.html', **html_options)
+
+@app.route('/admin/nodes', methods=['GET', 'POST'])
+def nodes_manager():
+    # How to know that is his first time => This onl IP was his computer and don't have this email in DB
+    # If he try to log again will be email and password empty
+    count = 20
+    limit= 7
+    
+    # Page
+    page = request.args.get('page', default = 1, type = int)
+    pages= math.ceil( count / limit )
+    
+    if page < 0 : page = 1
+    if page > pages : page = pages
+
+    # Number
+    start = (page-1) * limit
+    end =  start + limit if ( start + limit ) < count else count
+    
+    html_options = {
+        'title': 'Nodes manager',
+        'page' : page,
+        'previous_page': page - 1 if page - 1 > 1 else 1,
+        'next_page': page + 1 if page + 1 < pages else pages,
+        'pages': pages,
+        'limit': limit,
+        'start': start,
+        'end'  : end
+    }
+
+    return render_template('_admin_nodes_manager_template.html', **html_options)
+
+@app.route('/admin/accounts', methods=['GET', 'POST'])
+def account_manager():
+    # How to know that is his first time => This onl IP was his computer and don't have this email in DB
+    # If he try to log again will be email and password empty
+    html_options = {
+        'title': 'Accounts manager',
+    }
+    if request.method == 'POST':
+        # If the first time login in
+        fullname = request.form.get('fullname')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        repassword = request.form.get('repassword')
+        type_cd = 1
+
+        # else show login form
+        account, status = accountBusiness.newAccount(
+            fullname, email, password, repassword, type_cd)
+
+        return {
+            'status': status,
+            'account': account.as_dict() if account else None,
+        }
+
+    return render_template('_admin_accounts_manager_template.html', **html_options)
 
 
 @app.route('/dashboard/transactions')

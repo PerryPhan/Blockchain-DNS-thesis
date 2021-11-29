@@ -1,7 +1,7 @@
 {% extends 'admin_template.html' %} {% block left %}
 <div class="part navigator-part">
-  <a href="#">
-    <div class="navigation blocks_and_trans active">
+  <a href="./blocktxs">
+    <div class="navigation blocks_and_trans">
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
         <path
           d="M0 11.1111H8.88889V0H0V11.1111ZM0 20H8.88889V13.3333H0V20ZM11.1111 20H20V8.88889H11.1111V20ZM11.1111 0V6.66667H20V0H11.1111Z"
@@ -23,8 +23,8 @@
       <span>Accounts</span>
     </div>
   </a>
-  <a href="./nodes">
-    <div class="navigation">
+  <a href="#">
+    <div class="navigation active">
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
         <path
           d="M1.11111 0C0.496667 0 0 0.497778 0 1.11111V18.8889C0 19.5022 0.496667 20 1.11111 20H8.88889C9.50333 20 10 19.5022 10 18.8889V15V5V1.11111C10 0.497778 9.50333 0 8.88889 0H1.11111ZM10 5C10 7.75667 12.2433 10 15 10C17.7567 10 20 7.75667 20 5C20 2.24333 17.7567 0 15 0C12.2433 0 10 2.24333 10 5ZM15 10C12.2433 10 10 12.2433 10 15C10 17.7567 12.2433 20 15 20C17.7567 20 20 17.7567 20 15C20 12.2433 17.7567 10 15 10Z"
@@ -37,143 +37,128 @@
   </a>
 </div>
 {% endblock %} {% block center %}
-<main class="block_and_trans">
-  <div class="blocks">
+<main class="nodes">
+  <div class="common">
     <div class="top">
-      <h3>Blocks</h3>
+      <h3>Nodes</h3>
       <div class="right">
         <div class="paginator">
           <div class="btn-box">
             <div class="first-side">
               <span>
-                <a href="#">First</a>
+                <a href="./nodes">First</a>
               </span>
               <span>
-                <a href="#" id="a-table-previous" class="nohref"
+                <a href="./nodes?page={{previous_page}}" id="a-table-previous" class="nohref"
                   ><img
                     src="{{url_for('static',filename='img/arrow-left-icon.png')}}"
                     alt="left-icon" /></a
               ></span>
             </div>
             <div class="index-side">
-              <span id="span-table-index-page">1</span>
+              <span id="span-table-index-page">{{ page }}</span>
               <span>/</span>
-              <span id="span-table-total-page">10</span>
+              <span id="span-table-total-page">{{ pages }}</span>
             </div>
             <div class="last-side">
               <span>
-                <a href="#" id="a-table-next">
+                <a href="./nodes?page={{next_page}}" id="a-table-next">
                   <img
                     src="{{url_for('static',filename='img/arrow-right-icon.png')}}"
                     alt="right-icon"
                 /></a>
               </span>
               <span>
-                <a href="#">Last</a>
+                <a href="./nodes?page={{pages}}">Last</a>
               </span>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-    <div class="content">
-      <div class="block">
-        <div class="flex id">
-          <label for="id">id</label>
-          <div class="value">#<span>1</span></div>
-          <div class="datetime">
-            <span>Nov</span>
-            <span>28th</span>,
-            <span>2021</span>
+        <div class="sort">
+          <div class="sort-btn-box">
+            <button>
+              <h3>Sort</h3>
+              <img
+                src="{{url_for('static',filename='img/sort-icon.png')}}"
+                alt="sort-icon"
+              />
+            </button>
           </div>
         </div>
-        <div class="flex transactions">
-          <label for="id">Transactions</label>
-          <div class="value">5</div>
-        </div>
-        <div class="flex previous">
-          <label for="id">Previous</label>
-          <div class="value">Genesis</div>
-        </div>
-        <div class="flex add-by">
-          <label for="id">Add by this node</label>
-          <div class="value">+10</div>
-        </div>
-        <div class="flex created-by">Created by <span>Node VN</span></div>
       </div>
     </div>
-  </div>
-  <div class="trans common">
-    <div class="top">
-      <h3>Transactions</h3>
-      <div class="right">
-        <div class="sort"></div>
-      </div>
-    </div>
-    <div class="content">
-      <div class="items transaction">
+    <div class="content full-page">
+      {% for i in range(start, end) %}
+      <!-- ITEMS -->
+      <div class="items node common active animation slidetoLeft">
         <div class="flex id-hash">
-          <div class="label">ID Hash:</div>
-          <div class="value">
-            2d9783223ce2a1112e1ba5f59c543d989c058c72e1f40d9dd79982e3ab5dc4f9|3
-          </div>
-          <div class="status green">Add</div>
+          <div class="label">ID:</div>
+          <div class="value">4130731f3e7a48d4968e95cc0fc776cf</div>
+          <div class="status green">Active</div>
         </div>
         <div class="flex data">
           <div class="label">Data:</div>
           <div class="value">
-            <span>Domain: abc.com</span>
-            <span>SOA & NS Record : default</span>
-            <span>A Record : 1 ( 192.168.1.7 ) </span>
+            IP: <span class="ip">192.168.1.7</span>
+            Name: <span class="name">Nodename</span>
+            Port: <span class="port">5000</span>
           </div>
           <div class="datetime">Nov 20th, 2021</div>
         </div>
       </div>
+      <!-- END ITEMS -->
+      {% endfor %}
     </div>
   </div>
 </main>
-{% endblock %} {% block right_sub_information %}
-<div class="avatar-sub-box">
-  <div class="field left">
-    <h5>Wallet</h5>
-    <h4>$<span>10,00</span></h4>
-  </div>
-  <div class="field right">
-    <h5>Status</h5>
-    <h4 class="activated">Activated</h4>
-    <h4 class="inactivated d-none">Activated</h4>
-  </div>
-</div>
 {% endblock %} {% block right %}
-<div class="part common-part block-part genesis-part">
-  <h4>Genesis Blocks</h4>
-  <div class="block common genesis-block">
+<div class="part common-part node-info-part">
+  <h4>This Node Information</h4>
+  <div class="common node-info">
     <div class="flex id-hash">
-      <label for="id">Id</label>
-      <div class="value">0</div>
+      <label for="id">id</label>
+      <div class="value ">
+        <div class="info animation slidetoLeft">
+          <span>4130731f3e7a48d4968e95cc0fc776cf</span>
+      </div>
+      </div>
     </div>
     <div class="flex time">
-      <label for="time">Time</label>
+      <label for="time">time</label>
       <div class="value">
-        <span>November</span>
-        <span>29th</span>,
-        <span>2021</span>
+        <div class="animation goup info">
+          <span>November 29th, 2021</span>
+        </div>
       </div>
     </div>
-    <div class="flex hash">
-      <label for="hash">Hash</label>
+    <div class="flex name">
+      <label for="name">name</label>
       <div class="value">
-        0000000000000000000000...
-        <div class="sub-value">64 chars</div>
+        <div class="animation goup info">
+          <span>Nodename</span>
+        </div>
+        
       </div>
     </div>
-    <div class="flex node">
-      <label for="node">Node</label>
+    <div class="flex ipport">
+      <label for="ipport">iP port</label>
       <div class="value">
-        Node VN
-        <div class="sub-value">212515151191819818</div>
+        <div class="animation goup info">
+        <span>192.168.1.7</span> : <span>5000</span>
+      </div>
+      </div>
+    </div>
+    <div class="flex status">
+      <label for="status">status</label>
+      <div class="value green">
+        <div class="animation goup info">Active</div>
       </div>
     </div>
   </div>
+  <div class="back-node">
+    <a href="#">Back to my node</a>
+  </div>
 </div>
+{% endblock %} {% block script %} 
+
 {% endblock %}
