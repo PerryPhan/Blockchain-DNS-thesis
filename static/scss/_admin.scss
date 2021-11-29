@@ -437,6 +437,13 @@
             .items {
               box-sizing: border-box;
               margin-bottom: 15px;
+              transition: .3s; 
+              cursor: pointer;
+              
+              &.selected,
+              &:hover{
+                background-color: $admin-center-selected-item-bgcolor !important;
+              }
 
               .flex {
                 .label {

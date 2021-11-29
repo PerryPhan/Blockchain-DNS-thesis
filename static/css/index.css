@@ -697,6 +697,11 @@ body {
 .admin.container .section.section-center main .common .content .items {
   box-sizing: border-box;
   margin-bottom: 15px;
+  transition: 0.3s;
+  cursor: pointer;
+}
+.admin.container .section.section-center main .common .content .items.selected, .admin.container .section.section-center main .common .content .items:hover {
+  background-color: #E1F6FF !important;
 }
 .admin.container .section.section-center main .common .content .items .flex {
   display: flex;

@@ -1,5 +1,6 @@
 const SELECTED_NODE = "Selected Node Information";
 const THIS_NODE = "This Node Information";
+const SELECTED_CLASS = "selected"
 
 var node_info_part_h4 = $(".node-info-part h4");
 var node_info_field = [".id-hash", ".time", ".name", ".ipport", ".status"];
@@ -43,7 +44,11 @@ function set_node_info(obj) {
     }
   }
 }
-
+$(".items").on("click", function(){
+  $(".items").removeClass(SELECTED_CLASS)
+  $(this).addClass(SELECTED_CLASS)
+  $(this).children('.id-hash').children('.value').click()
+})
 $(".items.node .id-hash .value").on("click", function () {
   let data = $(this).parent().parent().children(".data");
   let value = $(data).children(".value");
