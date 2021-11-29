@@ -47,13 +47,14 @@ def blocks_txs_manager():
 def nodes_manager():
     # How to know that is his first time => This onl IP was his computer and don't have this email in DB
     # If he try to log again will be email and password empty
-    count = 20
+    count = dns.blockchain.nodes.getNetworkCount()
     limit= 7
     
     # Page
     page = request.args.get('page', default = 1, type = int)
     pages= math.ceil( count / limit )
     
+    # Condition
     if page < 0 : page = 1
     if page > pages : page = pages
 
@@ -61,15 +62,18 @@ def nodes_manager():
     start = (page-1) * limit
     end =  start + limit if ( start + limit ) < count else count
     
+    list_of_nodes = dns.blockchain.nodes.getNetworkWithOffsetAndLimit(start, limit)
+    this_node = dns.blockchain.nodes.getNode()
+    
     html_options = {
         'title': 'Nodes manager',
         'page' : page,
         'previous_page': page - 1 if page - 1 > 1 else 1,
         'next_page': page + 1 if page + 1 < pages else pages,
         'pages': pages,
-        'limit': limit,
-        'start': start,
-        'end'  : end
+        'count': count,
+        'list_of_nodes': list_of_nodes, 
+        'this_node': this_node,
     }
 
     return render_template('_admin_nodes_manager_template.html', **html_options)

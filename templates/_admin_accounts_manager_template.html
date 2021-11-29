@@ -56,7 +56,7 @@
             <div class="index-side">
               <span id="span-table-index-page">1</span>
               <span>/</span>
-              <span id="span-table-total-page">10</span>
+              <span id="span-table-total-page">1</span>
             </div>
             <div class="last-side">
               <span>
@@ -84,32 +84,87 @@
       </div>
     </div>
     <div class="content full-page">
-      <div class="items transaction">
+      <!-- ITEMS -->
+      <div class="items account common animation slidetoLeft">
+        
         <div class="flex id-hash">
-          <div class="label">ID Hash:</div>
-          <div class="value">
-            2d9783223ce2a1112e1ba5f59c543d989c058c72e1f40d9dd79982e3ab5dc4f9|3
-          </div>
-          <div class="action add">Add</div>
+          <div class="label">ID:</div>
+          <div class="value">2d9783223ce2a1112e1ba5f59c5412312</div>
+          <div class="status blue"> Hoster </div>
         </div>
         <div class="flex data">
           <div class="label">Data:</div>
           <div class="value">
-            <span>Domain: abc.com</span>
-            <span>SOA & NS Record : default</span>
-            <span>A Record : 1 ( 192.168.1.7 ) </span>
+            Fullname : <span>Phan Dai</span>
+            Email : <span>daiphan308@gmail.com</span>
           </div>
           <div class="datetime">Nov 20th, 2021</div>
         </div>
       </div>
+      <!-- END ITEMS -->
     </div>
   </div>
 </main>
 {% endblock %} {% block right %}
-<div class="part common-part ">
-  <h4>This Account</h4>
-  <div class="common">
-    This account information
+<div class="part common-part account-info-part">
+  <div class="part-head">
+    <h4>This Account Information</h4>
+    <div class="edit-box">
+      <button class="btn-edit">
+        Edit
+        <svg width="23" height="22" viewBox="0 0 23 22" fill="none">
+          <path d="M11.4998 1.83325C6.20984 1.83325 1.9165 5.93992 1.9165 10.9999C1.9165 16.0599 6.20984 20.1666 11.4998 20.1666C16.7898 20.1666 21.0832 16.0599 21.0832 10.9999C21.0832 5.93992 16.7898 1.83325 11.4998 1.83325ZM12.4582 15.5833H10.5415V10.0833H12.4582V15.5833ZM12.4582 8.24992H10.5415V6.41659H12.4582V8.24992Z" fill="#9F38A7"/>
+          </svg>
+      </button>
+      <button class="btn-close">
+        Close
+        <svg  width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM17 13H7V11H17V13Z" fill="#D20C0C"/>
+          </svg>
+      </button>
   </div>
 </div>
+  <div class="common account-info">
+    <div class="flex id-hash">
+      <label for="id">id</label>
+      <div class="value">
+        <div class="info animation slidetoLeft">
+          <span>2d9783223ce2a1112e1ba5f59c5412312</span>
+      </div>
+      </div>
+    </div>
+    <div class="flex fullname">
+      <label for="fullname">fullname</label>
+      <div class="value">
+        <div class="animation goup info">
+          <span>Phan Dai</span>
+        </div>
+      </div>
+    </div>
+    <div class="flex email">
+      <label for="email">email</label>
+      <div class="value">
+        <div class="animation goup info">
+          <span>daiphan308@gmail.com</span>
+        </div>
+        
+      </div>
+    </div>
+    <div class="flex type">
+      <label for="type">Type</label>
+      <div class="value">
+        <div class="animation goup info">
+          <span class="admin">Admin</span>
+      </div>
+      </div>
+    </div>
+    <div class="flex time">
+      <label for="time">time</label>
+      <div class="value green ">
+        <div class="animation goup info">Nov 29th, 2021</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}

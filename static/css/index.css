@@ -352,6 +352,44 @@ body {
 .admin.container .section.section-right .part {
   margin-bottom: 30px;
 }
+.admin.container .section.section-right .part .part-head {
+  margin: 0px;
+  display: flex;
+  align-items: flex-start;
+  padding-right: 20px;
+}
+.admin.container .section.section-right .part .part-head h4 {
+  max-width: 200px;
+  margin: 0;
+  padding: 0;
+  font-size: 26px;
+  letter-spacing: 2%;
+  color: #9F38A7;
+}
+.admin.container .section.section-right .part .part-head .edit-box {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 1 0 auto;
+}
+.admin.container .section.section-right .part .part-head .edit-box button {
+  margin-right: 10px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  border: none;
+  outline: none;
+  border-radius: 10px;
+}
+.admin.container .section.section-right .part .part-head .edit-box button svg {
+  margin-left: 10px;
+}
+.admin.container .section.section-right .part .part-head .edit-box button.btn-edit {
+  background-color: #d7b1fa;
+}
+.admin.container .section.section-right .part .part-head .edit-box button.btn-close {
+  background-color: #f38f8b;
+}
 .admin.container .section.section-right .part.information-part {
   display: flex;
   flex-direction: column;
@@ -517,6 +555,51 @@ body {
   color: #5890d2;
   font-weight: 600;
 }
+.admin.container .section.section-right .part.account-info-part .account-info .flex {
+  display: flex;
+  font-size: 19px;
+  height: 30px;
+  margin-bottom: 10px;
+}
+.admin.container .section.section-right .part.account-info-part .account-info .flex.id-hash label {
+  text-transform: uppercase;
+  width: fit-content;
+}
+.admin.container .section.section-right .part.account-info-part .account-info .flex.id-hash .value {
+  font-weight: 600;
+  width: max-content;
+  max-width: 330px;
+  margin-left: 10px;
+  color: #8165FF;
+}
+.admin.container .section.section-right .part.account-info-part .account-info .flex.fullname .value, .admin.container .section.section-right .part.account-info-part .account-info .flex.email .value {
+  color: #8165FF;
+}
+.admin.container .section.section-right .part.account-info-part .account-info .flex.type .value {
+  height: 50px !important;
+}
+.admin.container .section.section-right .part.account-info-part .account-info .flex.type .value span {
+  padding: 5px;
+  border-radius: 20px;
+}
+.admin.container .section.section-right .part.account-info-part .account-info .flex.type .value span.admin {
+  font-weight: bold;
+  color: #8119d6;
+}
+.admin.container .section.section-right .part.account-info-part .account-info .flex label {
+  text-transform: capitalize;
+  width: 25%;
+  max-width: 80px;
+  font-weight: 600;
+}
+.admin.container .section.section-right .part.account-info-part .account-info .flex .value {
+  overflow: hidden;
+  height: 100%;
+  text-align: right;
+}
+.admin.container .section.section-right .part.account-info-part .account-info .flex .value .sub-value {
+  color: #AB98FF;
+}
 .admin.container .section.section-right .part.createdby-part {
   position: absolute;
   bottom: 15px;
@@ -551,6 +634,11 @@ body {
 }
 .admin.container .section.section-center main .top h3 {
   width: fit-content;
+}
+.admin.container .section.section-center main .top h5 {
+  margin-left: 20px;
+  color: #9F9F9F;
+  line-height: 15px;
 }
 .admin.container .section.section-center main .top .right {
   flex: 1 0 auto;
@@ -717,7 +805,7 @@ body {
   padding: 15px 40px 5px;
 }
 .admin.container .section.section-center main .common .content .items.transaction.active, .admin.container .section.section-center main .common .content .items.common.active {
-  background-color: #e9ffee;
+  background-color: #f1faf3;
 }
 .admin.container .section.section-center main .common .content .items.transaction .flex, .admin.container .section.section-center main .common .content .items.common .flex {
   margin-bottom: 10px;
@@ -746,6 +834,12 @@ body {
 }
 .admin.container .section.section-center main .common .content .items.transaction .flex .status.green, .admin.container .section.section-center main .common .content .items.common .flex .status.green {
   color: #147112;
+}
+.admin.container .section.section-center main .common .content .items.transaction .flex .status.blue, .admin.container .section.section-center main .common .content .items.common .flex .status.blue {
+  color: #061495;
+}
+.admin.container .section.section-center main .common .content .items.transaction .flex .status.grey, .admin.container .section.section-center main .common .content .items.common .flex .status.grey {
+  color: #9F9F9F;
 }
 .admin.container .section.section-center main .common .content .items.transaction .flex .datetime, .admin.container .section.section-center main .common .content .items.common .flex .datetime {
   flex: 1 0 auto;

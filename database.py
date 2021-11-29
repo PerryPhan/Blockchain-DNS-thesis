@@ -93,18 +93,23 @@ def merge_obj(obj, merge_obj):
 class Accounts(db.Model):
     __tablename__ = 'accounts'
     __table_args__ = {'extend_existing': True}
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(64), primary_key=True)
     fullname = db.Column(db.String(40), nullable=False)
     email = db.Column(db.String(40), nullable=False)
     password = db.Column(db.String(255), nullable=False)
     type_cd = db.Column(db.Integer, nullable=False)
+    timestamp = db.Column(db.Float, nullable=False)
     is_deleted = db.Column(db.Boolean, nullable=False)
     # ==============
-    transactions = db.relationship('Transactions',backref="owner")
+    transactions = db.relationship('Transactions', backref="owner")
+    node = db.relationship('Nodes', backref="admin")
     # To String 
 
     def as_dict(self):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+    def datetime_format(self):
+        return datetime.fromtimestamp(self.timestamp).strftime("%b %d, %Y") if self.timestamp else None
 
 class Nodes(db.Model):
     __tablename__ = 'nodes'
@@ -115,11 +120,17 @@ class Nodes(db.Model):
     port = db.Column(db.Integer, nullable=False)
     is_deleted = db.Column(db.Boolean, nullable=False)
     is_active = db.Column(db.Boolean, nullable=False)
+    timestamp = db.Column(db.Float, nullable=False)
     # ==============
     blocks = db.relationship('Blocks', backref="node")
+    account_id = db.Column(db.String(64), db.ForeignKey('accounts.id'), nullable=True)
     
     def as_dict(self):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+    def datetime_format(self):
+        return datetime.fromtimestamp(self.timestamp).strftime("%b %d, %Y") if self.timestamp else None
+
 
 class Blocks(db.Model):
     __tablename__ = 'blocks'
@@ -157,7 +168,7 @@ class Blocks(db.Model):
 class Transactions(db.Model):
     __tablename__ = 'transactions'
     __table_args__ = {'extend_existing': True}
-    id = db.Column(db.Integer(), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     action = db.Column(db.String(64), nullable=False)
     domain = db.Column(db.String(64), nullable=False)
     soa = db.Column(db.JSON, nullable=True)
@@ -166,8 +177,8 @@ class Transactions(db.Model):
     ttl = db.Column(db.Integer, nullable= False)
     timestamp = db.Column(db.Float, nullable=False)
     # ===============
-    account_id = db.Column(db.Integer(), db.ForeignKey('accounts.id'), nullable=True)
-    block_id  = db.Column(db.Integer(), db.ForeignKey('blocks.id'), nullable=True)
+    account_id = db.Column(db.String(64), db.ForeignKey('accounts.id'), nullable=True)
+    block_id  = db.Column(db.Integer, db.ForeignKey('blocks.id'), nullable=True)
     
     def as_dict(self):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
@@ -205,7 +216,7 @@ class Records :
         self.ns_count = None
         self.a_count  = None
         self.ttl = 3600,
-        self.account_id = 0
+        self.account_id = ''
         if transaction :
             return self.fromTransaction(transaction)
     

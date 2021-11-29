@@ -501,6 +501,12 @@ class NodesBusiness:
     def getNetwork(self):
         return db.session.query(Nodes).filter(Nodes.is_deleted == False).all()
 
+    def getNetworkWithOffsetAndLimit(self, offset, limit):
+        return db.session.query(Nodes).filter(Nodes.is_deleted == False).order_by(Nodes.timestamp.asc()).offset(offset).limit(limit).all()
+    
+    def getNetworkCount(self):
+        return db.session.query(Nodes).filter(Nodes.is_deleted == False).count()
+    
     def getActiveNetwork(self):
         return db.session.query(Nodes).filter(Nodes.is_active == True, Nodes.is_deleted == False).all()
 
@@ -617,7 +623,8 @@ class NodesBusiness:
             port=port,
             nodename=nodename,
             is_deleted=False,
-            is_active=is_active
+            is_active=is_active,
+            timestamp=time.time()
         )
 
         if not self.validateNode(node, True):
@@ -732,10 +739,12 @@ class AccountBusiness:
         password = generate_password_hash(password)
 
         return Accounts(
+            id = str(uuid4()).replace('-', ''),
             fullname=fullname,
             email=email,
             password=password,
             type_cd=type_cd,
+            timestamp=time.time(),
             is_deleted=False
         ), 200
 
