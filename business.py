@@ -306,89 +306,129 @@ class Blockchain:
 class TransactionBusiness:
     def __init__(self):
         self.TIME_TO_LIVE = 3600
+        
+    def returnRecordFormat(self):
+        return {
+            '$origin' : DOMAIN_FORMAT,
+            '$ttl'    : NUMBER_FORMAT,
+            
+            'soa': {
+                "mname": DOMAIN_FORMAT, 
+                "rname": DOMAIN_FORMAT, 
+                "serial": FLOAT_FORMAT,
+                "refresh": NUMBER_FORMAT,
+                "retry": NUMBER_FORMAT,
+                "expire": NUMBER_FORMAT,
+                "minimum": NUMBER_FORMAT
+            },
 
+            'ns':  [
+                {"host": DOMAIN_FORMAT},
+                {"host": DOMAIN_FORMAT}
+            ],
+
+            'a':  [
+                {
+                    "name": "@",
+                    "ttl": NUMBER_FORMAT,
+                    "value": IP_FORMAT
+                },
+                {
+                    "name": "@",
+                    "ttl": NUMBER_FORMAT,
+                    "value": IP_FORMAT
+                },
+                {
+                    "name": "@",
+                    "ttl": NUMBER_FORMAT,
+                    "value": IP_FORMAT
+                }
+            ]
+        }
+    
     def convertRequestToTransactionObj(self, request_form):
         return {
-            "domain": request_form['domain'],
-
+            "$origin": request_form['domain'],
+            "$ttl": self.TIME_TO_LIVE,
+            
             'soa': {
                 "mname": request_form['soa_mname'],
                 "rname": request_form['soa_rname'],
-                "refresh": request_form['soa_refresh'],
-                "retry": request_form['soa_retry'],
-                "expire": request_form['soa_expire'],
-                "minimum": request_form['soa_minimum'],
+                "serial": str(time.time()),
+                "refresh": int(request_form['soa_refresh']),
+                "retry": int(request_form['soa_retry']),
+                "expire": int(request_form['soa_expire']),
+                "minimum": int(request_form['soa_minimum'])
             },
 
             'ns':  [
                 {"host": request_form['ns_host1']},
-                {"host": request_form['ns_host2']},
+                {"host": request_form['ns_host2']}
             ],
 
             'a':  [
                 {
                     "name": request_form['a_name_1'],
-                    "ttl": request_form['a_ttl_1'],
+                    "ttl": int(request_form['a_ttl_1']),
                     "value": request_form['a_value_1']
                 },
                 {
                     "name": request_form['a_name_2'],
-                    "ttl": request_form['a_ttl_2'],
+                    "ttl": int(request_form['a_ttl_2']),
                     "value": request_form['a_value_2']
                 },
                 {
                     "name": request_form['a_name_3'],
-                    "ttl": request_form['a_ttl_3'],
+                    "ttl": int(request_form['a_ttl_3']),
                     "value": request_form['a_value_3']
-                },
-            ],
+                }
+            ]
         }
 
     def checkTransactionFormat(self, obj):
-        checked = copy(RECORD_FORMAT)
-        if 'domain' in obj:
-            if obj['domain']:
-                checked['domain'] = copy(checked['domain'])
-                checked['domain'] = True if re.match(
-                    checked['domain'], obj['domain']) else False
-
-        checked['soa'] = copy(checked['soa'])
+        checked = self.returnRecordFormat()
+        if '$origin' in obj:
+            if obj['$origin']:
+                checked['$origin'] = True if re.match(
+                    checked['$origin'], obj['$origin']) else False
+        else: checked['$origin'] = False
+        
         if 'soa' in obj:
             if obj['soa']:
                 for key in obj['soa'].keys():
+                    if type( obj['soa'][key] ) == int :
+                        obj['soa'][key] = str(obj['soa'][key])
                     checked['soa'][key] = True if obj['soa'][key] and re.match(
                         checked['soa'][key], obj['soa'][key]) else False
-
-        checked['soa'] = all([checked['soa'][key]
+            checked['soa'] = all([checked['soa'][key]
                              for key in checked['soa'].keys()])
+        else: checked['soa'] = False
 
-        checked['ns'] = copy(checked['ns'])
         if 'ns' in obj:
             if obj['ns']:
                 for i in range(len(obj['ns'])):
-                    checked['ns'][i] = copy(checked['ns'][i])
                     checked['ns'][i]['host'] = copy(checked['ns'][i]['host'])
                     checked['ns'][i]['host'] = True if obj['ns'][i]['host'] and re.match(
                         checked['ns'][i]['host'], obj['ns'][i]['host']) else False
-
-        checked['ns'] = all([ns['host'] for ns in checked['ns']])
-
-        checked['a'] = copy(checked['a'])
+            checked['ns'] = all([ns['host'] for ns in checked['ns']])
+        else: checked['ns'] = False
+        
         if 'a' in obj:
             if obj['a']:
                 for i in range(len(obj['a'])):
                     if obj['a'][i]['value'] != "":
                         for key in obj['a'][i].keys():
-                            checked['a'][i] = copy(checked['a'][i])
-                            checked['a'][i][key] = copy(checked['a'][i][key])
+                            if type(  obj['a'][i][key] ) == int :
+                                 obj['a'][i][key] = str( obj['a'][i][key])
                             checked['a'][i][key] = True if obj['a'][i][key] and re.match(
                                 checked['a'][i][key], obj['a'][i][key]) else False
-
-        for spec in checked['a']:
-            spec = all([spec[key] for key in spec.keys()])
-
-        checked['a'] = all([spec for spec in checked['a']])
-
+            for spec in checked['a']:
+                spec = all([spec[key] for key in spec.keys()])
+            checked['a'] = all([spec for spec in checked['a']])
+        else: checked['a'] = False
+        
+        checked['$ttl'] = True if re.match(checked['$ttl'], str(obj['$ttl'])) else False
+        
         return all([checked[key] for key in checked.keys()])
 
     def countAllTransactions(self):
@@ -406,30 +446,25 @@ class TransactionBusiness:
             obj['soa']['expire']) != int else obj['soa']['expire']
         obj['soa']['minimum'] = int(obj['soa']['minimum']) if type(
             obj['soa']['minimum']) != int else obj['soa']['minimum']
-        obj['soa']['serial'] = str(time.time())
-
-        obj['ttl'] = self.TIME_TO_LIVE
 
         for a in obj['a']:
-            a['ttl'] = int(a['ttl']) if type(a['ttl']) != int else a['ttl']
             a['value'] = a['value'] if a['value'] != '' else '0.0.0.0'
 
         return obj
-
+    
     def newTransaction(self, request_form, account_id, action, convertToObj=False):
         obj = request_form
         if convertToObj == True:
             obj = self.convertRequestToTransactionObj(obj)
         if self.checkTransactionFormat(obj) == True:
-            #  Add serial & ttl to SOA
             obj = self.correctFormat(obj)
             tran = Transactions(
-                domain=obj['domain'],
+                domain=obj['$origin'],
                 action=action,
                 soa=obj['soa'],
                 ns=obj['ns'],
                 a=obj['a'],
-                ttl=obj['ttl'],
+                ttl= obj['$ttl'],
                 timestamp=time.time(),
                 account_id=account_id,
             )

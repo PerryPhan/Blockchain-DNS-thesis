@@ -18,40 +18,8 @@ IP_FORMAT = '^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|
 DOMAIN_FORMAT = '^[a-zA-Z0-9][a-zA-Z0-9-_]{0,61}[a-zA-Z0-9]{0,1}\.([a-zA-Z]{1,6}|[a-zA-Z0-9-]{1,30}\.[a-zA-Z]{2,3})$'
 # Số , ex :  0 - 99999+
 NUMBER_FORMAT = '^[0-9]+$'
-RECORD_FORMAT = {
-    'domain' : DOMAIN_FORMAT,
-    'soa': {
-        "mname": DOMAIN_FORMAT, 
-        "rname": DOMAIN_FORMAT, 
-        "refresh": NUMBER_FORMAT,
-        "retry": NUMBER_FORMAT,
-        "expire": NUMBER_FORMAT,
-        "minimum": NUMBER_FORMAT,
-    },
+FLOAT_FORMAT = '^[0-9]+\.{1}[0-9]+$'
 
-    'ns':  [
-        {"host": DOMAIN_FORMAT},
-        {"host": DOMAIN_FORMAT},
-    ],
-
-    'a':  [
-        {
-            "name": "@",
-            "ttl": NUMBER_FORMAT,
-            "value": IP_FORMAT
-        },
-        {
-            "name": "@",
-            "ttl": NUMBER_FORMAT,
-            "value": IP_FORMAT
-        },
-        {
-            "name": "@",
-            "ttl": NUMBER_FORMAT,
-            "value": IP_FORMAT
-        },
-    ],
-}
 ZONE_FORMAT = {
 	"$origin": "",
 	"$ttl": 3600,

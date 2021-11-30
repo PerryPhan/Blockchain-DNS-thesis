@@ -8,8 +8,10 @@ from business import *
 accountBusiness = AccountBusiness()
 dns = DNSResolver()
 # -FRONT --------------------------------------------------
-# FOR INDEX 
+# FOR INDEX
 # --------------------------------------------------
+
+
 @app.route('/')
 def home():
     return redirect('/dashboard/transactions')
@@ -19,19 +21,21 @@ def home():
 def manager():
     if session:
         if 'account' in session:
-            if session['account']['type_cd'] == 1 : #admin access
+            if session['account']['type_cd'] == 1:  # admin access
                 account_options = {
                     'account_id': session['account']['id'],
                     'account_fullname': session['account']['fullname']
                 }
             return redirect('/admin/blocktxs')
     session['regis_email'] = dns.blockchain.nodes.getNode().admin.email
-    
+
     return redirect('/login')
 
 # -FRONT --------------------------------------------------
-# FOR ADMIN 
+# FOR ADMIN
 # --------------------------------------------------
+
+
 @app.route('/admin/blocktxs', methods=['GET', 'POST'])
 def blocks_txs_manager():
     # How to know that is his first time => This onl IP was his computer and don't have this email in DB
@@ -58,120 +62,132 @@ def blocks_txs_manager():
 
     return render_template('_admin_blocktx_manager_template.html', **html_options)
 
+
 @app.route('/admin/nodes', methods=['GET', 'POST'])
 def nodes_manager():
     # How to know that is his first time => This onl IP was his computer and don't have this email in DB
     # If he try to log again will be email and password empty
     count = dns.blockchain.nodes.countNetwork()
-    limit= 7
+    limit = 7
 
-    # Default 
-    page = 1 
+    # Default
+    page = 1
     pages = 1
     offset = 0
     list_of_nodes = []
     this_node = None
 
     # Has items
-    if count > 0 : 
+    if count > 0:
         # Page
-        page = request.args.get('page', default = 1, type = int)
-        pages= math.ceil( count / limit )
-        
+        page = request.args.get('page', default=1, type=int)
+        pages = math.ceil(count / limit)
+
         # Condition
-        if page <= 0 : page = 1
-        if page > pages : page = pages
+        if page <= 0:
+            page = 1
+        if page > pages:
+            page = pages
 
         # Number
         offset = (page-1) * limit
-        
-        list_of_nodes = dns.blockchain.nodes.getNetworkWithOffsetAndLimit(offset, limit)
+
+        list_of_nodes = dns.blockchain.nodes.getNetworkWithOffsetAndLimit(
+            offset, limit)
         this_node = dns.blockchain.nodes.getNode()
-    
+
     html_options = {
         'title': 'Nodes manager',
-        'page' : page,
+        'page': page,
         'previous_page': page - 1 if page - 1 > 1 else 1,
         'next_page': page + 1 if page + 1 < pages else pages,
         'pages': pages,
         'count': count,
-        'list_of_nodes': list_of_nodes, 
+        'list_of_nodes': list_of_nodes,
         'this_node': this_node,
     }
 
     return render_template('_admin_nodes_manager_template.html', **html_options)
+
 
 @app.route('/admin/accounts', methods=['GET', 'POST'])
 def account_manager():
     # How to know that is his first time => This onl IP was his computer and don't have this email in DB
     # If he try to log again will be email and password empty
     count = accountBusiness.countListAccounts()
-    limit= 7
+    limit = 7
 
-    # Default 
-    page = 1 
+    # Default
+    page = 1
     pages = 1
     offset = 0
     list_of_accounts = []
 
     # Has items
-    if count > 0 : 
+    if count > 0:
         # Page
-        page = request.args.get('page', default = 1, type = int)
-        pages= math.ceil( count / limit )
-        
+        page = request.args.get('page', default=1, type=int)
+        pages = math.ceil(count / limit)
+
         # Condition
-        if page <= 0 : page = 1
-        if page > pages : page = pages
+        if page <= 0:
+            page = 1
+        if page > pages:
+            page = pages
 
         # Number
         offset = (page-1) * limit
-        
-        list_of_accounts = accountBusiness.getListAccountsWithOffsetAndLimit(offset, limit)
+
+        list_of_accounts = accountBusiness.getListAccountsWithOffsetAndLimit(
+            offset, limit)
         # this_node = accountBusiness.()
-    
-    
+
     html_options = {
         'title': 'Nodes manager',
-        'page' : page,
+        'page': page,
         'previous_page': page - 1 if page - 1 > 1 else 1,
         'next_page': page + 1 if page + 1 < pages else pages,
         'pages': pages,
         'count': count,
-        'list_of_accounts': list_of_accounts, 
+        'list_of_accounts': list_of_accounts,
         # 'this_node': this_node,
     }
 
     return render_template('_admin_accounts_manager_template.html', **html_options)
 
 # -FRONT --------------------------------------------------
-# FOR DASHBOARD 
+# FOR DASHBOARD
 # --------------------------------------------------
+
+
 @app.route('/dashboard/transactions')
 def dashboardTransactions():
     # Pagination
     count = dns.blockchain.transactions.countAllTransactions()
     limit = 7
 
-    # Default 
-    page = 1 
+    # Default
+    page = 1
     pages = 1
     offset = 0
     list = []
 
     # Has items
-    if count > 0 : 
+    if count > 0:
         # Page
-        page = request.args.get('page', default = 1, type = int)
-        pages= math.ceil( count / limit )
-        
+        page = request.args.get('page', default=1, type=int)
+        pages = math.ceil(count / limit)
+
         # Condition
-        if page <= 0 : page = 1
-        if page > pages : page = pages
+        if page <= 0:
+            page = 1
+        if page > pages:
+            page = pages
 
         # Number
         offset = (page-1) * limit
-        list = dns.blockchain.transactions.getListTransactionstsWithOffsetAndLimit(offset, limit)
+        list = dns.blockchain.transactions.getListTransactionstsWithOffsetAndLimit(
+            offset, limit)
 
     html_options = {
         'type': 1,
@@ -180,7 +196,7 @@ def dashboardTransactions():
         # Pagination
         'list': list,
         'node': dns.blockchain.nodes.node,
-        'page' : page,
+        'page': page,
         'previous_page': page - 1 if page - 1 > 1 else 1,
         'next_page': page + 1 if page + 1 < pages else pages,
         'pages': pages,
@@ -197,31 +213,35 @@ def dashboardTransactions():
 
     return render_template('_dashboard_template.html', **html_options)
 
+
 @app.route('/dashboard/domains')
 def dashboardDomains():
     # Pagination
     count = dns.blockchain.transactions.countAllTransactions()
     limit = 7
 
-    # Default 
-    page = 1 
+    # Default
+    page = 1
     pages = 1
     offset = 0
     list = []
 
     # Has items
-    if count > 0 : 
+    if count > 0:
         # Page
-        page = request.args.get('page', default = 1, type = int)
-        pages= math.ceil( count / limit )
-        
+        page = request.args.get('page', default=1, type=int)
+        pages = math.ceil(count / limit)
+
         # Condition
-        if page <= 0 : page = 1
-        if page > pages : page = pages
+        if page <= 0:
+            page = 1
+        if page > pages:
+            page = pages
 
         # Number
         offset = (page-1) * limit
-        list = dns.blockchain.transactions.getListTransactionstsWithOffsetAndLimit(offset, limit)
+        list = dns.blockchain.transactions.getListTransactionstsWithOffsetAndLimit(
+            offset, limit)
         list = dns.blockchain.transactions.getDomainList(list)
 
     html_options = {
@@ -231,7 +251,7 @@ def dashboardDomains():
         # Pagination
         'list': list,
         'node': dns.blockchain.nodes.node,
-        'page' : page,
+        'page': page,
         'previous_page': page - 1 if page - 1 > 1 else 1,
         'next_page': page + 1 if page + 1 < pages else pages,
         'pages': pages,
@@ -247,6 +267,7 @@ def dashboardDomains():
             return render_template('_dashboard_template.html', **html_options, **account_options)
 
     return render_template('_dashboard_template.html', **html_options)
+
 
 @app.route('/dashboard/transactions/detail')
 def detailDashboardTransactions():
@@ -268,6 +289,7 @@ def detailDashboardTransactions():
 
     return render_template('_detail_dashboard_template.html', **html_options)
 
+
 @app.route('/dashboard/domains/detail')
 def detailDashboardDomains():
     domain = request.args.get('domain', default='', type=str)
@@ -288,12 +310,10 @@ def detailDashboardDomains():
 
     return render_template('_detail_dashboard_template.html', **html_options)
 
+
 @app.route('/dashboard/operation', methods=['GET', 'POST'])
 def dashboard_operation():
-    ALLOWED_EXTS = {"txt"}
-
-    def checkFileExtension(file):
-        return '.' in file and len(file.rsplit('.')) == 2 and file.rsplit('.', 1)[1].lower() in ALLOWED_EXTS
+    ALLOWED_EXTS = {"txt", "zone"}
 
     def checkFileNameFormat(filename):
         # Check file name
@@ -301,7 +321,7 @@ def dashboard_operation():
             return filename, 404
 
         # Check file extension
-        if checkFileExtension(filename) == False:
+        if '.' in filename and len(filename.rsplit('.')) == 3 and filename.rsplit('.', 1)[-1].lower() in ALLOWED_EXTS == False:
             return filename, 500
 
         # Format that filename can store any where
@@ -314,30 +334,67 @@ def dashboard_operation():
             form, session['account']['id'], 'add', True
         )
         # Add single Transaction
-        status = dns.blockchain.transactions.addTransaction(tran)
+        # status = dns.blockchain.transactions.addTransaction(tran)
+        message = Message.getMessage('TransactionAdding',status )
         
-        return tran, status
+        return  {
+            'status': status,
+            'message': message,
+        }
 
     def handleMultipleRecordsForm(files):
-        files_list_obj = {}
+        errors = []
+        records = {}
+        status = 404
+        
         for file in files:
-            # Check 
+            # Check
             filename, status = checkFileNameFormat(file.filename)
-            print(filename, status)
-            if status != 200 :
-                files_list_obj[filename] = False
-            else :
-            # Save
-                files_list_obj[filename] = True
+            if status != 200:
+                errors.append(filename)
+            else:
+                # Upload and save file 
                 file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 file.save(file_path)
-
-        # # Open file and add the content to TRANSACTION
-        # with open(file_path, "r", encoding="utf-8") as f:
-        #     #    Do like 1 form
-        #     return 200
-        print( [ value for value in files_list_obj.values()] )
-        return any( [ value for value in files_list_obj.values()] )
+                # Open 
+                with open(file_path, "r", encoding="utf-8") as f:
+                    try:
+                        data = json.load(f)
+                        records[data['$origin']] = data
+                    except: 
+                        errors.append(filename)
+                        pass
+                    
+        if len(records) > 0:
+            if len(files) == len(records) : # Enough files
+                status = 200
+            else : # Not enough files
+                status = 202
+        else : # No files
+            status = 500
+            
+        data_errors = []
+        insert_value = ''
+        if status != 500:     
+            for record in records.values():
+                data_tran, data_status = dns.blockchain.transactions.newTransaction(
+                    record, session['account']['id'], 'add'
+                )
+                if data_status != 200: 
+                    data_errors.append( record['$origin'] )
+                # If data_status != 200 -> data_errors.append()
+                # If data_status = 200 -> Add
+        
+        if( len(data_errors) > 0 ) : insert_value += 'data of domain '+','.join(data_errors)+' not in right format'
+        if insert_value != '' :  insert_value += ' and '
+        insert_value += ','.join(errors) + " wrong filename or expected $origin properties"
+        
+        message = Message.getMessage('TransactionAdding',status, insert_value )    
+        
+        return {
+            'status': status,
+            'message': message,
+        }
 
     # Check account
     if not session or not 'account' in session:
@@ -355,30 +412,26 @@ def dashboard_operation():
     }
 
     if request.method == 'POST':
-        status = 0
-        
+        response = {}
         if request.files.getlist('file'):
             files = request.files.getlist('file')
-            
-            return {
-                'status': 200,
-                'handle': handleMultipleRecordsForm(files)
-            }
-        tran, status = handleOneRecordForm(request.form)
-        return {
-            'status': status,
-            'transaction': tran.as_dict() if tran else None,
-        }
+            response = handleMultipleRecordsForm(files)
+            return render_template('_operation_dashboard_template.html', **html_options, **response)
 
+        response = handleOneRecordForm(request.form)
+        return render_template('_operation_dashboard_template.html', **html_options, **response)
     return render_template('_operation_dashboard_template.html', **html_options)
 
 # -FRONT --------------------------------------------------
 # FOR LOGIN
 # --------------------------------------------------
+
+
 @app.route('/logout')
 def logout():
     session.pop('account', None)
     return redirect('/')
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -416,6 +469,7 @@ def login():
         session.pop('regis_email', None)
 
     return render_template('_login_template.html', **html_options, regis_email=regis_email)
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -473,6 +527,8 @@ def load_domain_list():
 # -BACK ------------------------------------------------
 # FOR POSTMAN
 # --------------------------------------------------
+
+
 @app.route('/blockchain/transactions')
 def showTransactionsBuffer():
     tranList = [tran.as_dict() for tran in dns.blockchain.current_transactions]
@@ -482,6 +538,7 @@ def showTransactionsBuffer():
         'len': len(tranList),
         'trans': tranList,
     })
+
 
 @app.route('/blockchain/dump')
 def dumpChain():
@@ -496,6 +553,7 @@ def dumpChain():
             'blocks': chain,
         }
     })
+
 
 @app.route('/dns/resolve', methods=['GET', 'POST'])
 def resolve():
@@ -516,6 +574,7 @@ def resolve():
         'message': 'Resolver webpage'
     })
 
+
 @app.route('/blockchain/ledger')
 def getLedger():
     ledger = dns.blockchain.ledger
@@ -526,6 +585,7 @@ def getLedger():
         'len': len(ledger),
         'ledger': ledger
     })
+
 
 @app.route('/blockchain/wallet')
 def getWallet():
@@ -540,6 +600,8 @@ def getWallet():
 # -BACK ------------------------------------------------
 # FOR CALLING
 # --------------------------------------------------
+
+
 @app.route('/blockchain/overide')
 def overideBlockchain():
     status = dns.blockchain.overrideTheLongestChain()
@@ -611,7 +673,6 @@ def proofOfWork():
     })
 
 
-
 # Run --------------------------------------------------
 if __name__ == "__main__":
     from argparse import ArgumentParser
@@ -631,57 +692,61 @@ if __name__ == "__main__":
             print("\n-------- GOODBYE !! ------")
 
     def createNodeAdminCLI(node):
-        # Ask question about fullname, generate email, password, retype password 
+        # Ask question about fullname, generate email, password, retype password
         format = ACCOUNT_FORMAT
 
         print('\n_________ CREATE NODE ADMIN CLI ___________ \n')
 
         print('ADMIN INFORMATION ( fullname, password ) : ')
-        # Fullname 
-        fullname = input("1) Fullname ( ex: Phan Dai ) or [Enter] :") or 'Phan Dai'
+        # Fullname
+        fullname = input(
+            "1) Fullname ( ex: Phan Dai ) or [Enter] :") or 'Phan Dai'
         print()
 
-        # Email 
+        # Email
         while(True):
-            email_fullname = "_".join(re.split('\W+',fullname.lower()))
-            email = input("2) Email ( ex: <full_name>@<node>.<any> ) or [Enter] :") or email_fullname + '@' + "".join(re.split('\W+',node.nodename.lower())) + '.dnschain'
+            email_fullname = "_".join(re.split('\W+', fullname.lower()))
+            email = input("2) Email ( ex: <full_name>@<node>.<any> ) or [Enter] :") or email_fullname + '@' + "".join(
+                re.split('\W+', node.nodename.lower())) + '.dnschain'
             print('Checking email ', email, '..')
             if re.match(format['email'], email):
-                if not accountBusiness.getAccountByEmail(email) :
+                if not accountBusiness.getAccountByEmail(email):
                     print('-> Final email : ', email)
                     break
-                else :
+                else:
                     print(" This email is exsited ")
-            else :
+            else:
                 print(' This email has wrong format')
         print()
-        
-        # Password and Repassword 
+
+        # Password and Repassword
         while(True):
-            password = getpass.getpass("2) Password ( auto hide, required 8+ chars, 1 special, 1 lower, 1 upper ) :")
+            password = getpass.getpass(
+                "2) Password ( auto hide, required 8+ chars, 1 special, 1 lower, 1 upper ) :")
             repassword = getpass.getpass("RePassword :")
-            if re.match(format['password'], password) :
-                if password == repassword  : 
+            if re.match(format['password'], password):
+                if password == repassword:
                     break
-                else :
+                else:
                     print('Password and repassword not the same')
-            else : 
+            else:
                 print('Wrong password format')
-        
-        # Type_cd 
+
+        # Type_cd
         type_cd = ADMIN_CD
-        
-        admin, status = accountBusiness.newAccount(fullname,email,password,repassword,type_cd)
-        
-        if status != 200 : 
+
+        admin, status = accountBusiness.newAccount(
+            fullname, email, password, repassword, type_cd)
+
+        if status != 200:
             print("Sorry please try again with different properties' values")
-            print("____ FAIL TO CREATE ADMIN  ", admin.email, "______\n") 
+            print("____ FAIL TO CREATE ADMIN  ", admin.email, "______\n")
             return admin, status
 
         print("____ CREATE ADMIN SUCCESSFULLY ", admin.email, "______\n")
         accountBusiness.addAccount(admin)
-        return admin, status 
-    
+        return admin, status
+
     atexit.register(onClosingNode)
 
     # INIT CMD PARAM-------------------------------
@@ -705,7 +770,8 @@ if __name__ == "__main__":
     genport_flag = args.genport
 
     # SET NODE -------------------------------
-    node, code = dns.blockchain.nodes.handleNodeInformation(host, port, genport_flag, name)
+    node, code = dns.blockchain.nodes.handleNodeInformation(
+        host, port, genport_flag, name)
 
     print('___________ BLOCKCHAIN DNS CLI ______________ \n')
     print("Config Node Information : ")
@@ -721,7 +787,7 @@ if __name__ == "__main__":
         print('//----------------------------------------//')
         try:
             admin, status = createNodeAdminCLI(node)
-            if status != 200: 
+            if status != 200:
                 exit(0)
             dns.initBlockchain(node, admin)
             app.run(host=node.ip, port=node.port,
@@ -731,17 +797,17 @@ if __name__ == "__main__":
             onClosingNode()
     # - REGISTED NODE -------------------------------
     elif code == 201:
-        
+
         print('//----------------------------------------//')
         print('  WELCOME BACK NODE ', node.id[:-20] + '..xxx')
         print('//----------------------------------------//')
         try:
-            if not node.account_id :
+            if not node.account_id:
                 admin, status = createNodeAdminCLI(node)
-                if status != 200: 
+                if status != 200:
                     exit(0)
-            else :
-                print(" Admin: ",node.admin.email,"\n")
+            else:
+                print(" Admin: ", node.admin.email, "\n")
             dns.initBlockchain(node)
             app.run(host=node.ip, port=node.port,
                     debug=True, use_reloader=False)
@@ -754,5 +820,6 @@ if __name__ == "__main__":
             f"Return code #{code}: WRONG INFORMATION OR THIS NODE IS RUNNING \n")
         print("Please try again with 2 options bellow :")
         print("1. Append '-p' option to access program \n")
-        print("2. -p <port> ( port : must be from [ 5000, 5999 ] ) or -gp to generate random port ")
+        print(
+            "2. -p <port> ( port : must be from [ 5000, 5999 ] ) or -gp to generate random port ")
         print("   -h <host> ( host : must be same as IPv4 format )")

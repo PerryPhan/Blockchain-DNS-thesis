@@ -1,4 +1,4 @@
-#[domain] [type] [ip] [port] [ttl-Timetolive]
+#[domain] [type] [ip] [port] [ttl]
 michael.bit A  192.168.176.250 80 14400
 brooke.bit A  192.168.19.204 80 14400
 peter.bit A  192.168.153.197 80 14400

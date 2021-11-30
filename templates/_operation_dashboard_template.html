@@ -115,12 +115,12 @@
         </tbody>
       </table>
     </div>
+    {% if message %}
+      <h3 style="color: red">{{message}}</h3>
+      {% endif %}
     <div class="operation-box">
       <form class="typing-form animation" method="POST">
         <h1>Typing Form</h1>
-        {% if message %}
-        <h3 style="color: red">{{message}}</h3>
-        {% endif %}
         <div class="field domain-field">
           <h5 for="domain">Domain</h5>
           <input
@@ -312,9 +312,6 @@
       >
 
         <h1>File Form</h1>
-        {% if message %}
-        <h3 style="color: red">{{message}}</h3>
-        {% endif %}
 
         <div class="field files-field">
           <label for="file-upload" class="custom-file-upload">
@@ -330,12 +327,12 @@
             <ul>
             </ul>
           </div>
-          <input id="file-upload" type="file" name="file" multiple  accept="text/plain"  />
+          <input id="file-upload" type="file" name="file" multiple  accept="text/plain, .zone"  />
         </div>
 
         <div class="field submit-field">
           <button type="reset">Reset</button>
-          <button type="submit">OK</button>
+          <button type="submit" disabled>OK</button>
         </div>
       </form>
     </div>

@@ -251,6 +251,11 @@ class Message:
                 500: f'Don\'t have enough {inserted_value} transactions to start mining',
                 404: 'Something goes wrong with adding progress in mining',
                 200: 'Mine block successfully',
+            },
+            "TransactionAdding" :{
+                500: 'Wrong data or files format. Example of right format : xyz.com.zone',
+                202: f'Adding records successfully but { inserted_value }',
+                200: 'Adding records and convert to txs successfully'
             }
         }
         if action and action in messages :
