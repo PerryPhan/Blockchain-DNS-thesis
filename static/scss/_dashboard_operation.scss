@@ -3,7 +3,6 @@
   height: 520px;
   overflow: hidden;
   display: flex;
-  border: 2px solid rebeccapurple;
 
   form {
     padding: 15px;
@@ -11,10 +10,6 @@
 
     h1 {
       font-size: 24px;
-    }
-
-    &:first-child {
-      border-right: 1px solid black;
     }
 
     &.typing-form,
@@ -26,7 +21,17 @@
           font-size: 15px;
           padding-bottom: 10px;
         }
-
+        &.soa-field,
+        &.a-field,
+        &.ns-field,
+        &.domain-field {
+          input {
+            background-color: transparent;
+          }
+          h5 {
+            color: rgb(7, 53, 202);
+          }
+        }
         &.submit-field {
           margin-top: 5px;
           display: flex;
@@ -101,9 +106,87 @@
         }
 
         &.files-field {
-          height: 75%;
-          margin: 5px 0;
-          background-color: #dddddda2;
+          height: 80%;
+          width: 100%;
+          margin: 10px 0;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background: rgba(235, 255, 254, 0.993);
+          border-radius: 10px;
+
+          .file-name {
+            transition: .5s;
+            background-color: white;
+            height: 90%;
+            padding: 20px 0;
+            width: 160px;
+            border-radius: 10px;
+            max-height: 500px;
+            overflow: auto;
+            overflow-x: hidden;
+            h5{
+              padding: 0;
+              margin: 0;
+              text-align: center;
+            }
+            ul {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              padding: 10px;
+              text-align: center;
+              li {
+                list-style: none;
+                padding: 10px;
+                width: 120px;
+                margin-bottom: 10px;
+                background-color: rgb(100, 144, 245);
+                border-radius: 10px;
+                color: white;
+                background: linear-gradient(90deg, #4A8DF1 10.35%, rgba(63, 60, 210, 0.89) 76.65%);
+              }
+            }
+
+          }
+
+          #file-upload {
+            display: none;
+          }
+
+          .custom-file-upload {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: 0.5s;
+            margin-right: 100px;
+
+            img {
+              width: 130px;
+              height: 80px;
+              margin-bottom: 20px;
+            }
+            h3 {
+              border-radius: 10px;
+              padding: 10px 30px;
+              background-color: rgb(47, 87, 218);
+              margin-bottom: 10px;
+              color: white;
+            }
+            h5 {
+              max-width: 200px;
+              text-align: center;
+              color: rgba(37, 37, 37, 0.541);
+            }
+
+            &:hover {
+              transform: scale(1.1);
+              h5 {
+                color: rgb(7, 53, 202);
+              }
+            }
+          }
         }
       }
     }

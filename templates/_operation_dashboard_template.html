@@ -1,5 +1,4 @@
-{% extends 'dashboard_template.html' %} 
-{% block main %}
+{% extends 'dashboard_template.html' %} {% block main %}
 <div class="operation main">
   <div class="aside animation asideSlidetoRight">
     <div class="tab-title {% if type == 1 %} active {% endif %}">
@@ -311,16 +310,29 @@
         method="POST"
         enctype="multipart/form-data"
       >
+
         <h1>File Form</h1>
         {% if message %}
         <h3 style="color: red">{{message}}</h3>
         {% endif %}
+
         <div class="field files-field">
           <label for="file-upload" class="custom-file-upload">
-            <i class="fa fa-cloud-upload"></i> Custom Upload
-        </label>
-        <input id="file-upload" type="file"/>
+            <img
+              src="{{url_for('static',filename='img/file-input-hero.png')}}"
+              alt="file-uploader"
+            />
+            <h3>Upload files</h3>
+            <h5>Only accept file have right format like typing</h5>
+          </label>
+          <div class="file-name">
+            <h5>Empty</h5>
+            <ul>
+            </ul>
+          </div>
+          <input id="file-upload" type="file" name="file" multiple  accept="text/plain"  />
         </div>
+
         <div class="field submit-field">
           <button type="reset">Reset</button>
           <button type="submit">OK</button>

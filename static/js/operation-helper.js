@@ -7,6 +7,7 @@ NS_HOST_2 = $('input[name=ns_host2]') ;
 A_NAME_1  = $('input[name=a_name_1]') ;
 A_NAME_2  = $('input[name=a_name_2]') ;
 A_NAME_3  = $('input[name=a_name_3]') ;
+
 // Handling
 function checkDomainInput(domain){
     if ( domain != ''){
@@ -34,12 +35,18 @@ DOMAIN.on('input',function(e){
     domain = e.target.value;
     checkDomainInput(domain) 
 })
+var file_name_h5 = $('.file-name h5')
+var file_list_ul = $('.file-name ul') 
 
-// $('.typing-form').on('mouseover', function(){
-//     $('.files-form').addClass('blur-screen')
-//     $(this).removeClass('blur-screen')
-// })
-// $('.files-form').on('mouseover', function(){
-//     $('.typing-form').addClass('blur-screen')
-//     $(this).removeClass('blur-screen')
-// })
+$('.files-field #file-upload').on('input',function(e){
+    file_name_h5.text('File List')
+    // Get
+    new_file_name_split_list = e.target.value.split('\\');
+    new_file_name = new_file_name_split_list[new_file_name_split_list.length -1 ]
+    // Set
+    file_list_ul.append(`<li>${new_file_name}</li>`)    
+})
+$('.files-form .submit-field button[type=reset]').on('click',function(){
+    file_name_h5.text('Empty')
+    file_list_ul.html('')    
+})

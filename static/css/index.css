@@ -1648,7 +1648,6 @@ body {
   height: 520px;
   overflow: hidden;
   display: flex;
-  border: 2px solid rebeccapurple;
 }
 .dashboard.container .main.operation .operation-box form {
   padding: 15px;
@@ -1657,15 +1656,18 @@ body {
 .dashboard.container .main.operation .operation-box form h1 {
   font-size: 24px;
 }
-.dashboard.container .main.operation .operation-box form:first-child {
-  border-right: 1px solid black;
-}
 .dashboard.container .main.operation .operation-box form.typing-form .field, .dashboard.container .main.operation .operation-box form.files-form .field {
   padding: 5px 0;
 }
 .dashboard.container .main.operation .operation-box form.typing-form .field h5, .dashboard.container .main.operation .operation-box form.files-form .field h5 {
   font-size: 15px;
   padding-bottom: 10px;
+}
+.dashboard.container .main.operation .operation-box form.typing-form .field.soa-field input, .dashboard.container .main.operation .operation-box form.typing-form .field.a-field input, .dashboard.container .main.operation .operation-box form.typing-form .field.ns-field input, .dashboard.container .main.operation .operation-box form.typing-form .field.domain-field input, .dashboard.container .main.operation .operation-box form.files-form .field.soa-field input, .dashboard.container .main.operation .operation-box form.files-form .field.a-field input, .dashboard.container .main.operation .operation-box form.files-form .field.ns-field input, .dashboard.container .main.operation .operation-box form.files-form .field.domain-field input {
+  background-color: transparent;
+}
+.dashboard.container .main.operation .operation-box form.typing-form .field.soa-field h5, .dashboard.container .main.operation .operation-box form.typing-form .field.a-field h5, .dashboard.container .main.operation .operation-box form.typing-form .field.ns-field h5, .dashboard.container .main.operation .operation-box form.typing-form .field.domain-field h5, .dashboard.container .main.operation .operation-box form.files-form .field.soa-field h5, .dashboard.container .main.operation .operation-box form.files-form .field.a-field h5, .dashboard.container .main.operation .operation-box form.files-form .field.ns-field h5, .dashboard.container .main.operation .operation-box form.files-form .field.domain-field h5 {
+  color: #0735ca;
 }
 .dashboard.container .main.operation .operation-box form.typing-form .field.submit-field, .dashboard.container .main.operation .operation-box form.files-form .field.submit-field {
   margin-top: 5px;
@@ -1724,9 +1726,81 @@ body {
   border-bottom: 2px solid rebeccapurple;
 }
 .dashboard.container .main.operation .operation-box form.typing-form .field.files-field, .dashboard.container .main.operation .operation-box form.files-form .field.files-field {
-  height: 75%;
-  margin: 5px 0;
-  background-color: #dddddda2;
+  height: 80%;
+  width: 100%;
+  margin: 10px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(235, 255, 254, 0.993);
+  border-radius: 10px;
+}
+.dashboard.container .main.operation .operation-box form.typing-form .field.files-field .file-name, .dashboard.container .main.operation .operation-box form.files-form .field.files-field .file-name {
+  transition: 0.5s;
+  background-color: white;
+  height: 90%;
+  padding: 20px 0;
+  width: 160px;
+  border-radius: 10px;
+  max-height: 500px;
+  overflow: auto;
+  overflow-x: hidden;
+}
+.dashboard.container .main.operation .operation-box form.typing-form .field.files-field .file-name h5, .dashboard.container .main.operation .operation-box form.files-form .field.files-field .file-name h5 {
+  padding: 0;
+  margin: 0;
+  text-align: center;
+}
+.dashboard.container .main.operation .operation-box form.typing-form .field.files-field .file-name ul, .dashboard.container .main.operation .operation-box form.files-form .field.files-field .file-name ul {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+  text-align: center;
+}
+.dashboard.container .main.operation .operation-box form.typing-form .field.files-field .file-name ul li, .dashboard.container .main.operation .operation-box form.files-form .field.files-field .file-name ul li {
+  list-style: none;
+  padding: 10px;
+  width: 120px;
+  margin-bottom: 10px;
+  background-color: #6490f5;
+  border-radius: 10px;
+  color: white;
+  background: linear-gradient(90deg, #4A8DF1 10.35%, rgba(63, 60, 210, 0.89) 76.65%);
+}
+.dashboard.container .main.operation .operation-box form.typing-form .field.files-field #file-upload, .dashboard.container .main.operation .operation-box form.files-form .field.files-field #file-upload {
+  display: none;
+}
+.dashboard.container .main.operation .operation-box form.typing-form .field.files-field .custom-file-upload, .dashboard.container .main.operation .operation-box form.files-form .field.files-field .custom-file-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: 0.5s;
+  margin-right: 100px;
+}
+.dashboard.container .main.operation .operation-box form.typing-form .field.files-field .custom-file-upload img, .dashboard.container .main.operation .operation-box form.files-form .field.files-field .custom-file-upload img {
+  width: 130px;
+  height: 80px;
+  margin-bottom: 20px;
+}
+.dashboard.container .main.operation .operation-box form.typing-form .field.files-field .custom-file-upload h3, .dashboard.container .main.operation .operation-box form.files-form .field.files-field .custom-file-upload h3 {
+  border-radius: 10px;
+  padding: 10px 30px;
+  background-color: #2f57da;
+  margin-bottom: 10px;
+  color: white;
+}
+.dashboard.container .main.operation .operation-box form.typing-form .field.files-field .custom-file-upload h5, .dashboard.container .main.operation .operation-box form.files-form .field.files-field .custom-file-upload h5 {
+  max-width: 200px;
+  text-align: center;
+  color: rgba(37, 37, 37, 0.541);
+}
+.dashboard.container .main.operation .operation-box form.typing-form .field.files-field .custom-file-upload:hover, .dashboard.container .main.operation .operation-box form.files-form .field.files-field .custom-file-upload:hover {
+  transform: scale(1.1);
+}
+.dashboard.container .main.operation .operation-box form.typing-form .field.files-field .custom-file-upload:hover h5, .dashboard.container .main.operation .operation-box form.files-form .field.files-field .custom-file-upload:hover h5 {
+  color: #0735ca;
 }
 
 /*# sourceMappingURL=index.css.map */

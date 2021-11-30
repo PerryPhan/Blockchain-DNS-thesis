@@ -298,11 +298,11 @@ def dashboard_operation():
     def checkFileNameFormat(filename):
         # Check file name
         if filename == '':
-            return render_template('_operation_dashboard_template.html', error_message=MESSAGE['FileError02']), 404
+            return filename, 404
 
         # Check file extension
         if checkFileExtension(filename) == False:
-            return render_template('_operation_dashboard_template.html', error_message=MESSAGE['FileError03']), 404
+            return filename, 500
 
         # Format that filename can store any where
         filename = secure_filename(filename)
@@ -318,19 +318,26 @@ def dashboard_operation():
         
         return tran, status
 
-    def handleMultipleRecordsForm(file):
-        filename, status = checkFileNameFormat(file.filename)
-        if status != 200:
-            return status
+    def handleMultipleRecordsForm(files):
+        files_list_obj = {}
+        for file in files:
+            # Check 
+            filename, status = checkFileNameFormat(file.filename)
+            print(filename, status)
+            if status != 200 :
+                files_list_obj[filename] = False
+            else :
+            # Save
+                files_list_obj[filename] = True
+                file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(file_path)
 
-        # Check uploads folder
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-
-        # Open file and add the content to TRANSACTION
-        with open(file_path, "r", encoding="utf-8") as f:
-            #    Do like 1 form
-            return 200
+        # # Open file and add the content to TRANSACTION
+        # with open(file_path, "r", encoding="utf-8") as f:
+        #     #    Do like 1 form
+        #     return 200
+        print( [ value for value in files_list_obj.values()] )
+        return any( [ value for value in files_list_obj.values()] )
 
     # Check account
     if not session or not 'account' in session:
@@ -349,15 +356,14 @@ def dashboard_operation():
 
     if request.method == 'POST':
         status = 0
-        if 'file' in request.files:
-            status = handleMultipleRecordsForm(request.files['file'])
-
+        
+        if request.files.getlist('file'):
+            files = request.files.getlist('file')
+            
             return {
-                'status': status,
-                'form': request.form,
-                'file':  request.files['file'].filename
+                'status': 200,
+                'handle': handleMultipleRecordsForm(files)
             }
-
         tran, status = handleOneRecordForm(request.form)
         return {
             'status': status,
