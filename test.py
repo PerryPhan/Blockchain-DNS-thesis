@@ -215,18 +215,31 @@ def checkTransactionFormat( domain, a, soa = None, ns = None, account_id = None)
 import os 
 # os.system('run_server.sh')
 
-food = 0 
-import threading
+# food = 0 
+# import threading
 
-def setInterval(func,time):
-    e = threading.Event()
-    while not e.wait(time):
-        func()
+# def setInterval(func,time):
+#     e = threading.Event()
+#     while not e.wait(time):
+#         func()
 
-def foo():
-    global food
-    food += 2
-    print( food )
+# def foo():
+#     global food
+#     food += 2
+#     print( food )
 
-# using
-setInterval(foo,2)
+# # using
+# setInterval(foo,2)
+
+import getpass
+# print('Fullname')
+# y = input()
+# x = getpass.getpass("Input something: ")
+# print(x)
+# i = 4
+# id = 'e09b8e14f720481a87cb929507d504a9'
+# print (id[ i : i + 4 ])
+# exit(0)
+
+if True :
+    a = 1

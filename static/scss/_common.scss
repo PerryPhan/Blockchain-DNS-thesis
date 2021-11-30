@@ -7,6 +7,16 @@
     transition: .2s;
 }
 
+.createdby {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  
+    svg {
+      margin-left: 10px;
+    }
+  }
+  
 h1 {
     font-size: 30px;
 }

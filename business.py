@@ -27,7 +27,10 @@ class DNSResolver:
         self.blockchain = Blockchain()
         pass
 
-    def initBlockchain(self, node):
+    def initBlockchain(self, node, admin = None):
+        if admin :
+            node.account_id = admin.id
+            self.blockchain.nodes.updateNode(node)
         self.blockchain.nodes.setNode(node)
         self.blockchain.loadChain()
 
@@ -388,6 +391,12 @@ class TransactionBusiness:
 
         return all([checked[key] for key in checked.keys()])
 
+    def countAllTransactions(self):
+        return db.session.query(Transactions).count()
+
+    def getListTransactionstsWithOffsetAndLimit(self, offset, limit ):
+        return db.session.query(Transactions).order_by(Transactions.timestamp.asc()).offset(offset).limit(limit).all()
+
     def correctFormat(self, obj):
         obj['soa']['refresh'] = int(obj['soa']['refresh']) if type(
             obj['soa']['refresh']) != int else obj['soa']['refresh']
@@ -460,10 +469,11 @@ class TransactionBusiness:
     def getAllTransactions(self):
         return Transactions.query.all()
 
-    def getDomainList(self):
-        # TODO : Pool + Blockchain
+    def getDomainList(self, from_transactions_list = None):
         records = []
-        for transaction in self.getAllTransactions():
+        if from_transactions_list : 
+            from_transactions_list = self.getAllTransactions()
+        for transaction in from_transactions_list:
             # TODO : Add + Update Tx
             if transaction.action == 'add':
                 records.append(Records(transaction))
@@ -476,6 +486,7 @@ class TransactionBusiness:
 
     def getTransactionById(self, id):
         return Transactions.query.filter(Transactions.id == id).first()
+
 # NodeBusiness  -----------------------------------
 
 
@@ -504,11 +515,17 @@ class NodesBusiness:
     def getNetworkWithOffsetAndLimit(self, offset, limit):
         return db.session.query(Nodes).filter(Nodes.is_deleted == False).order_by(Nodes.timestamp.asc()).offset(offset).limit(limit).all()
     
-    def getNetworkCount(self):
+    def countNetwork(self):
         return db.session.query(Nodes).filter(Nodes.is_deleted == False).count()
     
     def getActiveNetwork(self):
         return db.session.query(Nodes).filter(Nodes.is_active == True, Nodes.is_deleted == False).all()
+
+    def getNodeWithNodename(self, nodename):
+        return db.session.query(Nodes).filter(
+            Nodes.nodename == nodename,
+            Nodes.is_deleted == False
+        ).all()
 
     def getNodeWithIP(self, ip):
         return db.session.query(Nodes).filter(
@@ -535,7 +552,7 @@ class NodesBusiness:
             return self.updateNode(node)
         return node
 
-    def handleNodeInformation(self, ip: str, port: int, nodename=''):
+    def handleNodeInformation(self, ip: str, port: int, genport_flag = False, nodename=None):
         """
             Handle 5 Cases :
                 Empty network  : Create OK
@@ -546,6 +563,7 @@ class NodesBusiness:
         """
         network = self.getNetwork()  # Found all node ( not-working status )
         id = str(uuid4()).replace('-', '')
+        
         if not network:  # 1. Empty network, create new
             return self.registerNode(
                 id,
@@ -577,10 +595,12 @@ class NodesBusiness:
                 anotherNode = [
                     node for node in nodeIP if node.is_active == False and node.ip == nodeIPPort.ip]
                 if len(anotherNode) <= 0:  # No node same IP spared
+                    if genport_flag == True :
+                        port = random.randint(self.PORT_START, self.PORT_END)
                     return self.registerNode(
                         id,
                         ip,
-                        random.randint(self.PORT_START, self.PORT_END),
+                        port,
                         nodename,
                         True
                     )
@@ -601,7 +621,7 @@ class NodesBusiness:
         if not node.id or len(node.id) > 40:
             checked = False
         # Check nodename ( null, 64 chars)
-        if len(node.nodename) > 64:
+        if not node.nodename or len(node.nodename) > 64:
             checked = False
         # Check IP ( not null, 16 chars, match regex )
         if not node.ip or len(node.ip) > 16:
@@ -614,9 +634,17 @@ class NodesBusiness:
         # Check duplicate
         if noCheckDuplicate and self.getNodeWithIPAndPort(node.ip, node.port):
             checked = False
+
         return checked
 
-    def registerNode(self, id: str, ip: str, port: int, nodename='', is_active=False):
+    def registerNode(self, id: str, ip: str, port: int, nodename=None, is_active=False):
+        if not nodename:
+            i = 0
+            while (True) :
+                nodename = 'Node '+ id[ i : i + 4 ] 
+                if not self.getNodeWithNodename(nodename):
+                    break
+
         node = Nodes(
             id=id,
             ip=ip,
@@ -646,7 +674,7 @@ class NodesBusiness:
                 Nodes.id == node.id,
                 Nodes.is_deleted == False
             ).update({
-                "ip": node.ip, "port": node.port, "nodename": node.nodename, "is_active": node.is_active
+                "ip": node.ip, "port": node.port, "nodename": node.nodename, "is_active": node.is_active, "account_id": node.account_id
             })
             db.session.commit()
             return node, 200
@@ -686,6 +714,12 @@ class AccountBusiness:
 
     def getListAccounts(self):
         return Accounts.query.order_by(Accounts.id).all()
+
+    def countListAccounts(self):
+        return db.session.query(Accounts).filter(Accounts.is_deleted == False).count()
+
+    def getListAccountsWithOffsetAndLimit(self, offset, limit ):
+        return db.session.query(Accounts).filter(Accounts.is_deleted == False).order_by(Accounts.timestamp.asc()).offset(offset).limit(limit).all()
 
     def authenticateAccount(self, email, password):
         status = 405

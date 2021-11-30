@@ -41,15 +41,16 @@
   <div class="common">
     <div class="top">
       <h3>Accounts</h3>
+      <h5>Total: {{count or '0'}}</h5>
       <div class="right">
         <div class="paginator">
           <div class="btn-box">
             <div class="first-side">
               <span>
-                <a href="#">First</a>
+                <a href="{% if pages == 1 %} # {% else %}./accounts {% endif %}">First</a>
               </span>
               <span>
-                <a href="#" id="a-table-previous" class="nohref"
+                <a href="{% if pages == 1 %} # {% else %} {% if page == 1 %} # {% else %} ./accounts?page={{previous_page}} {% endif %} {% endif %}" id="a-table-previous" class="nohref"
                   ><img src="{{url_for('static',filename='img/arrow-left-icon.png')}}" alt="left-icon" /></a
               ></span>
             </div>
@@ -60,12 +61,12 @@
             </div>
             <div class="last-side">
               <span>
-                <a href="#" id="a-table-next">
+                <a href="{% if pages == 1 %} # {% else %} {% if page == pages %} # {% else %}./accounts?page={{next_page}} {% endif %} {% endif %}" id="a-table-next">
                   <img src="{{url_for('static',filename='img/arrow-right-icon.png')}}" alt="right-icon"
                 /></a>
               </span>
               <span>
-                <a href="#">Last</a>
+                <a href="{% if pages == 1 %} # {% else %}./accounts?page={{pages}} {% endif %}">Last</a>
               </span>
             </div>
           </div>
@@ -84,24 +85,27 @@
       </div>
     </div>
     <div class="content full-page">
+      {% for account in list_of_accounts %}
       <!-- ITEMS -->
       <div class="items account common animation slidetoLeft">
-        
         <div class="flex id-hash">
           <div class="label">ID:</div>
-          <div class="value">2d9783223ce2a1112e1ba5f59c5412312</div>
-          <div class="status blue"> Hoster </div>
+          <div class="value">{{account.id}}</div>
+          <div class="status {% if account.type_cd == 2 %} blue {% else %} purple {% endif %}"> 
+            {% if account.type_cd == 2 %} Hoster {% else %} Admin {% endif %}  
+          </div>
         </div>
         <div class="flex data">
           <div class="label">Data:</div>
           <div class="value">
-            Fullname : <span>Phan Dai</span>
-            Email : <span>daiphan308@gmail.com</span>
+            Fullname : <span>{{account.fullname}}</span>
+            Email : <span>{{account.email}}</span>
           </div>
-          <div class="datetime">Nov 20th, 2021</div>
+          <div class="datetime">{{account.datetime_format()}}</div>
         </div>
       </div>
       <!-- END ITEMS -->
+      {% endfor %}
     </div>
   </div>
 </main>
@@ -110,7 +114,7 @@
   <div class="part-head">
     <h4>This Account Information</h4>
     <div class="edit-box">
-      <button class="btn-edit">
+      <!-- <button class="btn-edit">
         Edit
         <svg width="23" height="22" viewBox="0 0 23 22" fill="none">
           <path d="M11.4998 1.83325C6.20984 1.83325 1.9165 5.93992 1.9165 10.9999C1.9165 16.0599 6.20984 20.1666 11.4998 20.1666C16.7898 20.1666 21.0832 16.0599 21.0832 10.9999C21.0832 5.93992 16.7898 1.83325 11.4998 1.83325ZM12.4582 15.5833H10.5415V10.0833H12.4582V15.5833ZM12.4582 8.24992H10.5415V6.41659H12.4582V8.24992Z" fill="#9F38A7"/>
@@ -121,7 +125,7 @@
         <svg  width="24" height="24" viewBox="0 0 24 24" fill="none">
           <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM17 13H7V11H17V13Z" fill="#D20C0C"/>
           </svg>
-      </button>
+      </button> -->
   </div>
 </div>
   <div class="common account-info">

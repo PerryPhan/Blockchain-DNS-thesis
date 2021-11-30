@@ -38,6 +38,7 @@
                     position: absolute;
                     display: flex;
                     align-items: center;
+                    z-index: 1;
                 }
 
                 img {
@@ -49,6 +50,10 @@
                     font-size: $login-logo-text-size;
                     font-weight: bold;
                     color: $login-logo-text-color;
+                    a{
+                        text-decoration: none;
+                        color: inherit;
+                    }
                 }
 
 

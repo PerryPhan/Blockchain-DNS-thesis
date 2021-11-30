@@ -102,7 +102,7 @@ class Accounts(db.Model):
     is_deleted = db.Column(db.Boolean, nullable=False)
     # ==============
     transactions = db.relationship('Transactions', backref="owner")
-    node = db.relationship('Nodes', backref="admin")
+    node = db.relationship('Nodes', backref="admin", uselist=False)
     # To String 
 
     def as_dict(self):

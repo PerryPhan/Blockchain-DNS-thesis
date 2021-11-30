@@ -21,6 +21,10 @@
     <div class="tab-title {% if type == 3 %} active {% endif %}">
       <a href="./operation"><h3>Operation</h3></a>
     </div>
+    {% else %}
+    <div class="gotoadmin-box">
+      <a id="gotoadmin" href="../admin"> Login with admin right </a>
+    </div>
     {% endif %}
   </div>
   <div class="table-side">
@@ -114,9 +118,8 @@
               {{transaction.action or ''}}
             </td>
             <td class="block-field">{{transaction.block_id or ''}}</td>
-            <td class="time-field">
-              {{transaction.datetime_format() or ''}}</td>
-            <td class="status-field ">
+            <td class="time-field">{{transaction.datetime_format() or ''}}</td>
+            <td class="status-field">
               {% if transaction.block_id %}
               <div class="status success">Success</div>
               {% else %}
@@ -124,9 +127,7 @@
               {% endif %}
             </td>
             <td class="from-field">
-              <a href="#">
-                {{transaction.owner.fullname or ''}}
-              </a>
+              <a href="#"> {{transaction.owner.fullname or ''}} </a>
             </td>
             <td class="to-field">
               <a href="#">{{ node.nodename or '' }}</a>
@@ -180,43 +181,79 @@
       </table>
     </div>
     <div class="pagination">
+      {% if type == 1 %}
       <div class="btn-box">
         <div class="first-side">
           <span>
-            <a href="/table">First</a>
+            <a href="{% if pages == 1 %} # {% else %}./transactions {% endif %}">First</a>
           </span>
           <span>
-            <a href="#" id="a-table-previous" class="nohref"
+            <a href="{% if pages == 1 %} # {% else %} {% if page == 1 %} # {% else %} ./transactions?page={{previous_page}} {% endif %} {% endif %}" id="a-table-previous" class="nohref"
               ><img
                 src="{{url_for('static',filename='img/arrow-left-icon.png')}}"
                 alt="left-icon" /></a
           ></span>
         </div>
         <div class="index-side">
-          <span id="span-table-index-page"></span>
+          <span id="span-table-index-page">{{ page }}</span>
           <span>/</span>
-          <span id="span-table-total-page"></span>
+          <span id="span-table-total-page">{{ pages }}</span>
         </div>
         <div class="last-side">
           <span>
-            <a href="#" id="a-table-next">
+            <a href="{% if pages == 1 %} # {% else %} {% if page == pages %} # {% else %}./transactions?page={{next_page}} {% endif %} {% endif %}" id="a-table-next">
               <img
                 src="{{url_for('static',filename='img/arrow-right-icon.png')}}"
                 alt="right-icon"
             /></a>
           </span>
           <span>
-            <a href="/table">Last</a>
+            <a href="{% if pages == 1 %} # {% else %}./transactions?page={{pages}} {% endif %}">Last</a>
           </span>
         </div>
       </div>
+      {% else %}
+      <div class="btn-box">
+        <div class="first-side">
+          <span>
+            <a href="{% if pages == 1 %} # {% else %}./domains {{pages}} {% endif %}">First</a>
+          </span>
+          <span>
+            <a href="{% if pages == 1 %} # {% else %} {% if page == 1 %} # {% else %} ./domains?page={{previous_page}} {% endif %} {% endif %}" id="a-table-previous" class="nohref"
+              ><img
+                src="{{url_for('static',filename='img/arrow-left-icon.png')}}"
+                alt="left-icon" /></a
+          ></span>
+        </div>
+        <div class="index-side">
+          <span id="span-table-index-page">{{ page }}</span>
+          <span>/</span>
+          <span id="span-table-total-page">{{ pages }}</span>
+        </div>
+        <div class="last-side">
+          <span>
+            <a href="{% if pages == 1 %} # {% else %} {% if page == pages %} # {% else %}./domains?page={{next_page}} {% endif %} {% endif %}" id="a-table-next">
+              <img
+                src="{{url_for('static',filename='img/arrow-right-icon.png')}}"
+                alt="right-icon"
+            /></a>
+          </span>
+          <span>
+            <a href="{% if pages == 1 %} # {% else %}./domains?page={{pages}} {% endif %}">Last</a>
+          </span>
+        </div>
+      </div>
+      {% endif%}
     </div>
     <p class="createdby">
       This project is made by Phan Dai
-      <img
-        src="{{url_for('static',filename='img/dai-brand-icon.png')}}"
-        alt="pd-icon"
-      />
+      <svg width="27" height="24" viewBox="0 0 27 24" fill="none">
+        <rect x="0.604492" width="25.4788" height="24" rx="5" fill="#8165FF" />
+        <path
+          d="M7.2832 8.95898V18.0521C7.2832 18.5856 7.59499 19.0698 8.08063 19.2906C8.98144 19.7002 10.0042 19.0416 10.0042 18.0521V10.7622C10.0042 8.50801 11.8316 6.68063 14.0858 6.68063C15.6937 6.68063 17.0542 8.41259 17.0542 10.392C17.0542 11.1303 16.819 11.708 16.4577 12.1636C15.5928 13.2542 14.0858 12.1829 14.0858 10.791V10.2396C14.0858 9.73388 13.7779 9.27911 13.3084 9.09125C12.496 8.7662 11.6121 9.36453 11.6121 10.2396V13.2814C11.6121 15.1018 13.0878 16.5775 14.9082 16.5775H15.2954C15.5602 16.5775 15.826 16.5555 16.0755 16.4671C17.4628 15.9752 19.6516 14.2679 19.6516 10.392C19.6516 6.74893 17.718 4.9009 16.3337 4.21151C15.9239 4.00745 15.4616 3.95898 15.0038 3.95898H12.2832C9.52178 3.95898 7.2832 6.19756 7.2832 8.95898Z"
+          stroke="white"
+        />
+      </svg>
     </p>
   </div>
 </div>

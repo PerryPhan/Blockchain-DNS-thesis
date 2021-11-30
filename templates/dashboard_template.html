@@ -1,9 +1,8 @@
 {% extends 'template.html' %} {% block title %} {{ title or '' }} {% endblock %}
 {% block body %}
 <div class="dashboard container">
-
     {% block addtxbutton_modal %}
-    {% if account_id %}
+    {% if account_id and type != 3 %}
     <div class="add-tx-button-group modal">
         <a href="./operation">
         <div class="call-to-action">
@@ -55,9 +54,15 @@
         <div class="right">
         <div class="user">
             <div class="hello">
-            Hi. {% if account_id %}
-            <div class="name">{{ account_fullname or ''}}</div>
-            <div class="type hoster">Hoster</div>
+            Hi. 
+            {% if account_id %}
+                {% if type_cd == 2 %}
+                <div class="name">{{ account_fullname or ''}}</div>
+                <div class="type hoster">Hoster</div>
+                {% else %}    
+                <div class="name">{{ account_fullname or ''}}</div>
+                <div class="type admin">Admin</div>
+                {% endif %}    
             {% else %}
             <div class="name">Guest</div>
             <div class="type client">Client</div>
@@ -88,7 +93,6 @@
         </div>
     </div>
     {% endblock %}
-
 
     {% block main %} {% endblock %}
 

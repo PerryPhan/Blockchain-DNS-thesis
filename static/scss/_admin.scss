@@ -664,6 +664,10 @@
                       color: $dashboard-user-type-hoster-color;
                     }
 
+                    &.purple {
+                      color: $admin-right-genesis-h4-text-color;
+                    }
+
                     &.grey {
                       color: $admin-right-unactivated-text-color;
                     }
@@ -683,15 +687,5 @@
         }
       }
     }
-  }
-}
-
-.createdby {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  svg {
-    margin-left: 10px;
   }
 }

@@ -150,6 +150,10 @@
             background-color: ($dashboard-user-type-hoster-color);
           }
 
+          &.admin{
+            background-color: ($admin-right-genesis-h4-text-color);
+          }
+
           &.client {
             background-color: ($dashboard-user-type-client-color);
           }
@@ -175,11 +179,27 @@
 }
 
 @mixin dashb-aside {
+  position: relative;
   overflow: hidden;
   width: 0%;
   height: 100%;
   background-color: #465a65;
-
+  .gotoadmin-box{
+    position: absolute;
+    left: 30px;
+    bottom: 150px;
+    background: #ac27b6;
+    padding: 15px;
+    border-radius: 10px;
+    transition: .3s;
+    &:hover{
+      transform: scale(1.1);
+    }
+  }
+  #gotoadmin{
+    text-decoration: none;
+    color: white;
+  }
   .tab-title {
     cursor: pointer;
     color: white;
@@ -285,6 +305,8 @@
     }
 
     .first-side {
+      display: flex;
+      align-items: center;
       span {
         font-weight: 600;
         color: ($dashboard-hovered-tab-title-after-bgcolor);
@@ -297,6 +319,8 @@
     }
 
     .index-side {
+      display: flex;
+      align-items: center;
       span {
         margin: 0 5px;
         color: grey;
@@ -308,6 +332,8 @@
     }
 
     .last-side {
+      display: flex;
+      align-items: center;
       span {
         color: ($dashboard-hovered-tab-title-after-bgcolor);
         margin: 0 15px;

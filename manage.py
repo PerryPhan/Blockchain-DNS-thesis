@@ -1,3 +1,4 @@
+from re import split
 from werkzeug.wrappers import response
 from include import *
 from business import *
@@ -6,17 +7,31 @@ from business import *
 # Declare -------------------------------------------------
 accountBusiness = AccountBusiness()
 dns = DNSResolver()
-# FRONT --------------------------------------------------
-
-
+# -FRONT --------------------------------------------------
+# FOR INDEX 
+# --------------------------------------------------
 @app.route('/')
 def home():
     return redirect('/dashboard/transactions')
 
+
 @app.route('/admin')
 def manager():
-    return redirect('/admin/blocktxs')
+    if session:
+        if 'account' in session:
+            if session['account']['type_cd'] == 1 : #admin access
+                account_options = {
+                    'account_id': session['account']['id'],
+                    'account_fullname': session['account']['fullname']
+                }
+            return redirect('/admin/blocktxs')
+    session['regis_email'] = dns.blockchain.nodes.getNode().admin.email
+    
+    return redirect('/login')
 
+# -FRONT --------------------------------------------------
+# FOR ADMIN 
+# --------------------------------------------------
 @app.route('/admin/blocktxs', methods=['GET', 'POST'])
 def blocks_txs_manager():
     # How to know that is his first time => This onl IP was his computer and don't have this email in DB
@@ -47,23 +62,31 @@ def blocks_txs_manager():
 def nodes_manager():
     # How to know that is his first time => This onl IP was his computer and don't have this email in DB
     # If he try to log again will be email and password empty
-    count = dns.blockchain.nodes.getNetworkCount()
+    count = dns.blockchain.nodes.countNetwork()
     limit= 7
-    
-    # Page
-    page = request.args.get('page', default = 1, type = int)
-    pages= math.ceil( count / limit )
-    
-    # Condition
-    if page < 0 : page = 1
-    if page > pages : page = pages
 
-    # Number
-    start = (page-1) * limit
-    end =  start + limit if ( start + limit ) < count else count
-    
-    list_of_nodes = dns.blockchain.nodes.getNetworkWithOffsetAndLimit(start, limit)
-    this_node = dns.blockchain.nodes.getNode()
+    # Default 
+    page = 1 
+    pages = 1
+    offset = 0
+    list_of_nodes = []
+    this_node = None
+
+    # Has items
+    if count > 0 : 
+        # Page
+        page = request.args.get('page', default = 1, type = int)
+        pages= math.ceil( count / limit )
+        
+        # Condition
+        if page <= 0 : page = 1
+        if page > pages : page = pages
+
+        # Number
+        offset = (page-1) * limit
+        
+        list_of_nodes = dns.blockchain.nodes.getNetworkWithOffsetAndLimit(offset, limit)
+        this_node = dns.blockchain.nodes.getNode()
     
     html_options = {
         'title': 'Nodes manager',
@@ -82,42 +105,88 @@ def nodes_manager():
 def account_manager():
     # How to know that is his first time => This onl IP was his computer and don't have this email in DB
     # If he try to log again will be email and password empty
+    count = accountBusiness.countListAccounts()
+    limit= 7
+
+    # Default 
+    page = 1 
+    pages = 1
+    offset = 0
+    list_of_accounts = []
+
+    # Has items
+    if count > 0 : 
+        # Page
+        page = request.args.get('page', default = 1, type = int)
+        pages= math.ceil( count / limit )
+        
+        # Condition
+        if page <= 0 : page = 1
+        if page > pages : page = pages
+
+        # Number
+        offset = (page-1) * limit
+        
+        list_of_accounts = accountBusiness.getListAccountsWithOffsetAndLimit(offset, limit)
+        # this_node = accountBusiness.()
+    
+    
     html_options = {
-        'title': 'Accounts manager',
+        'title': 'Nodes manager',
+        'page' : page,
+        'previous_page': page - 1 if page - 1 > 1 else 1,
+        'next_page': page + 1 if page + 1 < pages else pages,
+        'pages': pages,
+        'count': count,
+        'list_of_accounts': list_of_accounts, 
+        # 'this_node': this_node,
     }
-    if request.method == 'POST':
-        # If the first time login in
-        fullname = request.form.get('fullname')
-        email = request.form.get('email')
-        password = request.form.get('password')
-        repassword = request.form.get('repassword')
-        type_cd = 1
-
-        # else show login form
-        account, status = accountBusiness.newAccount(
-            fullname, email, password, repassword, type_cd)
-
-        return {
-            'status': status,
-            'account': account.as_dict() if account else None,
-        }
 
     return render_template('_admin_accounts_manager_template.html', **html_options)
 
-
+# -FRONT --------------------------------------------------
+# FOR DASHBOARD 
+# --------------------------------------------------
 @app.route('/dashboard/transactions')
 def dashboardTransactions():
-    list = dns.blockchain.transactions.getAllTransactions()
-    noblocklist = dns.blockchain.transactions.getNoBlockTransactions()
+    # Pagination
+    count = dns.blockchain.transactions.countAllTransactions()
+    limit = 7
+
+    # Default 
+    page = 1 
+    pages = 1
+    offset = 0
+    list = []
+
+    # Has items
+    if count > 0 : 
+        # Page
+        page = request.args.get('page', default = 1, type = int)
+        pages= math.ceil( count / limit )
+        
+        # Condition
+        if page <= 0 : page = 1
+        if page > pages : page = pages
+
+        # Number
+        offset = (page-1) * limit
+        list = dns.blockchain.transactions.getListTransactionstsWithOffsetAndLimit(offset, limit)
+
     html_options = {
         'type': 1,
         'title': 'Transaction Dashboard ',
-        'count': len(list) if list else 0,
         'unit': 'tx',
+        # Pagination
         'list': list,
-        'no_block_list_count': len(noblocklist),
         'node': dns.blockchain.nodes.node,
+        'page' : page,
+        'previous_page': page - 1 if page - 1 > 1 else 1,
+        'next_page': page + 1 if page + 1 < pages else pages,
+        'pages': pages,
+        'count': count,
     }
+
     if session:
         if 'account' in session:
             account_options = {
@@ -128,6 +197,56 @@ def dashboardTransactions():
 
     return render_template('_dashboard_template.html', **html_options)
 
+@app.route('/dashboard/domains')
+def dashboardDomains():
+    # Pagination
+    count = dns.blockchain.transactions.countAllTransactions()
+    limit = 7
+
+    # Default 
+    page = 1 
+    pages = 1
+    offset = 0
+    list = []
+
+    # Has items
+    if count > 0 : 
+        # Page
+        page = request.args.get('page', default = 1, type = int)
+        pages= math.ceil( count / limit )
+        
+        # Condition
+        if page <= 0 : page = 1
+        if page > pages : page = pages
+
+        # Number
+        offset = (page-1) * limit
+        list = dns.blockchain.transactions.getListTransactionstsWithOffsetAndLimit(offset, limit)
+        list = dns.blockchain.transactions.getDomainList(list)
+
+    html_options = {
+        'type': 2,
+        'title': 'Domains Dashboard ',
+        'unit': 'domains',
+        # Pagination
+        'list': list,
+        'node': dns.blockchain.nodes.node,
+        'page' : page,
+        'previous_page': page - 1 if page - 1 > 1 else 1,
+        'next_page': page + 1 if page + 1 < pages else pages,
+        'pages': pages,
+        'count': count,
+    }
+
+    if session:
+        if 'account' in session:
+            account_options = {
+                'account_id': session['account']['id'],
+                'account_fullname': session['account']['fullname']
+            }
+            return render_template('_dashboard_template.html', **html_options, **account_options)
+
+    return render_template('_dashboard_template.html', **html_options)
 
 @app.route('/dashboard/transactions/detail')
 def detailDashboardTransactions():
@@ -149,30 +268,6 @@ def detailDashboardTransactions():
 
     return render_template('_detail_dashboard_template.html', **html_options)
 
-
-@app.route('/dashboard/domains')
-def dashboardDomains():
-    list = dns.blockchain.transactions.getDomainList()
-
-    html_options = {
-        'type': 2,
-        'title': 'Domains Dashboard ',
-        'count': len(list) if list else 0,
-        'unit': 'domains',
-        'list': list,
-    }
-
-    if session:
-        if 'account' in session:
-            account_options = {
-                'account_id': session['account']['id'],
-                'account_fullname': session['account']['fullname']
-            }
-            return render_template('_dashboard_template.html', **html_options, **account_options)
-
-    return render_template('_dashboard_template.html', **html_options)
-
-
 @app.route('/dashboard/domains/detail')
 def detailDashboardDomains():
     domain = request.args.get('domain', default='', type=str)
@@ -192,7 +287,6 @@ def detailDashboardDomains():
             return render_template('_detail_dashboard_template.html', **html_options, **account_options)
 
     return render_template('_detail_dashboard_template.html', **html_options)
-
 
 @app.route('/dashboard/operation', methods=['GET', 'POST'])
 def dashboard_operation():
@@ -221,7 +315,7 @@ def dashboard_operation():
         )
         # Add single Transaction
         status = dns.blockchain.transactions.addTransaction(tran)
-
+        
         return tran, status
 
     def handleMultipleRecordsForm(file):
@@ -272,20 +366,13 @@ def dashboard_operation():
 
     return render_template('_operation_dashboard_template.html', **html_options)
 
-
-@app.route('/block')
-def block_manager():
-    html_options = {
-        'title': 'Block Manager ',
-    }
-    return render_template('_block_manager_template.html', **html_options)
-
-
+# -FRONT --------------------------------------------------
+# FOR LOGIN
+# --------------------------------------------------
 @app.route('/logout')
 def logout():
     session.pop('account', None)
     return redirect('/')
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -311,11 +398,7 @@ def login():
         message = Message.getMessage('AccountLogin', status)
         if account:
             account = account.as_dict()
-            # TODO : create safe as_dict function
-            # account.pop('password', None):
             account['password'] = ''
-            # account.pop('id', None):
-
             session['account'] = account
 
         response = {'status': status, 'message': message}
@@ -327,7 +410,6 @@ def login():
         session.pop('regis_email', None)
 
     return render_template('_login_template.html', **html_options, regis_email=regis_email)
-
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -372,7 +454,9 @@ def register():
     return render_template('_login_template.html', **html_options)
 
 
-# BACK ------------------------------------------------
+# -BACK ------------------------------------------------
+# FOR DNS SERVER
+# --------------------------------------------------
 @app.route('/dns/load')
 def load_domain_list():
     return {
@@ -380,7 +464,9 @@ def load_domain_list():
         'data': dns.blockchain.transactions.getRawDomainData()
     }
 
-
+# -BACK ------------------------------------------------
+# FOR POSTMAN
+# --------------------------------------------------
 @app.route('/blockchain/transactions')
 def showTransactionsBuffer():
     tranList = [tran.as_dict() for tran in dns.blockchain.current_transactions]
@@ -390,7 +476,6 @@ def showTransactionsBuffer():
         'len': len(tranList),
         'trans': tranList,
     })
-
 
 @app.route('/blockchain/dump')
 def dumpChain():
@@ -405,7 +490,6 @@ def dumpChain():
             'blocks': chain,
         }
     })
-
 
 @app.route('/dns/resolve', methods=['GET', 'POST'])
 def resolve():
@@ -426,7 +510,30 @@ def resolve():
         'message': 'Resolver webpage'
     })
 
+@app.route('/blockchain/ledger')
+def getLedger():
+    ledger = dns.blockchain.ledger
+    message = 'Getting ledger successfully'
+    return jsonify({
+        'status': 200,
+        'message': message,
+        'len': len(ledger),
+        'ledger': ledger
+    })
 
+@app.route('/blockchain/wallet')
+def getWallet():
+    wallet = dns.blockchain.wallet
+    message = 'Getting wallet successfully'
+    return jsonify({
+        'status': 200,
+        'message': message,
+        'wallet': wallet
+    })
+
+# -BACK ------------------------------------------------
+# FOR CALLING
+# --------------------------------------------------
 @app.route('/blockchain/overide')
 def overideBlockchain():
     status = dns.blockchain.overrideTheLongestChain()
@@ -498,34 +605,13 @@ def proofOfWork():
     })
 
 
-@app.route('/blockchain/ledger')
-def getLedger():
-    ledger = dns.blockchain.ledger
-    message = 'Getting ledger successfully'
-    return jsonify({
-        'status': 200,
-        'message': message,
-        'len': len(ledger),
-        'ledger': ledger
-    })
-
-
-@app.route('/blockchain/wallet')
-def getWallet():
-    wallet = dns.blockchain.wallet
-    message = 'Getting wallet successfully'
-    return jsonify({
-        'status': 200,
-        'message': message,
-        'wallet': wallet
-    })
-
 
 # Run --------------------------------------------------
 if __name__ == "__main__":
     from argparse import ArgumentParser
     import socket
     import atexit
+    import getpass
 
     def onClosingNode():
         try:
@@ -538,11 +624,66 @@ if __name__ == "__main__":
         finally:
             print("\n-------- GOODBYE !! ------")
 
+    def createNodeAdminCLI(node):
+        # Ask question about fullname, generate email, password, retype password 
+        format = ACCOUNT_FORMAT
+
+        print('\n_________ CREATE NODE ADMIN CLI ___________ \n')
+
+        print('ADMIN INFORMATION ( fullname, password ) : ')
+        # Fullname 
+        fullname = input("1) Fullname ( ex: Phan Dai ) or [Enter] :") or 'Phan Dai'
+        print()
+
+        # Email 
+        while(True):
+            email_fullname = "_".join(re.split('\W+',fullname.lower()))
+            email = input("2) Email ( ex: <full_name>@<node>.<any> ) or [Enter] :") or email_fullname + '@' + "".join(re.split('\W+',node.nodename.lower())) + '.dnschain'
+            print('Checking email ', email, '..')
+            if re.match(format['email'], email):
+                if not accountBusiness.getAccountByEmail(email) :
+                    print('-> Final email : ', email)
+                    break
+                else :
+                    print(" This email is exsited ")
+            else :
+                print(' This email has wrong format')
+        print()
+        
+        # Password and Repassword 
+        while(True):
+            password = getpass.getpass("2) Password ( auto hide, required 8+ chars, 1 special, 1 lower, 1 upper ) :")
+            repassword = getpass.getpass("RePassword :")
+            if re.match(format['password'], password) :
+                if password == repassword  : 
+                    break
+                else :
+                    print('Password and repassword not the same')
+            else : 
+                print('Wrong password format')
+        
+        # Type_cd 
+        type_cd = ADMIN_CD
+        
+        admin, status = accountBusiness.newAccount(fullname,email,password,repassword,type_cd)
+        
+        if status != 200 : 
+            print("Sorry please try again with different properties' values")
+            print("____ FAIL TO CREATE ADMIN  ", admin.email, "______\n") 
+            return admin, status
+
+        print("____ CREATE ADMIN SUCCESSFULLY ", admin.email, "______\n")
+        accountBusiness.addAccount(admin)
+        return admin, status 
+    
     atexit.register(onClosingNode)
+
     # INIT CMD PARAM-------------------------------
     parser = ArgumentParser()
     parser.add_argument('-host', '--host', type=str,
                         help='Any IPv4 string in your network or your local IP in default ')
+    parser.add_argument('-n', '--name', nargs="?", const='', type=str,
+                        help='Custom node name or auto node name')
     parser.add_argument('-p', '--port', nargs="?", const=5000, type=int,
                         help='Port number must be from 5000 - 5999 to access or 5000 in default')
     parser.add_argument('-gp', '--genport', action="store_true",
@@ -552,43 +693,60 @@ if __name__ == "__main__":
     generatePort = args.genport
 
     # GET CMD PARAM -------------------------------
-    port = args.port if generatePort == False else NodesBusiness.getRandomPort()
     host = args.host or socket.gethostbyname(socket.gethostname())
+    name = args.name or None
+    port = args.port if generatePort == False else NodesBusiness.getRandomPort()
+    genport_flag = args.genport
 
     # SET NODE -------------------------------
-    node, code = dns.blockchain.nodes.handleNodeInformation(host, port)
+    node, code = dns.blockchain.nodes.handleNodeInformation(host, port, genport_flag, name)
+
     print('___________ BLOCKCHAIN DNS CLI ______________ \n')
     print("Config Node Information : ")
     print(f" 1) [Host] : [{node.ip or '_'}]")
     print(f" 2) [Port] : [{node.port or '_'}] \n")
-    print('Data is processing please wait ... \n')
+    print("Data is processing please wait ... \n")
 
     # RETURN CODE MESSAGE -------------------------------
+    # - NEW NODE -------------------------------
     if code == 200:
         print('//----------------------------------------//')
         print('  WELCOME NODE ', node.id[:-25] + '..xxx')
         print('//----------------------------------------//')
         try:
-            dns.initBlockchain(node)
+            admin, status = createNodeAdminCLI(node)
+            if status != 200: 
+                exit(0)
+            dns.initBlockchain(node, admin)
             app.run(host=node.ip, port=node.port,
                     debug=True, use_reloader=False)
-
         except:
             print('\n !!: Program is suddenly paused -> Turning off...')
+            onClosingNode()
+    # - REGISTED NODE -------------------------------
     elif code == 201:
+        
         print('//----------------------------------------//')
         print('  WELCOME BACK NODE ', node.id[:-20] + '..xxx')
         print('//----------------------------------------//')
         try:
+            if not node.account_id :
+                admin, status = createNodeAdminCLI(node)
+                if status != 200: 
+                    exit(0)
+            else :
+                print(" Admin: ",node.admin.email,"\n")
             dns.initBlockchain(node)
             app.run(host=node.ip, port=node.port,
                     debug=True, use_reloader=False)
         except:
             print(' Program is suddenly paused ! Turning off... ')
+            onClosingNode()
+    # - NOT FOUND NODE -------------------------------
     else:
         print(
-            f"Return code #{code}: WRONG INFORMATION OR NOT FOUND ARGUMENT \n")
+            f"Return code #{code}: WRONG INFORMATION OR THIS NODE IS RUNNING \n")
         print("Please try again with 2 options bellow :")
         print("1. Append '-p' option to access program \n")
-        print("2. -p <port> ( port : must be from [ 5000, 5999 ] )")
+        print("2. -p <port> ( port : must be from [ 5000, 5999 ] ) or -gp to generate random port ")
         print("   -h <host> ( host : must be same as IPv4 format )")

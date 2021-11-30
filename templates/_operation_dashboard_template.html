@@ -1,401 +1,334 @@
-{% extends 'template.html' %} {% block title %} {{ title or '' }} {% endblock %}
-{% block body %}
-<div class="dashboard container">
-  <div class="header">
-    <div class="left">
-      <div class="menu-btn">
-        <button id="menu-toggler">
-          <img
-            src="{{url_for('static',filename='img/menu-icon.png')}}"
-            alt="btn-menu-img"
-          />
-        </button>
-      </div>
-      <div class="logo">
-        <a href="#">
-          <div class="logo-link">
-            <div class="img-box">
-              <img
-                src="{{url_for('static',filename='img/dnschain-logo-last.png')}}"
-                alt="logo"
-              />
-            </div>
-            <h1>dnschain</h1>
-          </div>
-        </a>
-      </div>
-      <div class="search">
-        <img
-          src="{{url_for('static',filename='img/search-icon.png')}}"
-          alt="search-icon"
-        />
-        <input type="text" placeholder="Search infromation in profile" />
-      </div>
+{% extends 'dashboard_template.html' %} 
+{% block main %}
+<div class="operation main">
+  <div class="aside animation asideSlidetoRight">
+    <div class="tab-title {% if type == 1 %} active {% endif %}">
+      <a href="./transactions"><h3>Transaction List</h3></a>
     </div>
-    <div class="right">
-      <div class="user">
-        <div class="hello">
-          Hi. {% if account_id %}
-          <div class="name">{{ account_fullname or ''}}</div>
-          <div class="type hoster">Hoster</div>
-          {% else %}
-          <div class="name">Guest</div>
-          <div class="type client">Client</div>
-          {% endif %}
-        </div>
-        {% if account_id %}
-        <a href="/logout">
-          <div class="img-box">
-            Logout
-            <img
-              src="{{url_for('static',filename='img/logout-icon.png')}}"
-              alt="logout-icon"
-            />
-          </div>
-        </a>
-        {% else %}
-        <a href="/login">
-          <div class="img-box">
-            Login
-            <img
-              src="{{url_for('static',filename='img/logout-icon.png')}}"
-              alt="login-icon"
-            />
-          </div>
-        </a>
-        {% endif %}
-      </div>
+    <div class="sub-tab tab-title {% if type == 1 %} active {% endif %}">
+      <a href="./transactions/detail"><h3>Recent transaction detail</h3> </a>
+    </div>
+    <div class="tab-title {% if type == 2 %} active {% endif %}">
+      <a href="./domains"><h3>Domain List</h3></a>
+    </div>
+    <div class="sub-tab tab-title {% if type == 2 %} active {% endif %}">
+      <a href="./domains/detail"><h3>Recent domain detail</h3> </a>
+    </div>
+    <div class="tab-title {% if type == 3 %} active {% endif %}">
+      <a href="#"><h3>Operation</h3></a>
     </div>
   </div>
-  <div class="operation main">
-    <div class="aside animation asideSlidetoRight">
-      <div class="tab-title {% if type == 1 %} active {% endif %}">
-        <a href="./transactions"><h3>Transaction List</h3></a>
+  <div class="table-side">
+    <div class="titles">
+      <div class="title-left">
+        <h1>{{ title or '' }}</h1>
+        <h4>Total <span> {{ count or '0'}} </span> {{ unit or 'domains'}}</h4>
       </div>
-      <div class="sub-tab tab-title {% if type == 1 %} active {% endif %}">
-        <a href="./transactions/detail"><h3>Recent transaction detail</h3> </a>
-      </div>
-      <div class="tab-title {% if type == 2 %} active {% endif %}">
-        <a href="./domains"><h3>Domain List</h3></a>
-      </div>
-      <div class="sub-tab tab-title {% if type == 2 %} active {% endif %}">
-        <a href="./domains/detail"><h3>Recent domain detail</h3> </a>
-      </div>
-      <div class="tab-title {% if type == 3 %} active {% endif %}">
-        <a href="#"><h3>Operation</h3></a>
+      <div class="title-right">
+        <div class="sort-btn-box">
+          <button>
+            <h3>Sort</h3>
+            <img
+              src="{{url_for('static',filename='img/sort-icon.png')}}"
+              alt="sort-icon"
+            />
+          </button>
+        </div>
       </div>
     </div>
-    <div class="table-side">
-      <div class="titles">
-        <div class="title-left">
-          <h1>{{ title or '' }}</h1>
-          <h4>Total <span> {{ count or '0'}} </span> {{ unit or 'domains'}}</h4>
+    <div class="table-box">
+      <table>
+        <thead>
+          <tr>
+            <th class="index-field"></th>
+            <th class="id-field">ID</th>
+            <th class="transaction-hash-field">Transaction Hash</th>
+            <th class="action-field">Action</th>
+            <th class="block-field">Block</th>
+            <th class="time-field">Datetime</th>
+            <th class="status-field">Status</th>
+            <th class="from-field">From</th>
+            <th class="to-field">To</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for transaction in list %}
+          <tr>
+            <td class="index-field">
+              <svg
+                style="
+                  fill: rgb(34, 34, 34);
+                  background-color: rgb(211, 211, 211);
+                  border-radius: 10px;
+                  padding: 1px;
+                "
+                viewBox="0 0 24 24"
+                width="20"
+                height="20"
+              >
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M3.106 11.553a1 1 0 011.341-.447L12 14.882l7.553-3.776a1 1 0 11.894 1.788l-8 4a1 1 0 01-.894 0l-8-4a1 1 0 01-.447-1.341z"
+                  fill=""
+                ></path>
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M3.106 15.553a1 1 0 011.341-.447L12 18.882l7.553-3.776a1 1 0 11.894 1.788l-8 4a1 1 0 01-.894 0l-8-4a1 1 0 01-.447-1.341z"
+                  fill=""
+                ></path>
+                <path
+                  d="M12 13c-.2 0-.3 0-.4-.1l-8-4C3.2 8.7 3 8.4 3 8s.2-.7.6-.9l8-4c.2-.1.6-.1.8 0l8 4c.4.2.6.5.6.9s-.2.7-.6.9l-8 4c-.1.1-.2.1-.4.1z"
+                  fill=""
+                ></path>
+              </svg>
+            </td>
+            <th class="id-field">{{ transaction.id or '' }}</th>
+            <td class="transaction-hash-field">
+              <a href="./transactions/detail?id={{transaction.id}}"
+                >{{transaction.hash() or ''}}</a
+              >
+            </td>
+            <td class="action-field">{{transaction.action or ''}}</td>
+            <td class="block-field">{{transaction.block_id or ''}}</td>
+            <td class="time-field">{{transaction.datetime_format() or ''}}</td>
+            <td class="status-field">
+              <div class="status success">Success</div>
+            </td>
+            <td class="from-field">
+              <a href="#">{{transaction.owner.fullname or ''}}</a>
+            </td>
+            <td class="to-field">Here</td>
+          </tr>
+          {% endfor %}
+          <tr>
+            <td class="index-field"></td>
+            <td class="id-field">ID</td>
+            <td class="transaction-hash-field">Transaction Hash</td>
+            <td class="action-field">Action</td>
+            <td class="block-field">Block</td>
+            <td class="time-field">Datetime</td>
+            <td class="status-field">Status</td>
+            <td class="from-field">From</td>
+            <td class="to-field">To</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="operation-box">
+      <form class="typing-form animation" method="POST">
+        <h1>Typing Form</h1>
+        {% if message %}
+        <h3 style="color: red">{{message}}</h3>
+        {% endif %}
+        <div class="field domain-field">
+          <h5 for="domain">Domain</h5>
+          <input
+            type="text"
+            name="domain"
+            placeholder=" Type your domain ex: dai.com "
+            pattern="^[a-zA-Z0-9][a-zA-Z0-9-_]{0,61}[a-zA-Z0-9]{0,1}\.([a-zA-Z]{1,6}|[a-zA-Z0-9-]{1,30}\.[a-zA-Z]{2,3})$"
+            required
+          />
         </div>
-        <div class="title-right">
-          <div class="sort-btn-box">
-            <button>
-              <h3>Sort</h3>
-              <img
-                src="{{url_for('static',filename='img/sort-icon.png')}}"
-                alt="sort-icon"
+        <div class="field soa-field">
+          <h5 for="soa">SOA Record</h5>
+          <div class="form-oneline-group soa-inputs-group">
+            <div class="group">
+              <div class="label" for="soa_mname">Mname</div>
+              <input
+                type="text"
+                name="soa_mname"
+                placeholder="Auto-gen or custom"
+                pattern="^[a-zA-Z0-9][a-zA-Z0-9-_]{0,61}[a-zA-Z0-9]{0,1}\.([a-zA-Z]{1,6}|[a-zA-Z0-9-]{1,30}\.[a-zA-Z]{2,3})$"
+                required
               />
-            </button>
+            </div>
+            <div class="group">
+              <div class="label" for="soa_rname">Rname</div>
+              <input
+                type="text"
+                name="soa_rname"
+                placeholder="Auto-gen or custom"
+                pattern="^[a-zA-Z0-9][a-zA-Z0-9-_]{0,61}[a-zA-Z0-9]{0,1}\.([a-zA-Z]{1,6}|[a-zA-Z0-9-]{1,30}\.[a-zA-Z]{2,3})$"
+                required
+              />
+            </div>
+            <div class="group">
+              <div class="label" for="soa_refresh">Refresh</div>
+              <input
+                type="number"
+                name="soa_refresh"
+                min="1000"
+                max="4800"
+                value="3600"
+                required
+              />
+              <div class="label" for="soa_retry">Retry</div>
+              <input
+                type="number"
+                name="soa_retry"
+                min="600"
+                max="1000"
+                value="600"
+                required
+              />
+            </div>
+            <div class="group">
+              <div class="label" class="label" for="soa_expire">Expire</div>
+              <input
+                type="number"
+                name="soa_expire"
+                min="30"
+                max="50"
+                value="30"
+                required
+              />
+              <div class="label" for="soa_minimum">Minimum</div>
+              <input
+                type="number"
+                name="soa_minimum"
+                min="60000"
+                max="86400"
+                value="86400"
+                required
+              />
+            </div>
           </div>
         </div>
-      </div>
-      <div class="table-box">
-        <table>
-          <thead>
-            <tr>
-              <th class="index-field"></th>
-              <th class="id-field">ID</th>
-              <th class="transaction-hash-field">Transaction Hash</th>
-              <th class="action-field">Action</th>
-              <th class="block-field">Block</th>
-              <th class="time-field">Datetime</th>
-              <th class="status-field">Status</th>
-              <th class="from-field">From</th>
-              <th class="to-field">To</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for transaction in list %}
-            <tr>
-              <td class="index-field">
-                <svg
-                  style="
-                    fill: rgb(34, 34, 34);
-                    background-color: rgb(211, 211, 211);
-                    border-radius: 10px;
-                    padding: 1px;
-                  "
-                  viewBox="0 0 24 24"
-                  width="20"
-                  height="20"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M3.106 11.553a1 1 0 011.341-.447L12 14.882l7.553-3.776a1 1 0 11.894 1.788l-8 4a1 1 0 01-.894 0l-8-4a1 1 0 01-.447-1.341z"
-                    fill=""
-                  ></path>
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M3.106 15.553a1 1 0 011.341-.447L12 18.882l7.553-3.776a1 1 0 11.894 1.788l-8 4a1 1 0 01-.894 0l-8-4a1 1 0 01-.447-1.341z"
-                    fill=""
-                  ></path>
-                  <path
-                    d="M12 13c-.2 0-.3 0-.4-.1l-8-4C3.2 8.7 3 8.4 3 8s.2-.7.6-.9l8-4c.2-.1.6-.1.8 0l8 4c.4.2.6.5.6.9s-.2.7-.6.9l-8 4c-.1.1-.2.1-.4.1z"
-                    fill=""
-                  ></path>
-                </svg>
-              </td>
-              <th class="id-field">{{ transaction.id or '' }}</th>
-              <td class="transaction-hash-field">
-                <a href="./transactions/detail?id={{transaction.id}}"
-                  >{{transaction.hash() or ''}}</a
-                >
-              </td>
-              <td class="action-field">{{transaction.action or ''}}</td>
-              <td class="block-field">{{transaction.block_id or ''}}</td>
-              <td class="time-field">
-                {{transaction.datetime_format() or ''}}
-              </td>
-              <td class="status-field">
-                <div class="status success">Success</div>
-              </td>
-              <td class="from-field">
-                <a href="#">{{transaction.owner.fullname or ''}}</a>
-              </td>
-              <td class="to-field">Here</td>
-            </tr>
-            {% endfor %}
-            <tr>
-              <td class="index-field"></td>
-              <td class="id-field">ID</td>
-              <td class="transaction-hash-field">Transaction Hash</td>
-              <td class="action-field">Action</td>
-              <td class="block-field">Block</td>
-              <td class="time-field">Datetime</td>
-              <td class="status-field">Status</td>
-              <td class="from-field">From</td>
-              <td class="to-field">To</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="operation-box ">
-        <form class="typing-form animation" method="POST">
-          <h1>Typing Form</h1>
-          {% if message %}
-          <h3 style="color: red">{{message}}</h3>
-          {% endif %}
-          <div class="field domain-field">
-            <h5 for="domain">Domain</h5>
-            <input
-              type="text"
-              name="domain"
-              placeholder=" Type your domain ex: dai.com "
-              pattern="^[a-zA-Z0-9][a-zA-Z0-9-_]{0,61}[a-zA-Z0-9]{0,1}\.([a-zA-Z]{1,6}|[a-zA-Z0-9-]{1,30}\.[a-zA-Z]{2,3})$"
-              required
-            />
-          </div>
-          <div class="field soa-field">
-            <h5 for="soa">SOA Record</h5>
-            <div class="form-oneline-group soa-inputs-group">
-              <div class="group">
-                <div class="label" for="soa_mname">Mname</div>
-                <input
-                  type="text"
-                  name="soa_mname"
-                  placeholder="Auto-gen or custom"
-                  pattern="^[a-zA-Z0-9][a-zA-Z0-9-_]{0,61}[a-zA-Z0-9]{0,1}\.([a-zA-Z]{1,6}|[a-zA-Z0-9-]{1,30}\.[a-zA-Z]{2,3})$"
-                  required
-                />
-              </div>
-              <div class="group">
-                <div class="label" for="soa_rname">Rname</div>
-                <input
-                  type="text"
-                  name="soa_rname"
-                  placeholder="Auto-gen or custom"
-                  pattern="^[a-zA-Z0-9][a-zA-Z0-9-_]{0,61}[a-zA-Z0-9]{0,1}\.([a-zA-Z]{1,6}|[a-zA-Z0-9-]{1,30}\.[a-zA-Z]{2,3})$"
-                  required
-                />
-              </div>
-              <div class="group">
-                <div class="label" for="soa_refresh">Refresh</div>
-                <input
-                  type="number"
-                  name="soa_refresh"
-                  min="1000"
-                  max="4800"
-                  value="3600"
-                  required
-                />
-                <div class="label" for="soa_retry">Retry</div>
-                <input
-                  type="number"
-                  name="soa_retry"
-                  min="600"
-                  max="1000"
-                  value="600"
-                  required
-                />
-              </div>
-              <div class="group">
-                <div class="label" class="label" for="soa_expire">Expire</div>
-                <input
-                  type="number"
-                  name="soa_expire"
-                  min="30"
-                  max="50"
-                  value="30"
-                  required
-                />
-                <div class="label" for="soa_minimum">Minimum</div>
-                <input
-                  type="number"
-                  name="soa_minimum"
-                  min="60000"
-                  max="86400"
-                  value="86400"
-                  required
-                />
-              </div>
+        <div class="field ns-field">
+          <h5 for="ns">NS Record</h5>
+          <div class="form-oneline-group ns-inputs-group">
+            <div class="group">
+              <div class="label" for="ns_host1">Host 1</div>
+              <input
+                type="text"
+                name="ns_host1"
+                placeholder="Auto-gen or custom"
+                pattern="^[a-zA-Z0-9][a-zA-Z0-9-_]{0,61}[a-zA-Z0-9]{0,1}\.([a-zA-Z]{1,6}|[a-zA-Z0-9-]{1,30}\.[a-zA-Z]{2,3})$"
+                required
+              />
+            </div>
+            <div class="group">
+              <div class="label" for="ns_host2">Host 2</div>
+              <input
+                type="text"
+                name="ns_host2"
+                placeholder="Auto-gen or custom"
+                pattern="^[a-zA-Z0-9][a-zA-Z0-9-_]{0,61}[a-zA-Z0-9]{0,1}\.([a-zA-Z]{1,6}|[a-zA-Z0-9-]{1,30}\.[a-zA-Z]{2,3})$"
+                required
+              />
             </div>
           </div>
-          <div class="field ns-field">
-            <h5 for="ns">NS Record</h5>
-            <div class="form-oneline-group ns-inputs-group">
-              <div class="group">
-                <div class="label" for="ns_host1">Host 1</div>
-                <input
-                  type="text"
-                  name="ns_host1"
-                  placeholder="Auto-gen or custom"
-                  pattern="^[a-zA-Z0-9][a-zA-Z0-9-_]{0,61}[a-zA-Z0-9]{0,1}\.([a-zA-Z]{1,6}|[a-zA-Z0-9-]{1,30}\.[a-zA-Z]{2,3})$"
-                  required
-                />
-              </div>
-              <div class="group">
-                <div class="label" for="ns_host2">Host 2</div>
-                <input
-                  type="text"
-                  name="ns_host2"
-                  placeholder="Auto-gen or custom"
-                  pattern="^[a-zA-Z0-9][a-zA-Z0-9-_]{0,61}[a-zA-Z0-9]{0,1}\.([a-zA-Z]{1,6}|[a-zA-Z0-9-]{1,30}\.[a-zA-Z]{2,3})$"
-                  required
-                />
-              </div>
+        </div>
+        <div class="field a-field">
+          <h5 for="a">A Record</h5>
+          <div class="form-oneline-group a-inputs-group">
+            <div class="group">
+              <div class="label" for="a_name_1">Name</div>
+              <input
+                type="text"
+                name="a_name_1"
+                placeholder="Same as domain name"
+                readonly
+                required
+              />
+              <div class="label" for="a_value_1">Value</div>
+              <input
+                type="text"
+                name="a_value_1"
+                placeholder="Type domain IP ex: 1.1.1.1"
+                pattern="^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+                required
+              />
+              <div class="label" for="a_ttl_1">TTL</div>
+              <input
+                type="number"
+                name="a_ttl_1"
+                min="100"
+                max="400"
+                value="400"
+                required
+              />
+            </div>
+            <div class="group">
+              <div class="label" for="a_name_2">Name</div>
+              <input
+                type="text"
+                name="a_name_2"
+                placeholder="Same as domain name"
+                readonly
+              />
+              <div class="label" for="a_value_2">Value</div>
+              <input
+                type="text"
+                name="a_value_2"
+                placeholder="Type domain IP ex: 1.1.1.1"
+              />
+              <div class="label" for="a_ttl_2">TTL</div>
+              <input
+                type="number"
+                name="a_ttl_2"
+                min="100"
+                max="400"
+                value="400"
+              />
+            </div>
+            <div class="group">
+              <div class="label" for="a_name_3">Name</div>
+              <input
+                type="text"
+                name="a_name_3"
+                placeholder="Same as domain name"
+                readonly
+              />
+              <div class="label" for="a_value_3">Value</div>
+              <input
+                type="text"
+                name="a_value_3"
+                placeholder="Type domain IP ex: 1.1.1.1"
+              />
+              <div class="label" for="a_ttl_3">TTL</div>
+              <input
+                type="number"
+                name="a_ttl_3"
+                min="100"
+                max="400"
+                value="400"
+              />
             </div>
           </div>
-          <div class="field a-field">
-            <h5 for="a">A Record</h5>
-            <div class="form-oneline-group a-inputs-group">
-              <div class="group">
-                <div class="label" for="a_name_1">Name</div>
-                <input
-                  type="text"
-                  name="a_name_1"
-                  placeholder="Same as domain name"
-                  readonly
-                  required
-                />
-                <div class="label" for="a_value_1">Value</div>
-                <input
-                  type="text"
-                  name="a_value_1"
-                  placeholder="Type domain IP ex: 1.1.1.1"
-                  pattern="^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
-                  required
-                />
-                <div class="label" for="a_ttl_1">TTL</div>
-                <input
-                  type="number"
-                  name="a_ttl_1"
-                  min="100"
-                  max="400"
-                  value="400"
-                  required
-                />
-              </div>
-              <div class="group">
-                <div class="label" for="a_name_2">Name</div>
-                <input
-                  type="text"
-                  name="a_name_2"
-                  placeholder="Same as domain name"
-                  readonly
-                />
-                <div class="label" for="a_value_2">Value</div>
-                <input
-                  type="text"
-                  name="a_value_2"
-                  placeholder="Type domain IP ex: 1.1.1.1"
-                />
-                <div class="label" for="a_ttl_2">TTL</div>
-                <input
-                  type="number"
-                  name="a_ttl_2"
-                  min="100"
-                  max="400"
-                  value="400"
-                />
-              </div>
-              <div class="group">
-                <div class="label" for="a_name_3">Name</div>
-                <input
-                  type="text"
-                  name="a_name_3"
-                  placeholder="Same as domain name"
-                  readonly
-                />
-                <div class="label" for="a_value_3">Value</div>
-                <input
-                  type="text"
-                  name="a_value_3"
-                  placeholder="Type domain IP ex: 1.1.1.1"
-                />
-                <div class="label" for="a_ttl_3">TTL</div>
-                <input
-                  type="number"
-                  name="a_ttl_3"
-                  min="100"
-                  max="400"
-                  value="400"
-                />
-              </div>
-            </div>
-          </div>
-          <div class="field submit-field">
-            <button type="reset">Reset</button>
-            <button type="submit">OK</button>
-          </div>
-        </form>
+        </div>
+        <div class="field submit-field">
+          <button type="reset">Reset</button>
+          <button type="submit">OK</button>
+        </div>
+      </form>
 
-        <form
-          class="files-form animation blur-screen"
-          method="POST"
-          enctype="multipart/form-data"
-        >
-          <h1>File Form</h1>
-          {% if message %}
-          <h3 style="color: red">{{message}}</h3>
-          {% endif %}
-          <div class="field files-field">
-            <input type="file" name="file" />
-          </div>
-          <div class="field submit-field">
-            <button type="reset">Reset</button>
-            <button type="submit">OK</button>
-          </div>
-        </form>
-      </div>
+      <form
+        class="files-form animation blur-screen"
+        method="POST"
+        enctype="multipart/form-data"
+      >
+        <h1>File Form</h1>
+        {% if message %}
+        <h3 style="color: red">{{message}}</h3>
+        {% endif %}
+        <div class="field files-field">
+          <label for="file-upload" class="custom-file-upload">
+            <i class="fa fa-cloud-upload"></i> Custom Upload
+        </label>
+        <input id="file-upload" type="file"/>
+        </div>
+        <div class="field submit-field">
+          <button type="reset">Reset</button>
+          <button type="submit">OK</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
-<script src="{{url_for('static',filename='js/dashboard-helper.js')}}"></script>
+
 <script src="{{url_for('static',filename='js/operation-helper.js')}}"></script>
 {% endblock %}

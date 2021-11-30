@@ -73,7 +73,7 @@ def autoInsertTransaction(number):
     #         ip= ips[i],
     #         reward= reward,
     #         port= port)) 
-    
+
 autoInsertTransaction(numberOfTransactions)
 # Blocks ---------------------------------------------------------
 # PUSH ALL >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
