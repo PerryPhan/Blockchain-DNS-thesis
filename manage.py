@@ -1,5 +1,3 @@
-from re import split
-from werkzeug.wrappers import response
 from include import *
 from business import *
 
@@ -43,9 +41,47 @@ def blocks_txs_manager():
     admin = accountBusiness.getAccountById(
         session['account']['id']
     )
+    count = dns.blockchain.countBlocksList()
+    limit = 3
+
+    # Default
+    page = 1
+    pages = 1
+    offset = 0
+    list_of_blocks = []
+    this_node = None
+
+    # Has items
+    if count > 0:
+        # Page
+        page = request.args.get('page', default=1, type=int)
+        pages = math.ceil(count / limit)
+
+        # Condition
+        if page <= 0:
+            page = 1
+        if page > pages:
+            page = pages
+
+        # Number
+        offset = (page-1) * limit
+
+        list_of_blocks = dns.blockchain.getListBlocksWithOffsetAndLimit(offset, limit)
+    
     html_options = {
         'title': 'Blocks and Txs manager',
         'admin': admin,
+        # Data 
+        'wallet': dns.blockchain.wallet,
+        'genesis': dns.blockchain.getGenesisBlock(),
+        'node': dns.blockchain.nodes.getNode(),
+        # Pagination
+        'page': page,
+        'previous_page': page - 1 if page - 1 > 1 else 1,
+        'next_page': page + 1 if page + 1 < pages else pages,
+        'pages': pages,
+        'count': count,
+        'list_of_blocks': list_of_blocks
     }
     if request.method == 'POST':
         # If the first time login in
@@ -106,6 +142,7 @@ def nodes_manager():
 
     html_options = {
         'title': 'Nodes manager',
+        # Pagination
         'page': page,
         'previous_page': page - 1 if page - 1 > 1 else 1,
         'next_page': page + 1 if page + 1 < pages else pages,
@@ -156,7 +193,8 @@ def account_manager():
     )
 
     html_options = {
-        'title': 'Nodes manager',
+        'title': 'Accounts manager',
+        # Pagination
         'page': page,
         'previous_page': page - 1 if page - 1 > 1 else 1,
         'next_page': page + 1 if page + 1 < pages else pages,
@@ -175,8 +213,12 @@ def account_manager():
 
 @app.route('/dashboard/transactions')
 def dashboardTransactions():
+    if( dns.blockchain.transactions.countAllNoBlockTransactions() > 0) :
+        response = request.get()
+        pass
     # Pagination
     count = dns.blockchain.transactions.countAllTransactions()
+    no_block_count = dns.blockchain.transactions.countAllNoBlockTransactions()
     limit = 7
 
     # Default
@@ -214,7 +256,8 @@ def dashboardTransactions():
         'next_page': page + 1 if page + 1 < pages else pages,
         'pages': pages,
         'count': count,
-        
+        'no_block_count': no_block_count,
+        'buffer_len': BUFFER_MAX_LEN,
     }
 
     if session:

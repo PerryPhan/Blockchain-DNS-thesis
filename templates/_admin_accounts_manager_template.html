@@ -38,7 +38,7 @@
 </div>
 {% endblock %} {% block center %}
 <main class="accounts">
-  <div class="common">
+  <div class="common-container">
     <div class="top">
       <h3>Accounts</h3>
       <h5>Total: {{count or '0'}}</h5>
@@ -47,26 +47,42 @@
           <div class="btn-box">
             <div class="first-side">
               <span>
-                <a href="{% if pages == 1 %} # {% else %} ./accounts {% endif %}">First</a>
+                <a
+                  href="{% if pages == 1 %} # {% else %} ./accounts {% endif %}"
+                  >First</a
+                >
               </span>
               <span>
-                <a href="{% if pages == 1 %} # {% else %} {% if page == 1 %} # {% else %} ./accounts?page={{previous_page}} {% endif %} {% endif %}" id="a-table-previous" class="nohref"
-                  ><img src="{{url_for('static',filename='img/arrow-left-icon.png')}}" alt="left-icon" /></a
+                <a
+                  href="{% if pages == 1 %} # {% else %} {% if page == 1 %} # {% else %} ./accounts?page={{previous_page}} {% endif %} {% endif %}"
+                  id="a-table-previous"
+                  class="nohref"
+                  ><img
+                    src="{{url_for('static',filename='img/arrow-left-icon.png')}}"
+                    alt="left-icon" /></a
               ></span>
             </div>
             <div class="index-side">
-              <span id="span-table-index-page">1</span>
+              <span id="span-table-index-page">{{page}}</span>
               <span>/</span>
-              <span id="span-table-total-page">1</span>
+              <span id="span-table-total-page">{{pages}}</span>
             </div>
             <div class="last-side">
               <span>
-                <a href="{% if pages == 1 %} # {% else %} {% if page == pages %} # {% else %}./accounts?page={{next_page}} {% endif %} {% endif %}" id="a-table-next">
-                  <img src="{{url_for('static',filename='img/arrow-right-icon.png')}}" alt="right-icon"
+                <a
+                  href="{% if pages == 1 %} # {% else %} {% if page == pages %} # {% else %}./accounts?page={{next_page}} {% endif %} {% endif %}"
+                  id="a-table-next"
+                >
+                  <img
+                    src="{{url_for('static',filename='img/arrow-right-icon.png')}}"
+                    alt="right-icon"
                 /></a>
               </span>
               <span>
-                <a href="{% if pages == 1 %} # {% else %}./accounts?page={{pages}} {% endif %}">Last</a>
+                <a
+                  href="{% if pages == 1 %} # {% else %}./accounts?page={{pages}} {% endif %}"
+                  >Last</a
+                >
               </span>
             </div>
           </div>
@@ -91,17 +107,26 @@
         <div class="flex id-hash">
           <div class="label">ID:</div>
           <div class="value">{{account.id}}</div>
-          <div class="status {% if account.type_cd == 2 %} blue {% else %} purple {% endif %}"> 
-            {% if account.type_cd == 2 %} Hoster {% else %} Admin {% endif %}  
-          </div>
+          <div
+            class="
+              status
+              {% if account.type_cd == 2 %}
+              blue
+              {% else %}
+              purple
+              {% endif %}
+            "
+          >{% if account.type_cd == 2 %} Hoster {% else %} Admin {% endif %}</div>
         </div>
         <div class="flex data">
           <div class="label">Data:</div>
           <div class="value">
-            Fullname : <span>{{account.fullname}}</span>
-            Email : <span>{{account.email}}</span>
+            Fullname : <span class="fullname">{{account.fullname}}</span> Email
+            : <span class="email">{{account.email}}</span>
           </div>
-          <div class="datetime">{{account.datetime_format()}}</div>
+          <div class="time">
+            <span class="time">{{account.datetime_format()}}</span>
+          </div>
         </div>
       </div>
       <!-- END ITEMS -->
@@ -126,17 +151,16 @@
           <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM17 13H7V11H17V13Z" fill="#D20C0C"/>
           </svg>
       </button> -->
+    </div>
   </div>
-</div>
-
-  <div class="common account-info">
-    {% if admin %}
+  {% if admin %}
+  <div class="common-info account-info">
     <div class="flex id-hash">
       <label for="id">id</label>
       <div class="value">
         <div class="info animation slidetoLeft">
           <span>{{ admin.id }}</span>
-      </div>
+        </div>
       </div>
     </div>
     <div class="flex fullname">
@@ -153,7 +177,6 @@
         <div class="animation goup info">
           <span>{{ admin.email }}</span>
         </div>
-        
       </div>
     </div>
     <div class="flex type">
@@ -161,18 +184,22 @@
       <div class="value">
         <div class="animation goup info">
           <span class="admin">Admin</span>
-      </div>
+        </div>
       </div>
     </div>
     <div class="flex time">
       <label for="time">time</label>
-      <div class="value green ">
-        <div class="animation goup info">{{ admin.datetime_format() }}</div>
+      <div class="value green">
+        <div class="animation goup info">
+          <span>{{ admin.datetime_format() }}</span>
+          </div>
       </div>
     </div>
-    {% endif %}
   </div>
-
+  {% endif %}
+  <div class="back-node">
+    <a href="#">Back to my node</a>
+  </div>
 </div>
 
 {% endblock %}

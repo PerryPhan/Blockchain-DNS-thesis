@@ -317,6 +317,8 @@ body {
 }
 .admin.container .section.section-left .part.logo-part .logo {
   text-align: center;
+  text-decoration: none;
+  outline: none;
 }
 .admin.container .section.section-left .part.logo-part .logo img {
   width: 110px;
@@ -483,7 +485,7 @@ body {
   margin-left: 200px;
 }
 .admin.container .section.section-right .part.common-part h4 {
-  max-width: 200px;
+  max-width: 230px;
   margin: 0;
   margin-bottom: 40px;
   padding: 0;
@@ -491,7 +493,7 @@ body {
   letter-spacing: 2%;
   color: #9F38A7;
 }
-.admin.container .section.section-right .part.common-part .common {
+.admin.container .section.section-right .part.common-part .common-info {
   padding: 20px;
   padding-top: 30px;
   overflow: hidden;
@@ -499,22 +501,24 @@ body {
   box-shadow: 0px 5px 10px #9193a7;
   border-radius: 20px;
 }
-.admin.container .section.section-right .part.common-part .common .flex {
+.admin.container .section.section-right .part.common-part .common-info .flex {
   display: flex;
   font-size: 18px;
-  height: 30px;
+  height: 35px;
   margin-bottom: 25px;
 }
-.admin.container .section.section-right .part.common-part .common .flex label {
+.admin.container .section.section-right .part.common-part .common-info .flex label {
   width: 25%;
   max-width: 80px;
   font-weight: 600;
 }
-.admin.container .section.section-right .part.common-part .common .flex .value {
+.admin.container .section.section-right .part.common-part .common-info .flex .value {
   width: 75%;
   max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.admin.container .section.section-right .part.common-part .common .flex .value .sub-value {
+.admin.container .section.section-right .part.common-part .common-info .flex .value .sub-value {
   font-weight: 600;
 }
 .admin.container .section.section-right .part.genesis-part h4 {
@@ -574,15 +578,6 @@ body {
 .admin.container .section.section-right .part.node-info-part .node-info .flex .value .sub-value {
   color: #AB98FF;
 }
-.admin.container .section.section-right .part.node-info-part .back-node {
-  width: 100%;
-  text-align: right;
-}
-.admin.container .section.section-right .part.node-info-part .back-node a {
-  text-decoration: none;
-  color: #5890d2;
-  font-weight: 600;
-}
 .admin.container .section.section-right .part.account-info-part .account-info .flex {
   display: flex;
   font-size: 19px;
@@ -627,6 +622,16 @@ body {
 }
 .admin.container .section.section-right .part.account-info-part .account-info .flex .value .sub-value {
   color: #AB98FF;
+}
+.admin.container .section.section-right .part .back-node {
+  margin-top: 20px;
+  width: 100%;
+  text-align: right;
+}
+.admin.container .section.section-right .part .back-node a {
+  text-decoration: none;
+  color: #5890d2;
+  font-weight: 600;
 }
 .admin.container .section.section-right .part.createdby-part {
   position: absolute;
@@ -736,14 +741,18 @@ body {
 .admin.container .section.section-center main.block_and_trans .blocks .content {
   display: flex;
   box-sizing: border-box;
-  height: 180px;
+  height: 200px;
+  width: 100%;
+  overflow-x: hidden;
+  padding-left: 20px;
 }
 .admin.container .section.section-center main.block_and_trans .blocks .content .block {
   box-sizing: border-box;
   border-radius: 20px;
   margin-right: 35px;
-  width: 30%;
-  height: 100%;
+  min-width: 300px;
+  max-width: 300px;
+  height: 90%;
   background-color: #ffffff;
   padding: 20px 30px;
   box-shadow: 0px 5px 10px #9193A7;
@@ -799,7 +808,12 @@ body {
   max-width: 250px;
   text-align: right;
 }
-.admin.container .section.section-center main .common .content {
+.admin.container .section.section-center main.block_and_trans .trans .content {
+  height: 100%;
+  max-height: 350px;
+  overflow: auto;
+}
+.admin.container .section.section-center main .common-container .content {
   width: 100%;
   height: 420px;
   background-color: white;
@@ -807,72 +821,72 @@ body {
   border-radius: 20px;
   padding: 20px;
 }
-.admin.container .section.section-center main .common .content.full-page {
+.admin.container .section.section-center main .common-container .content.full-page {
   height: 700px;
 }
-.admin.container .section.section-center main .common .content .items {
+.admin.container .section.section-center main .common-container .content .items {
   box-sizing: border-box;
   margin-bottom: 15px;
   transition: 0.3s;
   cursor: pointer;
 }
-.admin.container .section.section-center main .common .content .items.selected, .admin.container .section.section-center main .common .content .items:hover {
+.admin.container .section.section-center main .common-container .content .items.selected, .admin.container .section.section-center main .common-container .content .items:hover {
   background-color: #E1F6FF !important;
 }
-.admin.container .section.section-center main .common .content .items .flex {
+.admin.container .section.section-center main .common-container .content .items .flex {
   display: flex;
   font-size: 16px;
 }
-.admin.container .section.section-center main .common .content .items .flex .label {
+.admin.container .section.section-center main .common-container .content .items .flex .label {
   font-weight: bold;
 }
-.admin.container .section.section-center main .common .content .items.transaction, .admin.container .section.section-center main .common .content .items.common {
+.admin.container .section.section-center main .common-container .content .items.transaction, .admin.container .section.section-center main .common-container .content .items.common {
   background-color: #f4f4f4;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 10px;
   padding: 15px 40px 5px;
 }
-.admin.container .section.section-center main .common .content .items.transaction.active, .admin.container .section.section-center main .common .content .items.common.active {
+.admin.container .section.section-center main .common-container .content .items.transaction.active, .admin.container .section.section-center main .common-container .content .items.common.active {
   background-color: #f1faf3;
 }
-.admin.container .section.section-center main .common .content .items.transaction .flex, .admin.container .section.section-center main .common .content .items.common .flex {
+.admin.container .section.section-center main .common-container .content .items.transaction .flex, .admin.container .section.section-center main .common-container .content .items.common .flex {
   margin-bottom: 10px;
 }
-.admin.container .section.section-center main .common .content .items.transaction .flex.id-hash .value, .admin.container .section.section-center main .common .content .items.common .flex.id-hash .value {
+.admin.container .section.section-center main .common-container .content .items.transaction .flex.id-hash .value, .admin.container .section.section-center main .common-container .content .items.common .flex.id-hash .value {
   cursor: pointer;
 }
-.admin.container .section.section-center main .common .content .items.transaction .flex .label, .admin.container .section.section-center main .common .content .items.common .flex .label {
+.admin.container .section.section-center main .common-container .content .items.transaction .flex .label, .admin.container .section.section-center main .common-container .content .items.common .flex .label {
   width: 10%;
   max-width: 100px;
 }
-.admin.container .section.section-center main .common .content .items.transaction .flex .value, .admin.container .section.section-center main .common .content .items.common .flex .value {
+.admin.container .section.section-center main .common-container .content .items.transaction .flex .value, .admin.container .section.section-center main .common-container .content .items.common .flex .value {
   width: 80%;
   max-width: 800px;
   color: #9F38A7;
 }
-.admin.container .section.section-center main .common .content .items.transaction .flex .value span, .admin.container .section.section-center main .common .content .items.common .flex .value span {
+.admin.container .section.section-center main .common-container .content .items.transaction .flex .value span, .admin.container .section.section-center main .common-container .content .items.common .flex .value span {
   font-weight: 500;
   color: black;
   margin-right: 40px;
 }
-.admin.container .section.section-center main .common .content .items.transaction .flex .status, .admin.container .section.section-center main .common .content .items.common .flex .status {
+.admin.container .section.section-center main .common-container .content .items.transaction .flex .status, .admin.container .section.section-center main .common-container .content .items.common .flex .status {
   flex: 1 0 auto;
   text-align: right;
   font-weight: 600;
 }
-.admin.container .section.section-center main .common .content .items.transaction .flex .status.green, .admin.container .section.section-center main .common .content .items.common .flex .status.green {
+.admin.container .section.section-center main .common-container .content .items.transaction .flex .status.green, .admin.container .section.section-center main .common-container .content .items.common .flex .status.green {
   color: #147112;
 }
-.admin.container .section.section-center main .common .content .items.transaction .flex .status.blue, .admin.container .section.section-center main .common .content .items.common .flex .status.blue {
+.admin.container .section.section-center main .common-container .content .items.transaction .flex .status.blue, .admin.container .section.section-center main .common-container .content .items.common .flex .status.blue {
   color: #061495;
 }
-.admin.container .section.section-center main .common .content .items.transaction .flex .status.purple, .admin.container .section.section-center main .common .content .items.common .flex .status.purple {
+.admin.container .section.section-center main .common-container .content .items.transaction .flex .status.purple, .admin.container .section.section-center main .common-container .content .items.common .flex .status.purple {
   color: #9F38A7;
 }
-.admin.container .section.section-center main .common .content .items.transaction .flex .status.grey, .admin.container .section.section-center main .common .content .items.common .flex .status.grey {
+.admin.container .section.section-center main .common-container .content .items.transaction .flex .status.grey, .admin.container .section.section-center main .common-container .content .items.common .flex .status.grey {
   color: #9F9F9F;
 }
-.admin.container .section.section-center main .common .content .items.transaction .flex .datetime, .admin.container .section.section-center main .common .content .items.common .flex .datetime {
+.admin.container .section.section-center main .common-container .content .items.transaction .flex .datetime, .admin.container .section.section-center main .common-container .content .items.common .flex .datetime {
   flex: 1 0 auto;
   text-align: right;
   font-size: 14px;
@@ -1296,15 +1310,20 @@ body {
 }
 .dashboard.container .main .aside .gotoadmin-box {
   position: absolute;
-  left: 30px;
+  display: flex;
+  justify-content: center;
+  left: 50%;
+  transform: translateX(-50%);
   bottom: 150px;
+  width: 150px;
   background: #ac27b6;
   padding: 15px;
   border-radius: 10px;
   transition: 0.3s;
+  text-align: center;
 }
 .dashboard.container .main .aside .gotoadmin-box:hover {
-  transform: scale(1.1);
+  transform: translateX(-50%) scale(1.1);
 }
 .dashboard.container .main .aside #gotoadmin {
   text-decoration: none;

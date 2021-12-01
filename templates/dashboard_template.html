@@ -56,7 +56,7 @@
             <div class="hello">
             Hi. 
             {% if account_id %}
-                {% if type_cd == 2 %}
+                {% if not isAdmin %}
                 <div class="name">{{ account_fullname or ''}}</div>
                 <div class="type hoster">Hoster</div>
                 {% else %}    

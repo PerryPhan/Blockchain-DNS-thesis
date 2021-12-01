@@ -164,6 +164,9 @@ class Blocks(db.Model):
             self.as_dict(), sort_keys=True).encode()
         hash = hashlib.sha256(block_string).hexdigest()
         return hash
+
+    def datetime_format(self):
+        return datetime.fromtimestamp(self.timestamp).strftime("%b %d, %Y") if self.timestamp else None
      
 class Transactions(db.Model):
     __tablename__ = 'transactions'

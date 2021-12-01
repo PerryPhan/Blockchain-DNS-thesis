@@ -186,14 +186,19 @@
   background-color: #465a65;
   .gotoadmin-box{
     position: absolute;
-    left: 30px;
+    display: flex;
+    justify-content: center;
+    left: 50%;
+    transform: translateX(-50%);
     bottom: 150px;
+    width: 150px;
     background: #ac27b6;
     padding: 15px;
     border-radius: 10px;
     transition: .3s;
+    text-align: center;
     &:hover{
-      transform: scale(1.1);
+      transform: translateX(-50%) scale(1.1);
     }
   }
   #gotoadmin{

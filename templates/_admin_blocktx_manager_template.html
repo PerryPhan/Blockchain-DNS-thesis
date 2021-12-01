@@ -38,7 +38,7 @@
 </div>
 {% endblock %} {% block center %}
 <main class="block_and_trans">
-  <div class="blocks">
+  <div class="blocks ">
     <div class="top">
       <h3>Blocks</h3>
       <div class="right">
@@ -46,30 +46,37 @@
           <div class="btn-box">
             <div class="first-side">
               <span>
-                <a href="#">First</a>
+                <a 
+                href="{% if pages == 1 %} # {% else %} ./blocktxs {% endif %}"
+                >First</a>
               </span>
               <span>
-                <a href="#" id="a-table-previous" class="nohref"
+                <a 
+                 href="{% if pages == 1 %} # {% else %} {% if page == 1 %} # {% else %} ./blocktxs?page={{previous_page}} {% endif %} {% endif %}"
+                 id="a-table-previous" 
+                 class="nohref"
                   ><img
                     src="{{url_for('static',filename='img/arrow-left-icon.png')}}"
                     alt="left-icon" /></a
               ></span>
             </div>
             <div class="index-side">
-              <span id="span-table-index-page">1</span>
+              <span id="span-table-index-page">{{page}}</span>
               <span>/</span>
-              <span id="span-table-total-page">10</span>
+              <span id="span-table-total-page">{{pages}}</span>
             </div>
             <div class="last-side">
               <span>
-                <a href="#" id="a-table-next">
+                <a href="{% if pages == 1 %} # {% else %} {% if page == pages %} # {% else %}./blocktxs?page={{next_page}} {% endif %} {% endif %}" id="a-table-next">
                   <img
                     src="{{url_for('static',filename='img/arrow-right-icon.png')}}"
                     alt="right-icon"
                 /></a>
               </span>
               <span>
-                <a href="#">Last</a>
+                <a 
+                href="{% if pages == 1 %} # {% else %}./blocktxs?page={{pages}} {% endif %}"
+                >Last</a>
               </span>
             </div>
           </div>
@@ -77,6 +84,8 @@
       </div>
     </div>
     <div class="content">
+      {% for i in range(4) %}
+      <!-- ITEM -->
       <div class="block">
         <div class="flex id">
           <label for="id">id</label>
@@ -101,9 +110,11 @@
         </div>
         <div class="flex created-by">Created by <span>Node VN</span></div>
       </div>
+      <!-- ITEM -->
+      {% endfor %}
     </div>
   </div>
-  <div class="trans common">
+  <div class="trans common-container">
     <div class="top">
       <h3>Transactions</h3>
       <div class="right">
@@ -111,6 +122,8 @@
       </div>
     </div>
     <div class="content">
+      {% for i in range(6) %}
+      <!-- ITEM -->
       <div class="items transaction">
         <div class="flex id-hash">
           <div class="label">ID Hash:</div>
@@ -129,6 +142,8 @@
           <div class="datetime">Nov 20th, 2021</div>
         </div>
       </div>
+      <!-- ITEM -->
+      {% endfor %}
     </div>
   </div>
 </main>
@@ -136,7 +151,7 @@
 <div class="avatar-sub-box">
   <div class="field left">
     <h5>Wallet</h5>
-    <h4>$<span>10,00</span></h4>
+    <h4>$<span>{{ wallet or '0.00'}}</span></h4>
   </div>
   <div class="field right">
     <h5>Status</h5>
@@ -147,31 +162,40 @@
 {% endblock %} {% block right %}
 <div class="part common-part block-part genesis-part">
   <h4>Genesis Blocks</h4>
-  <div class="block common genesis-block">
+  <div class="block common-info genesis-block">
     <div class="flex id-hash">
       <label for="id">Id</label>
-      <div class="value">0</div>
+      <div class="value">
+        <div class="info animation slidetoLeft">
+          <span>{{ genesis.id }}</span></div>
+      </div>
     </div>
     <div class="flex time">
       <label for="time">Time</label>
       <div class="value">
-        <span>November</span>
-        <span>29th</span>,
-        <span>2021</span>
+        <div class="animation goup info">
+          <span> {{ genesis.datetime_format() }} </span>
+        </div>
       </div>
     </div>
     <div class="flex hash">
       <label for="hash">Hash</label>
       <div class="value">
-        0000000000000000000000...
-        <div class="sub-value">64 chars</div>
+        <div class="animation goup info">
+          <span> {{ genesis.hash }} </span>
+          <div class="sub-value">64 chars</div>
+        </div>
+        
       </div>
     </div>
     <div class="flex node">
       <label for="node">Node</label>
       <div class="value">
-        Node VN
-        <div class="sub-value">212515151191819818</div>
+        <div class="animation goup info">
+          <span>{{ node.nodename}}</span>
+          <div class="sub-value"> {{ node.id}} </div>
+        </div>
+        
       </div>
     </div>
   </div>

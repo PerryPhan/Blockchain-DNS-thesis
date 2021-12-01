@@ -48,6 +48,7 @@ class Blockchain:
         self.nodes = NodesBusiness()
         self.transactions = TransactionBusiness()
         self.chain = []
+        self.genesis_block = None
         self.MINE_REWARD = MINE_REWARD
         self.BUFFER_MAX_LEN = BUFFER_MAX_LEN
         self.DIFFICULTY = DIFFICULTY
@@ -98,14 +99,16 @@ class Blockchain:
 
     # GET & SHOW CHAIN ----------------------------------------------------------
     def getGenesisBlock(self):
-        return Blocks(
-            id='0',
+        if not self.genesis_block :
+            self.genesis_block = Blocks(
+            id= '0',
             timestamp=time.time(),
             nonce=1,
             hash='0'*64,
             node_id=self.node_id,
             transactions=None
-        ) if self.node_id else None
+            ) if self.node_id else None
+        return self.genesis_block
 
     def loadChain(self):
         '''
@@ -300,6 +303,12 @@ class Blockchain:
                         return transaction, 200
         return None, 404
 
+    def countBlocksList(self):
+        return db.session.query(Blocks).count()
+
+    def getListBlocksWithOffsetAndLimit(self, offset, limit ):
+        return db.session.query(Blocks).order_by(Blocks.timestamp.asc()).offset(offset).limit(limit).all()
+
 # TransactionBusiness  -----------------------------------
 
 
@@ -433,6 +442,9 @@ class TransactionBusiness:
 
     def countAllTransactions(self):
         return db.session.query(Transactions).count()
+
+    def countAllNoBlockTransactions(self):
+        return db.session.query(Transactions).filter(Transactions.block_id == None ).count()
 
     def correctFormat(self, obj):
         obj['soa']['refresh'] = int(obj['soa']['refresh']) if type(
@@ -619,7 +631,7 @@ class NodesBusiness:
             return self.updateNode(node)
         return node
 
-    def handleNodeInformation(self, ip: str, port: int, genport_flag = False, nodename=None):
+    def handleNodeInformation(self, ip: str, port: int, genport_flag = False, nodename=None, is_active = True):
         """
             Handle 5 Cases :
                 Empty network  : Create OK
@@ -637,7 +649,7 @@ class NodesBusiness:
                 ip,
                 port,
                 nodename,
-                True
+                is_active
             )
         else:
             nodeIP = self.getNodeWithIP(ip)
@@ -647,7 +659,7 @@ class NodesBusiness:
                     ip,
                     port,
                     nodename,
-                    True
+                    is_active
                 )
             nodeIPPort = self.getNodeWithIPAndPort(ip, port)
             if not nodeIPPort:  # 3. Have this IP but don't have this port, create new
@@ -656,7 +668,7 @@ class NodesBusiness:
                     ip,
                     port,
                     nodename,
-                    True
+                    is_active
                 )
             elif nodeIPPort.is_active == True:  # 4. This node already active
                 anotherNode = [
@@ -669,7 +681,7 @@ class NodesBusiness:
                         ip,
                         port,
                         nodename,
-                        True
+                        is_active
                     )
                 else:  # This node has same IP, different port and haven't used yet
                     self.activeNode(anotherNode[0])

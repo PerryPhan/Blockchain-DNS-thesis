@@ -38,7 +38,7 @@
 </div>
 {% endblock %} {% block center %}
 <main class="nodes">
-  <div class="common">
+  <div class="common-container">
     <div class="top">
       <h3>Nodes</h3>
       <h5>Total: {{count or '0'}}</h5>
@@ -47,10 +47,15 @@
           <div class="btn-box">
             <div class="first-side">
               <span>
-                <a href="{% if pages == 1 %} # {% else %}./nodes {% endif %}">First</a>
+                <a href="{% if pages == 1 %} # {% else %}./nodes {% endif %}"
+                  >First</a
+                >
               </span>
               <span>
-                <a href="{% if pages == 1 %} # {% else %} {% if page == 1 %} # {% else %} ./nodes?page={{previous_page}} {% endif %} {% endif %}" id="a-table-previous" class="nohref"
+                <a
+                  href="{% if pages == 1 %} # {% else %} {% if page == 1 %} # {% else %} ./nodes?page={{previous_page}} {% endif %} {% endif %}"
+                  id="a-table-previous"
+                  class="nohref"
                   ><img
                     src="{{url_for('static',filename='img/arrow-left-icon.png')}}"
                     alt="left-icon" /></a
@@ -63,14 +68,20 @@
             </div>
             <div class="last-side">
               <span>
-                <a href="{% if pages == 1 %} # {% else %} {% if page == pages %} # {% else %}./nodes?page={{next_page}} {% endif %} {% endif %}" id="a-table-next">
+                <a
+                  href="{% if pages == 1 %} # {% else %} {% if page == pages %} # {% else %}./nodes?page={{next_page}} {% endif %} {% endif %}"
+                  id="a-table-next"
+                >
                   <img
                     src="{{url_for('static',filename='img/arrow-right-icon.png')}}"
                     alt="right-icon"
                 /></a>
               </span>
               <span>
-                <a href="{% if pages == 1 %} # {% else %}./nodes?page={{pages}} {% endif %}">Last</a>
+                <a
+                  href="{% if pages == 1 %} # {% else %}./nodes?page={{pages}} {% endif %}"
+                  >Last</a
+                >
               </span>
             </div>
           </div>
@@ -95,14 +106,26 @@
         <div class="flex id-hash">
           <div class="label">ID:</div>
           <div class="value">{{node.id}}</div>
-          <div class="status {% if node.is_active == True %} green {% else %} grey {% endif %}">{% if node.is_active == True %} Active {% else %} Unactive {% endif %}</div>
+          <div
+            class="
+              status
+              {% if node.is_active == True %}
+              green
+              {% else %}
+              grey
+              {% endif %}
+            "
+          >
+            {% if node.is_active == True %} Active {% else %} Unactive {% endif
+            %}
+          </div>
         </div>
         <div class="flex data">
           <div class="label">Data:</div>
           <div class="value">
-            IP : <span class="ip">{{node.ip}}</span>
-            Name : <span class="name">{{node.nodename or 'Default'}}</span>
-            Port : <span class="port">{{node.port}}</span>
+            IP : <span class="ip">{{node.ip}}</span> Name :
+            <span class="name">{{node.nodename or 'Default'}}</span> Port :
+            <span class="port">{{node.port}}</span>
           </div>
           <div class="datetime">{{node.datetime_format()}}</div>
         </div>
@@ -116,13 +139,13 @@
 <div class="part common-part node-info-part">
   <h4>This Node Information</h4>
   {% if this_node %}
-  <div class="common node-info">
+  <div class="common-info node-info">
     <div class="flex id-hash">
       <label for="id">id</label>
-      <div class="value ">
+      <div class="value">
         <div class="info animation slidetoLeft">
           <span>{{this_node.id or ''}}</span>
-      </div>
+        </div>
       </div>
     </div>
     <div class="flex time">
@@ -139,21 +162,43 @@
         <div class="animation goup info">
           <span>{{this_node.nodename or 'Default'}}</span>
         </div>
-        
       </div>
     </div>
     <div class="flex ipport">
       <label for="ipport">iP port</label>
       <div class="value">
         <div class="animation goup info">
-        <span>{{this_node.ip}}</span> : <span>{{this_node.port}}</span>
-      </div>
+          <span>{{this_node.ip}}</span> : <span>{{this_node.port}}</span>
+        </div>
       </div>
     </div>
     <div class="flex status">
       <label for="status">status</label>
-      <div class="value {% if this_node.is_active == True %} green {% else %} grey {% endif %}">
-        <div class="animation goup info">{% if this_node.is_active == True %} Active {% else %} Unactive {% endif %}</div>
+      <div
+        class="
+          value
+          {%
+          if
+          this_node.is_active
+          ==
+          True
+          %}
+          green
+          {%
+          else
+          %}
+          grey
+          {%
+          endif
+          %}
+        "
+      >
+        <div class="animation goup info">
+          <span
+            >{% if this_node.is_active == True %} Active {% else %} Unactive {%
+            endif %}</span
+          >
+        </div>
       </div>
     </div>
   </div>
@@ -162,6 +207,4 @@
   </div>
   {% endif %}
 </div>
-{% endblock %} {% block script %} 
-
-{% endblock %}
+{% endblock %} {% block script %} {% endblock %}
