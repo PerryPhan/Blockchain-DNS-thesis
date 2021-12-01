@@ -102,7 +102,7 @@
     <div class="content full-page">
       {% for node in list_of_nodes %}
       <!-- ITEMS -->
-      <div class="items node common active animation slidetoLeft">
+      <div class="items node common {% if node.is_active == True %} active {% else %} inactive {% endif%} animation slidetoLeft">
         <div class="flex id-hash">
           <div class="label">ID:</div>
           <div class="value">{{node.id}}</div>
@@ -116,7 +116,7 @@
               {% endif %}
             "
           >
-            {% if node.is_active == True %} Active {% else %} Unactive {% endif
+            {% if node.is_active == True %} Active {% else %} Inactive {% endif
             %}
           </div>
         </div>

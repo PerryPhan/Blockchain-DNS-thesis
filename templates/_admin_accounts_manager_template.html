@@ -103,7 +103,7 @@
     <div class="content full-page">
       {% for account in list_of_accounts %}
       <!-- ITEMS -->
-      <div class="items account common animation slidetoLeft">
+      <div class="items account common {% if account.node.is_active == True %} active {% else %} inactive {% endif%} animation slidetoLeft">
         <div class="flex id-hash">
           <div class="label">ID:</div>
           <div class="value">{{account.id}}</div>

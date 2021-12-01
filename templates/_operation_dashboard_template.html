@@ -13,7 +13,9 @@
     <div class="sub-tab tab-title {% if type == 2 %} active {% endif %}">
       <a href="./domains/detail"><h3>Recent domain detail</h3> </a>
     </div>
-
+    <div class="tab-title {% if type == 3 %} active {% endif %}">
+      <a href="#"><h3>Operation</h3></a>
+    </div>
        {% if isAdmin %}
        <div class="gotoadmin-box">
         <a id="gotoadmin" href="../admin"> Admin panel </a>

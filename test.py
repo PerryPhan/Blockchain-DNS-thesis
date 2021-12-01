@@ -241,5 +241,36 @@ import getpass
 # print (id[ i : i + 4 ])
 # exit(0)
 
-if True :
-    a = 1
+# if True :
+#     a = 1
+
+import threading
+
+def hash(nonce):
+    block_string = json.dumps(
+    {'nonce': nonce}, sort_keys=True).encode()
+    hash = hashlib.sha256(block_string).hexdigest()
+    return hash
+
+def speedtimer():    
+    start = time.perf_counter()
+    # ----------------------------
+    nonce = 0
+    while not '111' in hash(nonce) :
+        nonce += 1
+    hashs = hash(nonce)
+    print(hashs, len(hashs))
+    # ----------------------------
+    end = time.perf_counter()
+    print(float(end-start))
+    
+# Demo : Testing 3 threads in local 
+print("READY")
+print("GO !!")
+speedtimer()
+# for i in range(3):
+#     x = threading.Thread(target=speedtimer)
+#     x.start()
+
+# for i in range(3):
+#     x.join()

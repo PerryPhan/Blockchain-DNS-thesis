@@ -91,8 +91,8 @@ class Blockchain:
         for block in self.chain:
             if block.id != 0 and block.add_by_node_id:
                 if block.add_by_node_id == self.node_id:
-                    totalRewards += self.MINE_REWARD
-        return totalRewards
+                    totalRewards += self.MINE_REWARD * len(block.transactions)
+        return '%.2f' % totalRewards
 
     def dumpChain(self):
         return [block.as_dict() for block in self.chain]
@@ -210,12 +210,15 @@ class Blockchain:
             Hash x nonce = Hash ['0x + 63chars']
         '''
         start = time.perf_counter()
+        print("Proof of work start in ", start)
         # ----------------------------
         block.nonce = 0
-        while not block.hash().startswith('0' * self.DIFFICULTY):
+        while not block._hash().startswith('0' * self.DIFFICULTY):
             block.nonce += 1
         # ----------------------------
         end = time.perf_counter()
+        print("Block nonce found: ",block.nonce, block.hash)
+        print("Proof of work end in ", end)
         return block, float(end-start)
 
     def findFastestBlockResponse(self, responses):
@@ -226,7 +229,9 @@ class Blockchain:
             fastestBlockResponse = responses[0]['block']
             return fastestBlockResponse
         else:
+            print(" FIND FASTEST BLOCK RESPONSE :")
             for response in responses:
+                print("RESPONSE: ",response['block']['node_id'], response['speedtime'])
                 if response['speedtime'] < minSpeedtime:
                     minSpeedtime = response['speedtime']
                     fastestBlockResponse = response['block']
@@ -258,7 +263,7 @@ class Blockchain:
         '''
             Return new block when provide informations
         '''
-        previous_hash = self.last_block.hash() if len(
+        previous_hash = self.last_block._hash() if len(
             self.chain) > 1 else '0'*64,  # genesis.hash
         return Blocks(
             id=len(self.chain),
@@ -303,6 +308,14 @@ class Blockchain:
                         return transaction, 200
         return None, 404
 
+    def getBlockTransactionWithId(self, id):
+        block = db.session.query(Blocks).filter( Blocks.id == id).first()
+        transactions = block.transactions
+        result = []
+        for tran in transactions:
+            result.append(self.transactions.getTransactionById( tran.split('|')[1] ))
+        return result
+    
     def countBlocksList(self):
         return db.session.query(Blocks).count()
 
@@ -521,8 +534,12 @@ class TransactionBusiness:
             # TODO : Add + Update Tx
             if transaction.action == 'add':
                 records.append(Records(transaction))
-            elif transaction.action == 'Update':
-                pass
+            elif transaction.action == 'update':
+                # Find domain name in records
+                for x in records: 
+                    if x.domain == transaction.domain:
+                        x = Records(transaction)
+                        break
         return records
    
     def getDomain(self, domain, from_transactions_list = None):
@@ -534,7 +551,7 @@ class TransactionBusiness:
             if record.domain == domain: 
                 result = record 
 
-        return record
+        return result
 
     def getRawDomainData(self):
         return [transaction.zone_format() for transaction in self.getAllTransactions()]
@@ -642,7 +659,6 @@ class NodesBusiness:
         """
         network = self.getNetwork()  # Found all node ( not-working status )
         id = str(uuid4()).replace('-', '')
-        
         if not network:  # 1. Empty network, create new
             return self.registerNode(
                 id,
@@ -652,6 +668,15 @@ class NodesBusiness:
                 is_active
             )
         else:
+            if genport_flag == True :
+                port = random.randint(self.PORT_START, self.PORT_END)
+                return self.registerNode(
+                    id,
+                    ip,
+                    port,
+                    nodename,
+                    is_active
+                )
             nodeIP = self.getNodeWithIP(ip)
             if not nodeIP:  # 2. Don't have this IP in DB, create new
                 return self.registerNode(
@@ -670,12 +695,10 @@ class NodesBusiness:
                     nodename,
                     is_active
                 )
-            elif nodeIPPort.is_active == True:  # 4. This node already active
+            elif nodeIPPort.is_active == True:  # 4. This node already active    
                 anotherNode = [
-                    node for node in nodeIP if node.is_active == False and node.ip == nodeIPPort.ip]
+                    node for node in nodeIP if node.is_active == False and node.ip == nodeIPPort.ip]  
                 if len(anotherNode) <= 0:  # No node same IP spared
-                    if genport_flag == True :
-                        port = random.randint(self.PORT_START, self.PORT_END)
                     return self.registerNode(
                         id,
                         ip,

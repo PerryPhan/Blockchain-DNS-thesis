@@ -1,4 +1,4 @@
-from constant import ZONE_FORMAT
+from constant import MINE_REWARD, ZONE_FORMAT
 from include import db, json, hashlib, datetime, copy
 import time
 ''' 
@@ -8,83 +8,14 @@ import time
 def recreate():
     db.drop_all()
     db.create_all()
-
-def insertBlock():
-    block = Blocks(
-        id = 1,
-        timestamp = 1.1,
-        nonce = 1,
-        transactions = [
-            {
-                'domain' : 'a',
-                'type' : 'A',
-                'ip' : '1.1.1.1',
-                'port' : 80,
-                'ttl' : 14400
-            } for i in range( 20 )
-        ],
-        previous_hash = '00',
-        node_id = None,
-        add_by_node_id = None
-    )
-    try :
-        db.session.add(block)
-        db.session.commit()
-    except:
-        db.session.rollback()
-        print('Can not add block')
-
-def getFirstBlock():
-    return Blocks.query.filter(
-            Blocks.id == 1,
-    ).first()
-
-def insertTransaction():
-    timestamp = time.time()
-    tran = Transactions(
-        id = '123456789',
-        action = 'Add',
-        domain = 'example.com',
-        soa = {
-		"mname": "ns1.example.com",
-		"rname": "admin.example.com",
-		"serial": "{time}",
-		"refresh": 3600,
-		"retry": 600,
-		"expire": 30,
-		"minimum": 86400
-        },
-        ns = [
-		{"host": "ns1.example.com"},
-		{"host": "ns2.example.com"}
-	    ],
-        a = [
-		{"name": "@",
-		  "ttl": 400,
-		  "value": "192.168.1.7"
-		},
-		{"name": "@",
-		  "ttl": 400,
-		  "value": "11.0.0.2"
-		},
-		{"name": "@",
-		  "ttl": 400,
-		  "value": "11.0.0.3"
-		}
-	    ],
-        ttl = 3600,
-        timestamp = timestamp
-    )
-    try :
-        db.session.add(tran)
-        db.session.commit()
-    except:
-        db.session.rollback()
-        print('Can not add tran')
-
-def getTransaction():
-    return Transactions.query.all()
-
+    
+def clear_data(session):
+    meta = db.metadata
+    for table in reversed(meta.sorted_tables):
+        print('Clear table %s' % table)
+        session.execute(table.delete())
+    session.commit()
+    
 def merge_obj(obj, merge_obj):
     for property in merge_obj:
         obj[property] = merge_obj[property]
@@ -159,7 +90,7 @@ class Blocks(db.Model):
         self.add_by_node_id     = json['add_by_node_id'] if 'add_by_node_id' in json else None
         return self
         
-    def hash(self):
+    def _hash(self):
         block_string = json.dumps(
             self.as_dict(), sort_keys=True).encode()
         hash = hashlib.sha256(block_string).hexdigest()
@@ -167,7 +98,13 @@ class Blocks(db.Model):
 
     def datetime_format(self):
         return datetime.fromtimestamp(self.timestamp).strftime("%b %d, %Y") if self.timestamp else None
-     
+    
+    def transactions_len(self):
+        return len(self.transactions)
+    
+    def earning(self):
+        return len(self.transactions) * MINE_REWARD
+    
 class Transactions(db.Model):
     __tablename__ = 'transactions'
     __table_args__ = {'extend_existing': True}

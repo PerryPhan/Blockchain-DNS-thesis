@@ -10,6 +10,7 @@
             padding-left: 20px;
             
             .block {
+                cursor: pointer;
                 box-sizing: border-box;
                 border-radius: 20px;
                 margin-right: 35px;
@@ -31,10 +32,14 @@
                         color: $admin-datetime-text-color;
                         letter-spacing: 4.5%;
                         font-size: 12px;
-
-                        span {
-                            margin-left: 10px;
+                        .value{
+                            color: inherit;
+                            width: 100%;
+                            span {
+                                margin-left: 10px;
+                            }
                         }
+                       
                     }
 
                     &.id {
@@ -79,7 +84,9 @@
                         width: 40%;
                         color: $admin-right-genesis-h4-text-color;
                         max-width: 250px;
+                        overflow: hidden;
                         text-align: right;
+                        
                     }
                 }
             }

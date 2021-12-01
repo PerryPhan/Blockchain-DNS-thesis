@@ -49,28 +49,36 @@ def blocks_txs_manager():
     pages = 1
     offset = 0
     list_of_blocks = []
-    this_node = None
+    list_of_transaction = []
 
     # Has items
     if count > 0:
         # Page
         page = request.args.get('page', default=1, type=int)
+        id = request.args.get('id', default=1, type=int)
         pages = math.ceil(count / limit)
 
         # Condition
+        
+        if id <= 0:
+            id = 1
+        elif id > count:
+            id = count
+             
         if page <= 0:
             page = 1
-        if page > pages:
+        elif page > pages:
             page = pages
-
+        
         # Number
         offset = (page-1) * limit
-
         list_of_blocks = dns.blockchain.getListBlocksWithOffsetAndLimit(offset, limit)
-    
+        list_of_transaction = dns.blockchain.getBlockTransactionWithId(id)
+        
     html_options = {
         'title': 'Blocks and Txs manager',
         'admin': admin,
+        'id': id,
         # Data 
         'wallet': dns.blockchain.wallet,
         'genesis': dns.blockchain.getGenesisBlock(),
@@ -81,7 +89,8 @@ def blocks_txs_manager():
         'next_page': page + 1 if page + 1 < pages else pages,
         'pages': pages,
         'count': count,
-        'list_of_blocks': list_of_blocks
+        'list_of_blocks': list_of_blocks,
+        'list_of_transaction': list_of_transaction,
     }
     if request.method == 'POST':
         # If the first time login in
@@ -191,7 +200,6 @@ def account_manager():
     admin = accountBusiness.getAccountById(
         session['account']['id']
     )
-
     html_options = {
         'title': 'Accounts manager',
         # Pagination
@@ -214,12 +222,11 @@ def account_manager():
 @app.route('/dashboard/transactions')
 def dashboardTransactions():
     if( dns.blockchain.transactions.countAllNoBlockTransactions() > 0) :
-        response = request.get()
         pass
     # Pagination
     count = dns.blockchain.transactions.countAllTransactions()
     no_block_count = dns.blockchain.transactions.countAllNoBlockTransactions()
-    limit = 7
+    limit = 10
 
     # Default
     page = 1
@@ -275,8 +282,9 @@ def dashboardTransactions():
 @app.route('/dashboard/domains')
 def dashboardDomains():
     # Pagination
-    count = dns.blockchain.transactions.countAllTransactions()
-    limit = 7
+    all =  dns.blockchain.transactions.getDomainList()
+    count = len(all)
+    limit = 10
 
     # Default
     page = 1
@@ -298,9 +306,7 @@ def dashboardDomains():
 
         # Number
         offset = (page-1) * limit
-        list = dns.blockchain.transactions.getListTransactionstsWithOffsetAndLimit(
-            offset, limit)
-        list = dns.blockchain.transactions.getDomainList(list)
+        list = all[offset : offset + limit]
 
     html_options = {
         'type': 2,
@@ -368,7 +374,6 @@ def detailDashboardDomains():
         'type': 2,
         'title': 'Domains Detail',
         'unit': 'domains',
-        
     }
 
     if session:
@@ -388,7 +393,8 @@ def detailDashboardDomains():
 @app.route('/dashboard/operation', methods=['GET', 'POST'])
 def dashboard_operation():
     ALLOWED_EXTS = {"txt", "zone"}
-
+    all_transactions = dns.blockchain.transactions.getAllTransactions()
+    
     def checkFileNameFormat(filename):
         # Check file name
         if filename == '':
@@ -403,9 +409,10 @@ def dashboard_operation():
         return filename, 200
 
     def handleOneRecordForm(form):
+        action = 'update' if dns.blockchain.transactions.getDomain( form['domain'], all_transactions) else 'add'
         # New transaction
         tran, status = dns.blockchain.transactions.newTransaction(
-            form, session['account']['id'], 'add', True
+            form, session['account']['id'], action, True
         )
         # Add single Transaction
         status = dns.blockchain.transactions.addTransaction(tran)
@@ -452,8 +459,10 @@ def dashboard_operation():
 
         if status != 500:     
             for record in records.values():
+                print(record)
+                data_action = 'update' if dns.blockchain.transactions.getDomain( record['$origin'], all_transactions ) else 'add'
                 data_tran, data_status = dns.blockchain.transactions.newTransaction(
-                    record, session['account']['id'], 'add'
+                    record, session['account']['id'], data_action
                 )
                 if data_status != 200: 
                     data_errors.append( record['$origin'] )
@@ -492,18 +501,34 @@ def dashboard_operation():
         **account_options,
         'transactions_list' : transactions_list_by_account
     }
-
+    
     if request.method == 'POST':
         response = {}
         if request.files.getlist('file'):
             files = request.files.getlist('file')
             response = handleMultipleRecordsForm(files)
-            return render_template('_operation_dashboard_template.html', **html_options, **response)
+        else :    
+            response = handleOneRecordForm(request.form)
+        
+        if dns.blockchain.transactions.countAllNoBlockTransactions() != 0 :
+            # Pre mining
+            transactions, status = dns.blockchain.prepareMiningBlockTransactions()
+            if status == 500:
+                return render_template('_operation_dashboard_template.html', **html_options, **response)
 
-        response = handleOneRecordForm(request.form)
+            # Mining
+            block = dns.blockchain.mineBlock(transactions)
+
+            if block:
+                block, status = dns.blockchain.addBlock(block)
+                dns.blockchain.transactions.setCurrentTxsBlockID(block.id)
+                dns.blockchain.broadcastNewBlock()
+                
+        html_options['transactions_list'] = dns.blockchain.transactions.getListTransactionsByAccount(account_options['account_id'])  
+        print("HTML OPTIONS: ",html_options['transactions_list'], len(html_options['transactions_list']))   
+        
         return render_template('_operation_dashboard_template.html', **html_options, **response)
     
-
     return render_template('_operation_dashboard_template.html', **html_options)
 
 # -FRONT --------------------------------------------------
@@ -733,6 +758,7 @@ def mineBlock():
         block, status = dns.blockchain.addBlock(block)
         dns.blockchain.transactions.setCurrentTxsBlockID(block.id)
         dns.blockchain.broadcastNewBlock()
+        
     message = Message.getMessage('BlockMining', status or 501)
 
     return jsonify({

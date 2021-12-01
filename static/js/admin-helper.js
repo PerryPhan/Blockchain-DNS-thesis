@@ -121,6 +121,15 @@ function get_account_obj( this_obj ){
   return obj
 }
 
+// BLOCKTXS
+function set_blocktxs_info(obj, list) {
+ 
+}
+
+function get_blocktxs_obj( this_obj ){
+
+}
+
 // COMMON
 $(".items").on("click", function(){
   $(".items").removeClass(SELECTED_CLASS)
@@ -161,3 +170,48 @@ setEventForItems('node', node_info_field, get_node_obj , set_node_info)
 if ( $('.items.account').exists() )
 setEventForItems('account', account_info_field, get_account_obj, set_account_info)
 
+if ( $('.block').exists() ){
+  page = $('#span-table-index-page').text()
+  $('.common-part .back-node').hide()
+  back = {
+    id : $('.common-info.genesis-block .flex.id-hash .value .info span').text(),
+    datetime: $('.common-info.genesis-block .flex.time .value .info span').text(),
+    transactions_len: $('.common-info.genesis-block .flex.transactions .value .info span').text(),
+    previous: $('.common-info.genesis-block .flex.hash .value .info span').text(),
+    node: $('.common-info.genesis-block .flex.node .value .info span').text(),
+    nodeid:$('.common-info.genesis-block .flex.node .value .info .sub-value').text(),
+  }
+  console.log(back)
+  $('.block').on('click', function(){
+
+    id = $(this).children('.flex.id').children('.value').children('span').text()
+    datetime = $(this).children('.flex.id').children('.datetime').children('span').text()
+    transactions_len = $(this).children('.flex.transactions').children('.value').children('span').text()
+    previous = $(this).children('.flex.previous').children('.value').children('span').text()
+    node = $(this).children('.flex.created-by').children('.value').children('span').text()
+    nodeid = $(this).children('.flex.created-by').attr('id')
+    
+    $('.common-part .back-node').show()
+
+    console.log(id, datetime, transactions_len, previous, node, nodeid)
+    $('.common-part.block-part h4').text('Selected block information')
+
+    $('.common-info.genesis-block .flex.id-hash .value').html(`<div class="info animation slidetoLeft"><span>${id}</span></div>`)
+    $('.common-info.genesis-block .flex.time .value').html(`<div class="animation goup info"><span>${datetime}</span></div>`)
+    $('.common-info.genesis-block .flex.transactions .value').html(`<div class="animation goup info"><span> ${transactions_len}</span><a href="./blocktxs?page=${page}&id=${id}">( See all )</a></div>`)
+    $('.common-info.genesis-block .flex.hash label').text('Previous hash')
+    $('.common-info.genesis-block .flex.hash .value').html(`<div class="animation goup info"><span>${previous}</span></div>`)
+    $('.common-info.genesis-block .flex.node .value').html(`<div class="animation goup info"><span>${node}</span><div class="sub-value">${nodeid}</div></div>`)
+  })
+
+  $('.common-part .back-node').on('click',function(){
+    $('.common-part.block-part h4').text('Genesis Block')
+    $('.common-info.genesis-block .flex.id-hash .value').html(`<div class="info animation slidetoLeft"><span>${back.id}</span></div>`)
+    $('.common-info.genesis-block .flex.time .value').html(`<div class="animation goup info"><span>${back.datetime}</span></div>`)
+    $('.common-info.genesis-block .flex.transactions .value').html(`<div class="animation goup info"><span>${back.transactions_len}</span></div>`)
+    $('.common-info.genesis-block .flex.hash label').text('Hash')
+    $('.common-info.genesis-block .flex.hash .value').html(`<div class="animation goup info"><span>${back.previous}</span></div>`)
+    $('.common-info.genesis-block .flex.node .value').html(`<div class="animation goup info"><span>${back.node}</span><div class="sub-value">${back.nodeid}</div></div>`)
+    $(this).hide()
+  })
+}

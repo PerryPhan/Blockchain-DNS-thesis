@@ -38,7 +38,7 @@
 </div>
 {% endblock %} {% block center %}
 <main class="block_and_trans">
-  <div class="blocks ">
+  <div class="blocks">
     <div class="top">
       <h3>Blocks</h3>
       <div class="right">
@@ -46,15 +46,16 @@
           <div class="btn-box">
             <div class="first-side">
               <span>
-                <a 
-                href="{% if pages == 1 %} # {% else %} ./blocktxs {% endif %}"
-                >First</a>
+                <a
+                  href="{% if pages == 1 %} # {% else %} ./blocktxs {% endif %}"
+                  >First</a
+                >
               </span>
               <span>
-                <a 
-                 href="{% if pages == 1 %} # {% else %} {% if page == 1 %} # {% else %} ./blocktxs?page={{previous_page}} {% endif %} {% endif %}"
-                 id="a-table-previous" 
-                 class="nohref"
+                <a
+                  href="{% if pages == 1 %} # {% else %} {% if page == 1 %} # {% else %} ./blocktxs?page={{previous_page}} {% endif %} {% endif %}"
+                  id="a-table-previous"
+                  class="nohref"
                   ><img
                     src="{{url_for('static',filename='img/arrow-left-icon.png')}}"
                     alt="left-icon" /></a
@@ -67,16 +68,20 @@
             </div>
             <div class="last-side">
               <span>
-                <a href="{% if pages == 1 %} # {% else %} {% if page == pages %} # {% else %}./blocktxs?page={{next_page}} {% endif %} {% endif %}" id="a-table-next">
+                <a
+                  href="{% if pages == 1 %} # {% else %} {% if page == pages %} # {% else %}./blocktxs?page={{next_page}} {% endif %} {% endif %}"
+                  id="a-table-next"
+                >
                   <img
                     src="{{url_for('static',filename='img/arrow-right-icon.png')}}"
                     alt="right-icon"
                 /></a>
               </span>
               <span>
-                <a 
-                href="{% if pages == 1 %} # {% else %}./blocktxs?page={{pages}} {% endif %}"
-                >Last</a>
+                <a
+                  href="{% if pages == 1 %} # {% else %}./blocktxs?page={{pages}} {% endif %}"
+                  >Last</a
+                >
               </span>
             </div>
           </div>
@@ -84,31 +89,35 @@
       </div>
     </div>
     <div class="content">
-      {% for i in range(4) %}
+      {% for dblock in list_of_blocks %}
       <!-- ITEM -->
       <div class="block">
-        <div class="flex id">
+        <div class="flex id" id="{{dblock._hash()}}">
           <label for="id">id</label>
-          <div class="value">#<span>1</span></div>
+          <div class="value">#<span>{{ dblock.id }}</span></div>
           <div class="datetime">
-            <span>Nov</span>
-            <span>28th</span>,
-            <span>2021</span>
+            <span>{{ dblock.datetime_format() }}</span>
           </div>
         </div>
         <div class="flex transactions">
-          <label for="id">Transactions</label>
-          <div class="value">5</div>
+          <label for="transactions">Transactions</label>
+          <div class="value">
+            <span>{{ dblock.transactions_len() }}</span>
+          </div>
         </div>
         <div class="flex previous">
-          <label for="id">Previous</label>
-          <div class="value">Genesis</div>
+          <label for="previous">Previous</label>
+          <div class="value"><span>{{ dblock.previous_hash }}</span></div>
         </div>
         <div class="flex add-by">
-          <label for="id">Add by this node</label>
-          <div class="value">+10</div>
+          <label for="add-by">Add by {% if dblock.node_id == dblock.add_by_node_id %} this node {% else %} other node {% endif %}</label>
+          <div class="value">
+            <span>{% if dblock.node_id == dblock.add_by_node_id %} +{{dblock.earning()}} {% else %} 0 {% endif %}</span>
+          </div>
         </div>
-        <div class="flex created-by">Created by <span>Node VN</span></div>
+        <div class="flex created-by" id ="{{ dblock.node.id }}" >
+          <div class="value">Created by <span>{{ dblock.node.nodename }}</span></div> 
+        </div>
       </div>
       <!-- ITEM -->
       {% endfor %}
@@ -116,30 +125,30 @@
   </div>
   <div class="trans common-container">
     <div class="top">
-      <h3>Transactions</h3>
+      <h3>Transactions of Block ID {{ id }}</h3>
       <div class="right">
         <div class="sort"></div>
       </div>
     </div>
     <div class="content">
-      {% for i in range(6) %}
+      {% for tran in list_of_transaction %}
       <!-- ITEM -->
       <div class="items transaction">
         <div class="flex id-hash">
           <div class="label">ID Hash:</div>
           <div class="value">
-            2d9783223ce2a1112e1ba5f59c543d989c058c72e1f40d9dd79982e3ab5dc4f9|3
+            {{ tran.block_tx_format() }}
           </div>
-          <div class="status green">Add</div>
+          <div class="status green">{{ tran.action.capitalize() }}</div>
         </div>
         <div class="flex data">
           <div class="label">Data:</div>
           <div class="value">
-            <span>Domain: abc.com</span>
+            <span>Domain: {{tran.domain}}</span>
             <span>SOA & NS Record : default</span>
-            <span>A Record : 1 ( 192.168.1.7 ) </span>
+            <span>A Record : {{tran.a[0]['value']}} </span>
           </div>
-          <div class="datetime">Nov 20th, 2021</div>
+          <div class="datetime">{{tran.datetime_format()}}</div>
         </div>
       </div>
       <!-- ITEM -->
@@ -147,6 +156,7 @@
     </div>
   </div>
 </main>
+
 {% endblock %} {% block right_sub_information %}
 <div class="avatar-sub-box">
   <div class="field left">
@@ -162,12 +172,15 @@
 {% endblock %} {% block right %}
 <div class="part common-part block-part genesis-part">
   <h4>Genesis Blocks</h4>
+  
+  {% if genesis %}
   <div class="block common-info genesis-block">
     <div class="flex id-hash">
       <label for="id">Id</label>
       <div class="value">
         <div class="info animation slidetoLeft">
-          <span>{{ genesis.id }}</span></div>
+          <span>{{ genesis.id }}</span>
+        </div>
       </div>
     </div>
     <div class="flex time">
@@ -178,6 +191,14 @@
         </div>
       </div>
     </div>
+    <div class="flex transactions">
+      <label for="transactions">Transactions</label>
+      <div class="value">
+        <div class="animation goup info">
+          <span> 0 </span>
+        </div>
+      </div>
+    </div>
     <div class="flex hash">
       <label for="hash">Hash</label>
       <div class="value">
@@ -185,7 +206,6 @@
           <span> {{ genesis.hash }} </span>
           <div class="sub-value">64 chars</div>
         </div>
-        
       </div>
     </div>
     <div class="flex node">
@@ -193,11 +213,14 @@
       <div class="value">
         <div class="animation goup info">
           <span>{{ node.nodename}}</span>
-          <div class="sub-value"> {{ node.id}} </div>
+          <div class="sub-value">{{ node.id}}</div>
         </div>
-        
       </div>
     </div>
+  </div>
+  {% endif %}
+  <div class="back-node">
+    <a href="#">Back to genesis </a>
   </div>
 </div>
 {% endblock %}

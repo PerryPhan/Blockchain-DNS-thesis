@@ -1,10 +1,11 @@
-from database import recreate
+from database import recreate, db, clear_data
 from business import NodesBusiness, AccountBusiness
 import socket, random, re
 from werkzeug.security import generate_password_hash
 
 # recreate()
 # CREATE NODES 
+
 nodes = NodesBusiness()
 host = socket.gethostbyname(socket.gethostname())
 port = 5000
@@ -29,35 +30,41 @@ def create_nodes( number ):
     names = generateName(number)
 
     for i in range(number):
-        print( str(i), ". " )
+        print( str(i), ". " , names[i].capitalize(), ' => Node '+ names[i])
         node, code = nodes.handleNodeInformation( host , port , True, 'Node '+ names[i] , False)
-        print( " NODE ",{
+        print( " NODE ",[
                 node.id,
-                host,
-                port,
-                node.nodename
-        }," with code ", code ) 
+                node.ip,
+                node.port,
+                node.nodename,
+                node.is_active
+        ]," with code ", code ) 
         if code == 200 :
             admin, status = create_admin(node, names[i])
             if status == 200:
                 node.account_id = admin.id
                 nodes.updateNode(node)
-
+        print()
+    print("DONE !!")
+    
 # CRAETE ADMIN
 accounts = AccountBusiness()
 def create_admin(node, name):
     # Get random fullname
-    fullname = name + ' ' + name
+    fullname = name.capitalize() + ' ' + name.capitalize()
     email = name + '@' + ''.join(re.split('\W+', node.nodename.lower())) + '.dnschain'
     secret = 'Phandai2@'
     type_cd = 1 
 
     admin, status =  accounts.newAccount(fullname, email, secret, secret, type_cd) 
     status = accounts.addAccount( admin )
-    print( "ADMIN ",{
+    print( "ADMIN ",[
         fullname,
         email,
-    }," with code ", status )
+    ]," with code ", status )
     return admin, status
 
+clear_data(db.session)
+print()
 create_nodes(number)
+

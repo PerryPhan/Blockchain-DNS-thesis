@@ -518,11 +518,16 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.admin.container .section.section-right .part.common-part .common-info .flex .value a {
+  margin-left: 10px;
+  text-decoration: none;
+  color: #1065c5;
+}
 .admin.container .section.section-right .part.common-part .common-info .flex .value .sub-value {
   font-weight: 600;
 }
 .admin.container .section.section-right .part.genesis-part h4 {
-  max-width: 100px;
+  max-width: 200px;
 }
 .admin.container .section.section-right .part.genesis-part .genesis-block .flex .value {
   text-align: right;
@@ -747,6 +752,7 @@ body {
   padding-left: 20px;
 }
 .admin.container .section.section-center main.block_and_trans .blocks .content .block {
+  cursor: pointer;
   box-sizing: border-box;
   border-radius: 20px;
   margin-right: 35px;
@@ -769,7 +775,11 @@ body {
   letter-spacing: 4.5%;
   font-size: 12px;
 }
-.admin.container .section.section-center main.block_and_trans .blocks .content .block .flex.created-by span {
+.admin.container .section.section-center main.block_and_trans .blocks .content .block .flex.created-by .value {
+  color: inherit;
+  width: 100%;
+}
+.admin.container .section.section-center main.block_and_trans .blocks .content .block .flex.created-by .value span {
   margin-left: 10px;
 }
 .admin.container .section.section-center main.block_and_trans .blocks .content .block .flex.id {
@@ -806,6 +816,7 @@ body {
   width: 40%;
   color: #9F38A7;
   max-width: 250px;
+  overflow: hidden;
   text-align: right;
 }
 .admin.container .section.section-center main.block_and_trans .trans .content {
@@ -848,6 +859,9 @@ body {
 }
 .admin.container .section.section-center main .common-container .content .items.transaction.active, .admin.container .section.section-center main .common-container .content .items.common.active {
   background-color: #f1faf3;
+}
+.admin.container .section.section-center main .common-container .content .items.transaction.inactive, .admin.container .section.section-center main .common-container .content .items.common.inactive {
+  background-color: #e4e4e4;
 }
 .admin.container .section.section-center main .common-container .content .items.transaction .flex, .admin.container .section.section-center main .common-container .content .items.common .flex {
   margin-bottom: 10px;

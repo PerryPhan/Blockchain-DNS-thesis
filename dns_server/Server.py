@@ -14,7 +14,7 @@ import threading, time
 def load_zones(from_ip, from_port, create_zone_file_flag ):
     if not from_ip:
         return None
-
+    print('LOAD ZONES LISTEN ON ',from_ip, from_port)
     json_zone = {}
     app_response = requests.get(f'http://{from_ip}:{from_port}/dns/load')
     app_response = app_response.json()
