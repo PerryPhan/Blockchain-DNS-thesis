@@ -37,7 +37,10 @@ DOMAIN.on("input", function (e) {
 });
 var file_name_h5 = $(".file-name h5");
 var file_list_ul = $(".file-name ul");
-
+var message = $("h3.message")
+$('input').on("input",function(){
+  message.hide()
+})
 $(".files-field #file-upload").on("input", function (e) {
   file_name_h5.text("File List");
   // Get

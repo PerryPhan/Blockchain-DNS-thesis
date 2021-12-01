@@ -6,6 +6,25 @@
   transition: 0.2s;
 }
 
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
 .createdby {
   display: flex;
   align-items: center;
@@ -1329,6 +1348,15 @@ body {
   color: inherit;
   text-decoration: none;
 }
+.dashboard.container .main h3.message {
+  width: 100%;
+  background-color: rgba(223, 52, 52, 0.801);
+  color: white;
+  padding: 3px 15px;
+}
+.dashboard.container .main h3.message.success {
+  background-color: rgba(22, 186, 60, 0.801);
+}
 .dashboard.container .main .table-side {
   display: flex;
   flex-direction: column;
@@ -1585,7 +1613,6 @@ body {
 .dashboard.container .main.detail .detail-box {
   height: 520px;
   padding: 10px;
-  border: 5px solid rgba(0, 0, 0, 0.445);
 }
 .dashboard.container .main.detail .detail-box .detail.transaction-detail .row {
   padding: 15px 0;
@@ -1609,15 +1636,29 @@ body {
   margin-right: 10px;
 }
 .dashboard.container .main.detail .detail-box .detail.domain-detail .row {
-  padding: 15px 0 10px;
   align-items: flex-start;
+  margin-bottom: 15px;
+}
+.dashboard.container .main.detail .detail-box .detail.domain-detail .row.domain-row {
+  padding: 10px;
+  background-color: #dad0f3;
+  color: #5728d8;
+}
+.dashboard.container .main.detail .detail-box .detail.domain-detail .row.domain-row .label {
+  font-size: 28px;
+  font-weight: bold;
+}
+.dashboard.container .main.detail .detail-box .detail.domain-detail .row.domain-row .value {
+  padding: 0;
+  font-size: 28px;
+  font-weight: bold;
 }
 .dashboard.container .main.detail .detail-box .detail.domain-detail .row .value {
   padding: 5px 0;
 }
 .dashboard.container .main.detail .detail-box .detail.domain-detail .row .value .subrow {
   display: flex;
-  padding-bottom: 20px;
+  margin-bottom: 15px;
 }
 .dashboard.container .main.detail .detail-box .detail.domain-detail .row .value .subrow .sublabel {
   width: 100px;
@@ -1640,6 +1681,7 @@ body {
 }
 .dashboard.container .main.operation .table-box {
   height: 20%;
+  max-height: 250px;
   overflow: auto;
   overflow-x: hidden;
 }

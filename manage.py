@@ -40,8 +40,12 @@ def manager():
 def blocks_txs_manager():
     # How to know that is his first time => This onl IP was his computer and don't have this email in DB
     # If he try to log again will be email and password empty
+    admin = accountBusiness.getAccountById(
+        session['account']['id']
+    )
     html_options = {
         'title': 'Blocks and Txs manager',
+        'admin': admin,
     }
     if request.method == 'POST':
         # If the first time login in
@@ -95,6 +99,10 @@ def nodes_manager():
         list_of_nodes = dns.blockchain.nodes.getNetworkWithOffsetAndLimit(
             offset, limit)
         this_node = dns.blockchain.nodes.getNode()
+    
+    admin = accountBusiness.getAccountById(
+        session['account']['id']
+    )
 
     html_options = {
         'title': 'Nodes manager',
@@ -105,6 +113,8 @@ def nodes_manager():
         'count': count,
         'list_of_nodes': list_of_nodes,
         'this_node': this_node,
+        'admin': admin,
+
     }
 
     return render_template('_admin_nodes_manager_template.html', **html_options)
@@ -140,7 +150,10 @@ def account_manager():
 
         list_of_accounts = accountBusiness.getListAccountsWithOffsetAndLimit(
             offset, limit)
-        # this_node = accountBusiness.()
+    
+    admin = accountBusiness.getAccountById(
+        session['account']['id']
+    )
 
     html_options = {
         'title': 'Nodes manager',
@@ -150,7 +163,7 @@ def account_manager():
         'pages': pages,
         'count': count,
         'list_of_accounts': list_of_accounts,
-        # 'this_node': this_node,
+        'admin': admin,
     }
 
     return render_template('_admin_accounts_manager_template.html', **html_options)
@@ -201,13 +214,15 @@ def dashboardTransactions():
         'next_page': page + 1 if page + 1 < pages else pages,
         'pages': pages,
         'count': count,
+        
     }
 
     if session:
         if 'account' in session:
             account_options = {
                 'account_id': session['account']['id'],
-                'account_fullname': session['account']['fullname']
+                'account_fullname': session['account']['fullname'],
+                'isAdmin': session['account']['type_cd'] == 1
             }
             return render_template('_dashboard_template.html', **html_options, **account_options)
 
@@ -262,7 +277,8 @@ def dashboardDomains():
         if 'account' in session:
             account_options = {
                 'account_id': session['account']['id'],
-                'account_fullname': session['account']['fullname']
+                'account_fullname': session['account']['fullname'],
+                'isAdmin': session['account']['type_cd'] == 1
             }
             return render_template('_dashboard_template.html', **html_options, **account_options)
 
@@ -271,19 +287,30 @@ def dashboardDomains():
 
 @app.route('/dashboard/transactions/detail')
 def detailDashboardTransactions():
-    id = request.args.get('id', default=1, type=int)
+    
+    idhash = request.args.get('idhash', default='', type=str)
+    if idhash == '' : 
+        return redirect('/dashboard/transactions')
+
+    tran, status = dns.blockchain.transactions.getTransactionWithIdHash(idhash)
+    if status != 200 : 
+        return redirect('/dashboard/transactions')
 
     html_options = {
         'type': 1,
         'title': 'Transaction Detail',
         'unit': 'tx',
+        # Transaction
+        'tran': tran,
+        'node': dns.blockchain.nodes.node,
     }
 
     if session:
         if 'account' in session:
             account_options = {
                 'account_id': session['account']['id'],
-                'account_fullname': session['account']['fullname']
+                'account_fullname': session['account']['fullname'],
+                'isAdmin': session['account']['type_cd'] == 1
             }
             return render_template('_detail_dashboard_template.html', **html_options, **account_options)
 
@@ -293,22 +320,26 @@ def detailDashboardTransactions():
 @app.route('/dashboard/domains/detail')
 def detailDashboardDomains():
     domain = request.args.get('domain', default='', type=str)
-
+    record = dns.blockchain.transactions.getDomain(domain)
     html_options = {
         'type': 2,
         'title': 'Domains Detail',
         'unit': 'domains',
+        
     }
 
     if session:
         if 'account' in session:
             account_options = {
                 'account_id': session['account']['id'],
-                'account_fullname': session['account']['fullname']
+                'account_fullname': session['account']['fullname'],
+                'isAdmin': session['account']['type_cd'] == 1
             }
-            return render_template('_detail_dashboard_template.html', **html_options, **account_options)
-
-    return render_template('_detail_dashboard_template.html', **html_options)
+            # Transaction Domain
+            return render_template('_detail_dashboard_template.html', **html_options, **account_options, record = record)
+    
+    # Transaction Domain
+    return render_template('_detail_dashboard_template.html', **html_options, record = record)
 
 
 @app.route('/dashboard/operation', methods=['GET', 'POST'])
@@ -334,7 +365,7 @@ def dashboard_operation():
             form, session['account']['id'], 'add', True
         )
         # Add single Transaction
-        # status = dns.blockchain.transactions.addTransaction(tran)
+        status = dns.blockchain.transactions.addTransaction(tran)
         message = Message.getMessage('TransactionAdding',status )
         
         return  {
@@ -375,6 +406,7 @@ def dashboard_operation():
             
         data_errors = []
         insert_value = ''
+
         if status != 500:     
             for record in records.values():
                 data_tran, data_status = dns.blockchain.transactions.newTransaction(
@@ -382,10 +414,13 @@ def dashboard_operation():
                 )
                 if data_status != 200: 
                     data_errors.append( record['$origin'] )
-                # If data_status != 200 -> data_errors.append()
-                # If data_status = 200 -> Add
+                else:
+                   dns.blockchain.transactions.addTransaction(data_tran)
+                
         
-        if( len(data_errors) > 0 ) : insert_value += 'data of domain '+','.join(data_errors)+' not in right format'
+        if( len(data_errors) > 0 ) : 
+            insert_value += 'data of domain '+','.join(data_errors)+' cannot process properly'
+        
         if insert_value != '' :  insert_value += ' and '
         insert_value += ','.join(errors) + " wrong filename or expected $origin properties"
         
@@ -403,12 +438,16 @@ def dashboard_operation():
     account_options = {
         'account_id': session['account']['id'],
         'account_fullname': session['account']['fullname'],
+        'isAdmin': session['account']['type_cd'] == 1
     }
-
+    
+    # Check list of transaction that account created 
+    transactions_list_by_account = dns.blockchain.transactions.getListTransactionsByAccount(account_options['account_id']) 
     html_options = {
         'title': 'Operation',
         'type': 3,
         **account_options,
+        'transactions_list' : transactions_list_by_account
     }
 
     if request.method == 'POST':
@@ -420,6 +459,8 @@ def dashboard_operation():
 
         response = handleOneRecordForm(request.form)
         return render_template('_operation_dashboard_template.html', **html_options, **response)
+    
+
     return render_template('_operation_dashboard_template.html', **html_options)
 
 # -FRONT --------------------------------------------------

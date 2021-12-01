@@ -13,9 +13,12 @@
     <div class="sub-tab tab-title {% if type == 2 %} active {% endif %}">
       <a href="./domains/detail"><h3>Recent domain detail</h3> </a>
     </div>
-    <div class="tab-title {% if type == 3 %} active {% endif %}">
-      <a href="#"><h3>Operation</h3></a>
-    </div>
+
+       {% if isAdmin %}
+       <div class="gotoadmin-box">
+        <a id="gotoadmin" href="../admin"> Admin panel </a>
+      </div>
+       {% endif %}
   </div>
   <div class="table-side">
     <div class="titles">
@@ -51,7 +54,7 @@
           </tr>
         </thead>
         <tbody>
-          {% for transaction in list %}
+          {% for transaction in transactions_list %}
           <tr>
             <td class="index-field">
               <svg
@@ -89,34 +92,26 @@
                 >{{transaction.hash() or ''}}</a
               >
             </td>
-            <td class="action-field">{{transaction.action or ''}}</td>
+            <td class="action-field {{transaction.action or ''}}">{{transaction.action or ''}}</td>
             <td class="block-field">{{transaction.block_id or ''}}</td>
             <td class="time-field">{{transaction.datetime_format() or ''}}</td>
             <td class="status-field">
               <div class="status success">Success</div>
             </td>
             <td class="from-field">
-              <a href="#">{{transaction.owner.fullname or ''}}</a>
+              <a href="#">{{transaction.owner.email or ''}}</a>
             </td>
-            <td class="to-field">Here</td>
+            <td class="to-field">
+              <a href="#">DNSChain</a>
+              </td>
           </tr>
           {% endfor %}
-          <tr>
-            <td class="index-field"></td>
-            <td class="id-field">ID</td>
-            <td class="transaction-hash-field">Transaction Hash</td>
-            <td class="action-field">Action</td>
-            <td class="block-field">Block</td>
-            <td class="time-field">Datetime</td>
-            <td class="status-field">Status</td>
-            <td class="from-field">From</td>
-            <td class="to-field">To</td>
-          </tr>
+          
         </tbody>
       </table>
     </div>
     {% if message %}
-      <h3 style="color: red">{{message}}</h3>
+    <h3 class="message {% if status == 200 %} success {% endif %}">{{message}}</h3>
       {% endif %}
     <div class="operation-box">
       <form class="typing-form animation" method="POST">

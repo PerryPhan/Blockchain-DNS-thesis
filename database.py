@@ -205,7 +205,7 @@ class Transactions(db.Model):
             "soa": self.soa,
             "ns": self.ns,
             "a": self.a
-        }
+        }    
 
 class Records :
     def __init__(self, transaction = None) :
@@ -223,12 +223,13 @@ class Records :
     def fromTransaction(self, transaction):
         self.domain     = transaction.domain
         self.soa        = transaction.soa
+        self.soa_count   = len(transaction.soa) if self.soa else 0
         self.ns         = transaction.ns
         self.ns_count   = len(transaction.ns) if self.ns else 0
         self.a          = transaction.a
         self.a_count    = len(transaction.a) if self.a else 0
         self.ttl        = transaction.ttl
-        self.account_id = transaction.account_id
+        self.account_email = transaction.owner.email
 
 class Message:
     @staticmethod
@@ -254,6 +255,7 @@ class Message:
             },
             "TransactionAdding" :{
                 500: 'Wrong data or files format. Example of right format : xyz.com.zone',
+                401: 'Error adding records to database',
                 202: f'Adding records successfully but { inserted_value }',
                 200: 'Adding records and convert to txs successfully'
             }

@@ -105,10 +105,12 @@
         <div class="avatar">
           <img src="{{url_for('static',filename='img/avatar.jpg')}}" alt="avatar" />
         </div>
+        {% if admin %}
         <div class="text">
-          <h3>Node VN Admin</h3>
-          <h5>admin@nodevn.dnschain</h5>
+          <h3>{{ admin.fullname }}</h3>
+          <h5>{{ admin.email }}</h5>
         </div>
+        {% endif %}
       </div>  
       {% block right_sub_information %}
 

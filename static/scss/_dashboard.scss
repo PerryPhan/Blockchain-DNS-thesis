@@ -558,7 +558,15 @@
     .aside {
       @include dashb-aside;
     }
-
+    h3.message{
+      width: 100%;
+      background-color: rgba(223, 52, 52, 0.801);      
+      color: white;
+      padding: 3px 15px;
+      &.success{
+        background-color: rgba(22, 186, 60, 0.801);
+      }
+    }
     .table-side {
       display: flex;
       flex-direction: column;
@@ -602,6 +610,8 @@
     &.operation{
       .table-box {
         height: 20%;
+
+        max-height: 250px;
         overflow: auto;
         overflow-x: hidden;
       }

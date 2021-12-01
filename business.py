@@ -434,9 +434,6 @@ class TransactionBusiness:
     def countAllTransactions(self):
         return db.session.query(Transactions).count()
 
-    def getListTransactionstsWithOffsetAndLimit(self, offset, limit ):
-        return db.session.query(Transactions).order_by(Transactions.timestamp.asc()).offset(offset).limit(limit).all()
-
     def correctFormat(self, obj):
         obj['soa']['refresh'] = int(obj['soa']['refresh']) if type(
             obj['soa']['refresh']) != int else obj['soa']['refresh']
@@ -506,7 +503,7 @@ class TransactionBusiness:
 
     def getDomainList(self, from_transactions_list = None):
         records = []
-        if from_transactions_list : 
+        if not from_transactions_list : 
             from_transactions_list = self.getAllTransactions()
         for transaction in from_transactions_list:
             # TODO : Add + Update Tx
@@ -515,12 +512,47 @@ class TransactionBusiness:
             elif transaction.action == 'Update':
                 pass
         return records
+   
+    def getDomain(self, domain, from_transactions_list = None):
+        result = None
+        if domain == '':
+            return result
+
+        for record in self.getDomainList(from_transactions_list):
+            if record.domain == domain: 
+                result = record 
+
+        return record
 
     def getRawDomainData(self):
         return [transaction.zone_format() for transaction in self.getAllTransactions()]
 
     def getTransactionById(self, id):
         return Transactions.query.filter(Transactions.id == id).first()
+
+    def getTransactionWithIdHash(self, idhash):
+        [hash, id] = idhash.split('|')
+        try:
+            id = int(id)
+            if( id < 0 ):
+                return None, 404
+        except: 
+            return None, 404
+
+        if hash :
+            if len(hash) == 64: 
+                tran = self.getTransactionById(id)
+                if hash == tran.hash():
+                    return tran, 200
+        return None, 404 
+
+    def getListTransactionstsWithOffsetAndLimit(self, offset, limit ):
+        return db.session.query(Transactions).order_by(Transactions.timestamp.asc()).offset(offset).limit(limit).all()
+
+    def getListTransactionsByAccount(self, account_id):
+        if not account_id: 
+            return None
+        return db.session.query(Transactions).filter(Transactions.account_id == account_id).order_by(Transactions.timestamp.desc()).all()
 
 # NodeBusiness  -----------------------------------
 
@@ -744,7 +776,7 @@ class AccountBusiness:
             return account if account and check_password_hash(account.password, password) else None
         return account
 
-    def getAccountById(self, id=0):
+    def getAccountById(self, id=''):
         return Accounts.query.filter(Accounts.id == id, Accounts.is_deleted == False).first()
 
     def getListAccounts(self):

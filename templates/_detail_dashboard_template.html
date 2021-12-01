@@ -31,7 +31,6 @@
     <div class="titles">
       <div class="title-left">
         <h1>{{ title or '' }}</h1>
-        <h4>Total <span> {{ count or '0'}} </span> {{ unit or ''}}</h4>
       </div>
       <div class="title-right">
         <div class="sort-btn-box">
@@ -73,57 +72,136 @@
           {% endif %}
         </thead>
         <tbody>
-          {% if type == 1 %}
+          {% if type == 1 %} {% if tran %} 
           <tr>
-            <td class="index-field"></td>
-            <th class="id-field">1</th>
-            <td class="transaction-hash-field">Transaction Hash</td>
-            <td class="action-field">Action</td>
-            <td class="block-field">Block</td>
-            <td class="time-field">Datetime</td>
-            <td class="status-field">Status</td>
-            <td class="from-field">From field</td>
-            <td class="to-field">To field</td>
+            <td class="index-field">
+              <svg
+                style="
+                  fill: rgb(34, 34, 34);
+                  background-color: rgb(211, 211, 211);
+                  border-radius: 10px;
+                  padding: 1px;
+                "
+                viewBox="0 0 24 24"
+                width="20"
+                height="20"
+              >
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M3.106 11.553a1 1 0 011.341-.447L12 14.882l7.553-3.776a1 1 0 11.894 1.788l-8 4a1 1 0 01-.894 0l-8-4a1 1 0 01-.447-1.341z"
+                  fill=""
+                ></path>
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M3.106 15.553a1 1 0 011.341-.447L12 18.882l7.553-3.776a1 1 0 11.894 1.788l-8 4a1 1 0 01-.894 0l-8-4a1 1 0 01-.447-1.341z"
+                  fill=""
+                ></path>
+                <path
+                  d="M12 13c-.2 0-.3 0-.4-.1l-8-4C3.2 8.7 3 8.4 3 8s.2-.7.6-.9l8-4c.2-.1.6-.1.8 0l8 4c.4.2.6.5.6.9s-.2.7-.6.9l-8 4c-.1.1-.2.1-.4.1z"
+                  fill=""
+                ></path>
+              </svg>
+            </td>
+            <th class="id-field">{{ tran.id or '' }}</th>
+            <td class="transaction-hash-field">
+              <a href="./transactions/detail?idhash={{tran.block_tx_format()}}"
+                >{{tran.hash() or ''}}</a
+              >
+            </td>
+            <td class="action-field {{tran.action or ''}}">
+              {{tran.action or ''}}
+            </td>
+            <td class="block-field">{{tran.block_id or 'None'}}</td>
+            <td class="time-field">{{tran.datetime_format() or ''}}</td>
+            <td class="status-field">
+              {% if tran.block_id %}
+              <div class="status success">Success</div>
+              {% else %}
+              <div class="status new">New</div>
+              {% endif %}
+            </td>
+            <td class="from-field">
+              <a href="#"> {{tran.owner.email}} </a>
+            </td>
+            <td class="to-field">
+              <a href="#">DNSChain</a>
+            </td>
           </tr>
-          {% else %}
+          {% endif %} {% else %} {% if record %}
           <tr>
-            <td class="index-field"></td>
-            <td class="domain-field">Domain</td>
-            <td class="a-field">A record</td>
-            <td class="soa-field">Soa</td>
-            <td class="ns-field">NS</td>
-            <td class="account-field">Account ID</td>
-            <td class="ttl-field">TTL</td>
+            <td class="index-field">
+              <svg
+                style="
+                  fill: rgb(221, 87, 47);
+                  background-color: rgb(211, 211, 211);
+                  border-radius: 10px;
+                  padding: 1px;
+                "
+                viewBox="0 0 24 24"
+                width="20"
+                height="20"
+              >
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M3.106 11.553a1 1 0 011.341-.447L12 14.882l7.553-3.776a1 1 0 11.894 1.788l-8 4a1 1 0 01-.894 0l-8-4a1 1 0 01-.447-1.341z"
+                  fill=""
+                ></path>
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M3.106 15.553a1 1 0 011.341-.447L12 18.882l7.553-3.776a1 1 0 11.894 1.788l-8 4a1 1 0 01-.894 0l-8-4a1 1 0 01-.447-1.341z"
+                  fill=""
+                ></path>
+                <path
+                  d="M12 13c-.2 0-.3 0-.4-.1l-8-4C3.2 8.7 3 8.4 3 8s.2-.7.6-.9l8-4c.2-.1.6-.1.8 0l8 4c.4.2.6.5.6.9s-.2.7-.6.9l-8 4c-.1.1-.2.1-.4.1z"
+                  fill=""
+                ></path>
+              </svg>
+            </td>
+            <td class="domain-field">
+              <a href="./domains/detail?domain={{record.domain}}"
+                >{{record.domain or ''}}</a
+              >
+            </td>
+            <td class="a-field">{{ record.a[0]['value'] or '' }}</td>
+            <td class="soa-field">{{ record.soa_count or ''}}</td>
+            <td class="ns-field">{{ record.ns_count or ''}}</td>
+            <td class="account-field">
+              <a href="#">{{ record.account_email or ''}}</a></td>
+            <td class="ttl-field">{{ record.ttl or '' }}</td>
           </tr>
-          {% endif %}
+          {% endif %} {% endif %}
         </tbody>
       </table>
     </div>
     <div class="detail-box">
-      {% if type == 1 %}
+      {% if type == 1 %}{% if tran %}
       <div class="detail transaction-detail">
         <div class="row id-row">
           <div class="label">ID</div>
-          <div class="value">1</div>
+          <div class="value">{{ tran.id or '' }}</div>
         </div>
         <div class="row tx-hash-row">
           <div class="label">Tx Hash</div>
-          <div class="value">dsadasdasda16516asda5d16as1dsa61d6asd1ad</div>
+          <div class="value">{{tran.hash() or ''}}</div>
         </div>
         <div class="row timestamp-row">
           <div class="label">Timestamp</div>
           <div class="value">
-            1921.215 <span> - </span>
-            <span> on Tuesday, 20 November 2021 at 19:30 </span>
+            {{ tran.timestamp or '' }} <span> - </span>
+            <span> on {{tran.datetime_format() or ''}} </span>
           </div>
         </div>
         <div class="row action-row">
           <div class="label">Action</div>
-          <div class="value add">Add</div>
+          <div class="value {{tran.action or ''}}"> {{tran.action or ''}}</div>
         </div>
         <div class="row ttl-row">
           <div class="label">TTL</div>
-          <div class="value">14400s</div>
+          <div class="value">{{tran.ttl or ''}}</div>
         </div>
         <div class="row account-row">
           <div class="label">Account</div>
@@ -133,94 +211,85 @@
                 src="{{url_for('static',filename='img/account-black-icon.png')}}"
                 alt=""
             /></span>
-            Phan Dai
+            {{ tran.owner.email or ''}}
           </div>
         </div>
         <div class="row block-row">
           <div class="label">Block</div>
-          <div class="value">ad151asd151grcefqc61a5dwd1r5fq651d5q1dsq</div>
+          <div class="value">{{ tran.block_id or 'None'}}</div>
         </div>
         <div class="row record-row">
           <div class="label">Record</div>
           <div class="value">
-            <a href="../domains/detail">example.com</a>
+            <a href="../domains/detail?domain={{ tran.domain or ''}}">{{ tran.domain or ''}}</a>
           </div>
         </div>
       </div>
-      {% endif %} {% if type == 2 %}
+      {% endif %}{% endif %} {% if type == 2 %} {% if record %}
       <div class="detail domain-detail">
         <div class="row domain-row">
           <div class="label">Domain:</div>
-          <div class="value">example.com</div>
+          <div class="value">{{record.domain or ''}}</div>
         </div>
         <div class="row soa-record-row">
           <div class="label">SOA Record:</div>
           <div class="value">
             <div class="subrow">
               <div class="sublabel">Mnname</div>
-              <div class="subvalue">ns1.daidns1.com</div>
+              <div class="subvalue">{{ record.soa['mname'] or '' }}</div>
             </div>
             <div class="subrow">
               <div class="sublabel">Rname</div>
-              <div class="subvalue">admin.daidns1.com</div>
+              <div class="subvalue">{{ record.soa['rname'] or '' }}</div>
+            </div>
+            <div class="subrow">
+              <div class="sublabel">Serial</div>
+              <div class="subvalue">{{ record.soa['serial'] or '' }}</div>
             </div>
             <div class="subrow">
               <div class="sublabel">Refresh</div>
-              <div class="subvalue">3600</div>
+              <div class="subvalue">{{ record.soa['refresh'] or '0' }}</div>
               <div class="sublabel">Retry</div>
-              <div class="subvalue">600</div>
+              <div class="subvalue">{{ record.soa['retry'] or '0' }}</div>
             </div>
             <div class="subrow">
               <div class="sublabel">Expire</div>
-              <div class="subvalue">30</div>
+              <div class="subvalue">{{ record.soa['expire'] or '0' }}</div>
               <div class="sublabel">Minimum</div>
-              <div class="subvalue">86400</div>
+              <div class="subvalue">{{ record.soa['minimum'] or '0' }}</div>
             </div>
           </div>
         </div>
         <div class="row ns-record-row">
           <div class="label">NS Records:</div>
           <div class="value">
+            {% if record.ns %}
+            {% for ns in record.ns %}
             <div class="subrow">
               <div class="sublabel">Host 1</div>
-              <div class="subvalue">ns1.daidns1.com</div>
+              <div class="subvalue">{{ns['host']}}</div>
             </div>
-            <div class="subrow">
-              <div class="sublabel">Host 2</div>
-              <div class="subvalue">ns2.daidns1.com</div>
-            </div>
+            {% endfor %} {% endif %}
           </div>
         </div>
         <div class="row a-row">
           <div class="label">A Records:</div>
           <div class="value">
+            {% if record.a %}
+            {% for a in record.a %}
             <div class="subrow">
               <div class="sublabel">Name</div>
-              <div class="subvalue">@</div>
+              <div class="subvalue">{{a['name']}}</div>
               <div class="sublabel">Value</div>
-              <div class="subvalue">192.168.1.1</div>
+              <div class="subvalue">{{a['value']}}</div>
               <div class="sublabel">TTL</div>
-              <div class="subvalue">400</div>
+              <div class="subvalue">{{a['ttl']}}</div>
             </div>
-            <div class="subrow">
-              <div class="sublabel">Name</div>
-              <div class="subvalue">@</div>
-              <div class="sublabel">Value</div>
-              <div class="subvalue">192.168.1.1</div>
-              <div class="sublabel">TTL</div>
-              <div class="subvalue">400</div>
-            </div>
-            <div class="subrow">
-              <div class="sublabel">Name</div>
-              <div class="subvalue">@</div>
-              <div class="sublabel">Value</div>
-              <div class="subvalue">192.168.1.1</div>
-              <div class="sublabel">TTL</div>
-              <div class="subvalue">400</div>
-            </div>
+            {% endfor %} {% endif %}
           </div>
         </div>
       </div>
+      {% endif %}
       {% endif %}
     </div>
   </div>

@@ -21,6 +21,11 @@
     <div class="tab-title {% if type == 3 %} active {% endif %}">
       <a href="./operation"><h3>Operation</h3></a>
     </div>
+       {% if isAdmin %}
+       <div class="gotoadmin-box">
+        <a id="gotoadmin" href="../admin"> Admin panel </a>
+      </div>
+       {% endif %}
     {% else %}
     <div class="gotoadmin-box">
       <a id="gotoadmin" href="../admin"> Login with admin right </a>
@@ -110,14 +115,14 @@
             </td>
             <th class="id-field">{{ transaction.id or '' }}</th>
             <td class="transaction-hash-field">
-              <a href="./transactions/detail?id={{transaction.id}}"
+              <a href="./transactions/detail?idhash={{transaction.block_tx_format()}}"
                 >{{transaction.hash() or ''}}</a
               >
             </td>
             <td class="action-field {{transaction.action or ''}}">
               {{transaction.action or ''}}
             </td>
-            <td class="block-field">{{transaction.block_id or ''}}</td>
+            <td class="block-field">{{transaction.block_id or 'None'}}</td>
             <td class="time-field">{{transaction.datetime_format() or ''}}</td>
             <td class="status-field">
               {% if transaction.block_id %}
@@ -127,10 +132,10 @@
               {% endif %}
             </td>
             <td class="from-field">
-              <a href="#"> {{transaction.owner.fullname or ''}} </a>
+              <a href="#"> {{transaction.owner.email}} </a>
             </td>
             <td class="to-field">
-              <a href="#">{{ node.nodename or '' }}</a>
+              <a href="#">DNSChain</a>
             </td>
           </tr>
           {% endfor %} {% endif %} {% else %} {% for domain in list %}
@@ -171,9 +176,10 @@
               >
             </td>
             <td class="a-field">{{ domain.a[0]['value'] or '' }}</td>
-            <td class="soa-field">{{ domain.soa or ''}}</td>
+            <td class="soa-field">{{ domain.soa_count or ''}}</td>
             <td class="ns-field">{{ domain.ns_count or ''}}</td>
-            <td class="account-field">{{ domain.account_id or ''}}</td>
+            <td class="account-field">
+              <a href="#">{{ domain.account_email or ''}}</a></td>
             <td class="ttl-field">{{ domain.ttl or '' }}</td>
           </tr>
           {% endfor %} {% endif %}
