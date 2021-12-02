@@ -124,6 +124,7 @@ class Blockchain:
         try:
 
             blocks_list = db.session.query(Blocks).all()
+            # TODO : check intergity of chain
             if len(blocks_list) > 0:
                 for block in blocks_list:
                     self.chain.append(block)
@@ -133,7 +134,6 @@ class Blockchain:
         except:
             print(' Error : something go wrong with Query')
             return 404
-    # TODO : check intergity of chain
 
     #  STEPS OF MINE BLOCK ----------------------------------------------------------
     def prepareMiningBlockTransactions(self):

@@ -1,35 +1,36 @@
 {
-	"$origin": "xyz.com",
+	"$origin": "acb.com",
 	"$ttl": 3600,
 
 	"soa": {
-		"mname": "ns1.xyz.com",
-		"rname": "admin.xyz.com",
+		"mname": "ns1.acb.com",
+		"rname": "admin.acb.com",
 		"serial": "{time}",
 		"refresh": 3600,
 		"retry": 600,
-		"expire": 604800,
+		"expire": 30,
 		"minimum": 86400
 	},
 
 	"ns": [
-		{"host": "ns1.xyz.com"},
-		{"host": "ns2.xyz.com"}
+		{"host": "ns1.acb.com"},
+		{"host": "ns2.acb.com"}
 	],
 
 	"a": [
 		{"name": "@",
 		  "ttl": 400,
-		  "value": "127.0.0.1"
+		  "value": "192.168.1.7"
 		},
 		{"name": "@",
 		  "ttl": 400,
-		  "value": "127.0.0.2"
+		  "value": "11.0.0.2"
 		},
 		{"name": "@",
 		  "ttl": 400,
-		  "value": "127.0.0.3"
+		  "value": "11.0.0.3"
 		}
 
+	]
 
 }
