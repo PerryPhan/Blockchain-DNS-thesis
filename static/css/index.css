@@ -746,7 +746,7 @@ body {
 .admin.container .section.section-center main.block_and_trans .blocks .content {
   display: flex;
   box-sizing: border-box;
-  height: 200px;
+  height: 220px;
   width: 100%;
   overflow-x: hidden;
   padding-left: 20px;
@@ -1496,6 +1496,9 @@ body {
 .dashboard.container .main .table-side .table-box table .action-field.add {
   color: rgba(223, 124, 43, 0.801);
 }
+.dashboard.container .main .table-side .table-box table .action-field.update {
+  color: rgba(230, 43, 136, 0.801);
+}
 .dashboard.container .main .table-side .table-box table .block-field {
   width: 14%;
   max-width: 250px;
@@ -1644,22 +1647,40 @@ body {
   overflow-x: hidden;
 }
 .dashboard.container .main.detail .detail-box {
+  display: flex;
   height: 520px;
   padding: 10px;
 }
+.dashboard.container .main.detail .detail-box .detail.transaction-detail {
+  margin-right: 50px;
+}
 .dashboard.container .main.detail .detail-box .detail.transaction-detail .row {
   padding: 15px 0;
+}
+.dashboard.container .main.detail .detail-box .detail.transaction-detail .row:first-child {
+  padding: 0;
+  padding-bottom: 15px;
+  color: #5728d8;
+  font-size: 20px;
+}
+.dashboard.container .main.detail .detail-box .detail.transaction-detail .row:first-child .value {
+  font-weight: bold;
 }
 .dashboard.container .main.detail .detail-box .detail.transaction-detail .row.timestamp-row .value span {
   margin-left: 5px;
   color: #7c7c7c;
 }
-.dashboard.container .main.detail .detail-box .detail.transaction-detail .row.action-row .value.add {
+.dashboard.container .main.detail .detail-box .detail.transaction-detail .row.action-row .value {
   width: fit-content;
   padding: 10px;
-  background-color: springgreen;
   font-weight: bold;
   border-radius: 10px;
+}
+.dashboard.container .main.detail .detail-box .detail.transaction-detail .row.action-row .value.add {
+  background-color: springgreen;
+}
+.dashboard.container .main.detail .detail-box .detail.transaction-detail .row.action-row .value.update {
+  background-color: #2cdac2;
 }
 .dashboard.container .main.detail .detail-box .detail.transaction-detail .row .value {
   display: flex;
@@ -1673,17 +1694,14 @@ body {
   margin-bottom: 15px;
 }
 .dashboard.container .main.detail .detail-box .detail.domain-detail .row.domain-row {
-  padding: 10px;
-  background-color: #dad0f3;
   color: #5728d8;
 }
 .dashboard.container .main.detail .detail-box .detail.domain-detail .row.domain-row .label {
-  font-size: 28px;
   font-weight: bold;
 }
 .dashboard.container .main.detail .detail-box .detail.domain-detail .row.domain-row .value {
   padding: 0;
-  font-size: 28px;
+  font-size: 20px;
   font-weight: bold;
 }
 .dashboard.container .main.detail .detail-box .detail.domain-detail .row .value {

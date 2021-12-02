@@ -188,6 +188,7 @@ class Blockchain:
         transactions = [tran.block_tx_format() for tran in transactions]
         request_block = self.newBlock(transactions).as_dict()
         # ----------------------------------------
+        print(" THREADING START IN NEIGHBOURS , AVAILABLE NODE COUNT : ",len(neighbours) )
         for node in neighbours:
             request_url = f'http://{node.ip}:{node.port}/blockchain/pow'
             # 4.1
@@ -210,6 +211,7 @@ class Blockchain:
             Hash x nonce = Hash ['0x + 63chars']
         '''
         start = time.perf_counter()
+        print(" PROOF OF WORK of ",block.add_by_node_id )
         print("Proof of work start in ", start)
         # ----------------------------
         block.nonce = 0
@@ -217,7 +219,8 @@ class Blockchain:
             block.nonce += 1
         # ----------------------------
         end = time.perf_counter()
-        print("Block nonce found: ",block.nonce, block.hash)
+        print("Block nonce found: ",block.nonce)
+        print("Block hashing: ",block._hash())
         print("Proof of work end in ", end)
         return block, float(end-start)
 
@@ -524,21 +527,20 @@ class TransactionBusiness:
         return Transactions.query.filter(Transactions.block_id == None).all()
 
     def getAllTransactions(self):
-        return Transactions.query.all()
+        return Transactions.query.order_by(Transactions.timestamp.asc()).all()
 
     def getDomainList(self, from_transactions_list = None):
         records = []
         if not from_transactions_list : 
             from_transactions_list = self.getAllTransactions()
         for transaction in from_transactions_list:
-            # TODO : Add + Update Tx
             if transaction.action == 'add':
                 records.append(Records(transaction))
             elif transaction.action == 'update':
                 # Find domain name in records
-                for x in records: 
-                    if x.domain == transaction.domain:
-                        x = Records(transaction)
+                for i in range(len(records)): 
+                    if records[i].domain == transaction.domain:
+                        records[i] = Records(transaction)
                         break
         return records
    

@@ -90,15 +90,19 @@
             </td>
             <th class="id-field">{{ transaction.id or '' }}</th>
             <td class="transaction-hash-field">
-              <a href="./transactions/detail?id={{transaction.id}}"
+              <a href="./transactions/detail?idhash={{transaction.block_tx_format()}}"
                 >{{transaction.hash() or ''}}</a
               >
             </td>
             <td class="action-field {{transaction.action or ''}}">{{transaction.action or ''}}</td>
-            <td class="block-field">{{transaction.block_id or ''}}</td>
+            <td class="block-field">{{transaction.block_id or 'None'}}</td>
             <td class="time-field">{{transaction.datetime_format() or ''}}</td>
             <td class="status-field">
+              {% if transaction.block_id %}
               <div class="status success">Success</div>
+              {% else %}
+              <div class="status new">New</div>
+              {% endif %}
             </td>
             <td class="from-field">
               <a href="#">{{transaction.owner.email or ''}}</a>

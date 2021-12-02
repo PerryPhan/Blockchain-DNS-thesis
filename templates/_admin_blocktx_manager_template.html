@@ -105,6 +105,10 @@
             <span>{{ dblock.transactions_len() }}</span>
           </div>
         </div>
+        <div class="flex hash">
+          <label for="hash">Hash</label>
+          <div class="value"><span>{{ dblock._hash() }}</span></div>
+        </div>
         <div class="flex previous">
           <label for="previous">Previous</label>
           <div class="value"><span>{{ dblock.previous_hash }}</span></div>
@@ -195,12 +199,21 @@
       <label for="transactions">Transactions</label>
       <div class="value">
         <div class="animation goup info">
-          <span> 0 </span>
+          <span>None</span>
         </div>
       </div>
     </div>
     <div class="flex hash">
       <label for="hash">Hash</label>
+      <div class="value">
+        <div class="animation goup info">
+          <span> {{ genesis.hash }} </span>
+          <div class="sub-value">64 chars</div>
+        </div>
+      </div>
+    </div>
+    <div class="flex previous d-none">
+      <label for="previous">Hash</label>
       <div class="value">
         <div class="animation goup info">
           <span> {{ genesis.hash }} </span>

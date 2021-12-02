@@ -1,9 +1,20 @@
 @mixin dashbdetail-detail-box {
+  display: flex;
   height: 520px;
   padding: 10px;
   .detail {
     &.transaction-detail {
+      margin-right: 50px;
       .row {
+        &:first-child{
+          padding: 0 ;
+          padding-bottom: 15px;
+          color: rgb(87, 40, 216);
+          font-size: 20px;
+          .value{
+            font-weight: bold;
+          }
+        }
         padding: 15px 0;
         &.timestamp-row {
           .value {
@@ -15,12 +26,15 @@
         }
         &.action-row {
           .value {
-            &.add {
-              width: fit-content;
+            width: fit-content;
               padding: 10px;
-              background-color: springgreen;
               font-weight: bold;
               border-radius: 10px;
+            &.add {
+              background-color: springgreen;
+            }
+            &.update {
+              background-color: rgb(44, 218, 194);
             }
           }
         }
@@ -40,17 +54,14 @@
         align-items: flex-start;
         margin-bottom: 15px;
         &.domain-row {
-          padding: 10px;
-          background-color:rgb(218, 208, 243);
           color: rgb(87, 40, 216);
 
           .label {
-            font-size: 28px ;
             font-weight: bold;
           }
           .value {
             padding: 0;
-            font-size: 28px;
+            font-size: 20px;
             font-weight: bold;
           }
         }

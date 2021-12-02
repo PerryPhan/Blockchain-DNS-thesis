@@ -352,6 +352,7 @@ def detailDashboardTransactions():
         # Transaction
         'tran': tran,
         'node': dns.blockchain.nodes.node,
+        'record': Records(tran)
     }
 
     if session:
@@ -411,21 +412,23 @@ def dashboard_operation():
     def handleOneRecordForm(form):
         action = 'update' if dns.blockchain.transactions.getDomain( form['domain'], all_transactions) else 'add'
         # New transaction
-        tran, status = dns.blockchain.transactions.newTransaction(
+        transaction, status = dns.blockchain.transactions.newTransaction(
             form, session['account']['id'], action, True
         )
         # Add single Transaction
-        status = dns.blockchain.transactions.addTransaction(tran)
+        status = dns.blockchain.transactions.addTransaction(transaction)
         message = Message.getMessage('TransactionAdding',status )
         
         return  {
             'status': status,
             'message': message,
+            'transaction' : transaction if status == 200 else None,
         }
 
     def handleMultipleRecordsForm(files):
         errors = []
         records = {}
+        transactions_arr = []
         status = 404
         
         for file in files:
@@ -459,7 +462,6 @@ def dashboard_operation():
 
         if status != 500:     
             for record in records.values():
-                print(record)
                 data_action = 'update' if dns.blockchain.transactions.getDomain( record['$origin'], all_transactions ) else 'add'
                 data_tran, data_status = dns.blockchain.transactions.newTransaction(
                     record, session['account']['id'], data_action
@@ -468,8 +470,8 @@ def dashboard_operation():
                     data_errors.append( record['$origin'] )
                 else:
                    dns.blockchain.transactions.addTransaction(data_tran)
+                   transactions_arr.append(data_tran)
                 
-        
         if( len(data_errors) > 0 ) : 
             insert_value += 'data of domain '+','.join(data_errors)+' cannot process properly'
         
@@ -481,6 +483,7 @@ def dashboard_operation():
         return {
             'status': status,
             'message': message,
+            'transactions': transactions_arr,
         }
 
     # Check account
@@ -499,18 +502,23 @@ def dashboard_operation():
         'title': 'Operation',
         'type': 3,
         **account_options,
-        'transactions_list' : transactions_list_by_account
+        'transactions_list' : transactions_list_by_account,
+        'unit': 'txs',
+        'count': len(transactions_list_by_account)
     }
-    
+    appending_transactions = []
     if request.method == 'POST':
         response = {}
-        if request.files.getlist('file'):
+        if len(request.files.getlist('file')) != 0:
             files = request.files.getlist('file')
             response = handleMultipleRecordsForm(files)
+            appending_transactions = response['transactions']
         else :    
             response = handleOneRecordForm(request.form)
-        
-        if dns.blockchain.transactions.countAllNoBlockTransactions() != 0 :
+            appending_transactions = [response['transaction']]
+
+        current_transactions =  dns.blockchain.transactions.countAllNoBlockTransactions()
+        if current_transactions != 0 and current_transactions >= BUFFER_MAX_LEN :
             # Pre mining
             transactions, status = dns.blockchain.prepareMiningBlockTransactions()
             if status == 500:
@@ -523,10 +531,10 @@ def dashboard_operation():
                 block, status = dns.blockchain.addBlock(block)
                 dns.blockchain.transactions.setCurrentTxsBlockID(block.id)
                 dns.blockchain.broadcastNewBlock()
-                
-        html_options['transactions_list'] = dns.blockchain.transactions.getListTransactionsByAccount(account_options['account_id'])  
-        print("HTML OPTIONS: ",html_options['transactions_list'], len(html_options['transactions_list']))   
-        
+            html_options['transactions_list'] = dns.blockchain.transactions.getListTransactionsByAccount(account_options['account_id'])          
+        else:
+            transactions_list_by_account.extend(appending_transactions)
+            html_options['transactions_list'] = transactions_list_by_account
         return render_template('_operation_dashboard_template.html', **html_options, **response)
     
     return render_template('_operation_dashboard_template.html', **html_options)
@@ -773,11 +781,11 @@ def proofOfWork():
     request_form_dict = request.form.to_dict(flat=False)
     block, speedtime = dns.blockchain.returnProofOfWorkOutput(
         request_form_dict)
-
+    
     return jsonify({
         'status': 200,
         'message': 'Processing proof of work successfully',
-        'hash': block.hash(),
+        'hash': block._hash(),
         'block': block.as_dict(),
         'speedtime': speedtime,
     })
