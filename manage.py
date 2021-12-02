@@ -470,7 +470,7 @@ def dashboard_operation():
                     data_errors.append( record['$origin'] )
                 else:
                    dns.blockchain.transactions.addTransaction(data_tran)
-                   transactions_arr.append(data_tran)
+                   transactions_arr.insert(0, data_tran)
                 
         if( len(data_errors) > 0 ) : 
             insert_value += 'data of domain '+','.join(data_errors)+' cannot process properly'
@@ -740,6 +740,9 @@ def overideBlockchain():
         }
     })
 
+@app.route('/blockchain/hash_list')
+def getHashList():
+    return { "hash" : dns.blockchain.block_transactions_hash }
 
 @app.route('/blockchain/add_block')
 def addNewBlock():
@@ -907,7 +910,10 @@ if __name__ == "__main__":
             admin, status = createNodeAdminCLI(node)
             if status != 200:
                 exit(0)
-            dns.initBlockchain(node, admin)
+            status = dns.initBlockchain(node, admin)
+            if status != 200:
+                print('!!: REPORT CHANGE IN DATA CAUSE SHUT DOWN !!')
+                exit(0)
             app.run(host=node.ip, port=node.port,
                     debug=True, use_reloader=False)
         except:
@@ -926,7 +932,10 @@ if __name__ == "__main__":
                     exit(0)
             else:
                 print(" Admin: ", node.admin.email, "\n")
-            dns.initBlockchain(node)
+            status = dns.initBlockchain(node)
+            if status != 200:
+                print('!!: REPORT CHANGE IN DATA CAUSE SHUT DOWN !!')
+                exit(0)
             app.run(host=node.ip, port=node.port,
                     debug=True, use_reloader=False)
         except:

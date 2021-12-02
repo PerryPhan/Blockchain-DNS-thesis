@@ -43,4 +43,4 @@ SPECIAL_CHARS = "''!@#$%^&*()-+?_=,<>/"""
 
 MINE_REWARD = 10
 BUFFER_MAX_LEN = 5
-DIFFICULTY = 2
+DIFFICULTY = 3

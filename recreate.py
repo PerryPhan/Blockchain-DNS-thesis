@@ -3,7 +3,7 @@ from business import NodesBusiness, AccountBusiness
 import socket, random, re
 from werkzeug.security import generate_password_hash
 
-# recreate()
+recreate()
 # CREATE NODES 
 
 nodes = NodesBusiness()

@@ -32,8 +32,8 @@ class DNSResolver:
             node.account_id = admin.id
             self.blockchain.nodes.updateNode(node)
         self.blockchain.nodes.setNode(node)
-        self.blockchain.loadChain()
-
+        return self.blockchain.loadChain()
+        
     def lookup(self, request_form):
         return self.blockchain.searchTransactionMatchObj(request_form)
 
@@ -109,7 +109,10 @@ class Blockchain:
             transactions=None
             ) if self.node_id else None
         return self.genesis_block
-
+    
+    def checkHashCondition(self, hash):
+        return hash.startswith('0' * self.DIFFICULTY)
+    
     def loadChain(self):
         '''
             Both init and reload blockchain by loading blocks from DB 
@@ -120,15 +123,32 @@ class Blockchain:
             return 500
 
         self.chain = [genesisBlock]
-        # self.chain = []
         try:
-
+            # Check Block hash
             blocks_list = db.session.query(Blocks).all()
-            # TODO : check intergity of chain
             if len(blocks_list) > 0:
-                for block in blocks_list:
-                    self.chain.append(block)
+                # Check Transaction hash
+                idhash_pool = self.transactions.getIdHashTransactionsPool()
+                if not self.checkHashCondition(blocks_list[0]._hash()): return 500                
+                self.chain.append( blocks_list[0] )
+                
+                for i in range( 1,len(blocks_list) ):
+                    pre_block = blocks_list[i-1]
+                    cur_block = blocks_list[i]
+                    
+                    # Layer #1 : valid hash 
+                    if not self.checkHashCondition(cur_block._hash()) : return 500
+                    
+                    # Layer #2 : previous_hash = pre_block._hash()
+                    if cur_block.previous_hash != pre_block._hash(): return 500
+                    
+                    # Layer #3 : transaction in trasaction pool 
+                    if any([ tran in idhash_pool for tran in cur_block.transactions]) == False : return 500
 
+                    # Get transaction idhash pool
+                    self.chain.append(cur_block)
+                     
+            
             return 200
 
         except:
@@ -302,15 +322,6 @@ class Blockchain:
         '''
         return self.loadChain()
 
-    # GENERAL FUNCTION ----------------------------------------------------------
-    def searchTransactionMatchObj(self, obj):
-        for transaction in self.all_transactions:
-            for key, value in transaction.items():
-                if key in obj.keys():
-                    if value == obj[key]:
-                        return transaction, 200
-        return None, 404
-
     def getBlockTransactionWithId(self, id):
         block = db.session.query(Blocks).filter( Blocks.id == id).first()
         transactions = block.transactions
@@ -455,6 +466,9 @@ class TransactionBusiness:
         checked['$ttl'] = True if re.match(checked['$ttl'], str(obj['$ttl'])) else False
         
         return all([checked[key] for key in checked.keys()])
+
+    def getIdHashTransactionsPool(self):
+        return [ tran.block_tx_format for tran in self.getAllTransactions()]
 
     def countAllTransactions(self):
         return db.session.query(Transactions).count()
