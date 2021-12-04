@@ -74,8 +74,8 @@ class Blocks(db.Model):
     # ===============
     node_id = db.Column(db.String(64), db.ForeignKey('nodes.id'))
     add_by_node_id = db.Column(db.String(64), nullable=True)
-    mined_transactions = db.relationship('Transactions', backref="block")
     hash = None
+    mined_transactions = db.relationship('Transactions', backref="block")
     
     def as_dict(self):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}

@@ -1,10 +1,10 @@
 {
-	"$origin": "acb.com",
+	"$origin": "spec.com",
 	"$ttl": 3600,
 
 	"soa": {
-		"mname": "ns1.acb.com",
-		"rname": "admin.acb.com",
+		"mname": "ns1.spec.com",
+		"rname": "admin.spec.com",
 		"serial": "{time}",
 		"refresh": 3600,
 		"retry": 600,
@@ -13,14 +13,14 @@
 	},
 
 	"ns": [
-		{"host": "ns1.acb.com"},
-		{"host": "ns2.acb.com"}
+		{"host": "ns1.spec.com"},
+		{"host": "ns2.spec.com"}
 	],
 
 	"a": [
 		{"name": "@",
 		  "ttl": 400,
-		  "value": "192.168.1.7"
+		  "value": "192.168.1.10"
 		},
 		{"name": "@",
 		  "ttl": 400,

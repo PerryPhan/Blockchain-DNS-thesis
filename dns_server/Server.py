@@ -5,7 +5,8 @@ import requests, json, os
 from argparse import ArgumentParser
 from dns_generator import ClientHandler
 from datetime import datetime
-
+import signal
+import sys
 
 # Global variables
 IP = '192.168.1.7'
@@ -64,13 +65,14 @@ def load_zones_from_path():
     return json_zone # {'daidns1.com': content of file 'daidns1.com' } 
 
 def main(from_ip_address, from_port, debug_flag=False):
-    
+    REST_TIME = 5 #sec
     def loading(from_ip_address, from_port, debug_flag, sec):
         global ZONES
+        print("THREADING ON ")
         ZONES = load_zones(from_ip_address, from_port, debug_flag) or load_zones_from_path() 
-
+        if not ZONES: return 
         time.sleep(sec)
-
+        
     try: # Version Listening IP, Port
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.bind((IP, PORT))
@@ -81,7 +83,7 @@ def main(from_ip_address, from_port, debug_flag=False):
     
     x = threading.Thread(
         target=loading,
-        args=[from_ip_address, from_port, debug_flag, 5]
+        args=[from_ip_address, from_port, debug_flag, REST_TIME]
     )
     x.start()
     x.join()
@@ -95,15 +97,18 @@ def main(from_ip_address, from_port, debug_flag=False):
         print("Initial len : ", len(ZONES))
         print("Initial arr : ", [ zone for zone in ZONES ])
     print("---------------- LISTENING ON PORT 53 --------------------")
-    print("< Press Ctrl + C to end process, this may take time, please wait >" )
-    REST_TIME = 5 #sec
-    while True:
+    print("< Press select 'Kill active process' or CTRL + C to end process, this may take time, please wait >" )
+    
+    while ZONES:
         try: 
             data, address = sock.recvfrom(650)
             # data: Raw Data , address : Tuple
             # b'I_\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00\x07daidns1\x03com\x00\x00\x01\x00\x01' ('192.168.1.7', 57426)
             # NEW_ZONES = load_zones(from_ip_address, from_port, debug_flag) or load_zones_from_path()
             # if NEW_ZONES != ZONES : ZONES = NEW_ZONES
+            if not ZONES :
+                x.join()
+                raise KeyboardInterrupt
             x = threading.Thread(
                 target=loading,
                 args=[from_ip_address, from_port, debug_flag, REST_TIME]
@@ -122,10 +127,11 @@ def main(from_ip_address, from_port, debug_flag=False):
             x.join()
             sock.close()
             break
-        except socket.error :
-            pass
-        except os.error :
-            pass
+        except os.error:
+            print("---------------- ENDING WITH CTRL + C --------------------" )
+            x.join()
+            sock.close()
+            break
     print("---------------- CLEANING DNS CACHE --------------------")
     os.system('restartNIC.bat')
 

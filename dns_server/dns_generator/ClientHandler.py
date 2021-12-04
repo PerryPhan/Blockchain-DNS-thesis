@@ -15,7 +15,13 @@ class ClientHandler(threading.Thread):
         self.debug = False
 
     def run(self):
-        resp = self.dns_gen.make_response()
-        self.sock.sendto( self.dns_gen.make_response(), self.client_address)
-        print("Request from {0} for {1}".format(self.client_address, self.dns_gen.domain))
+        try : 
+            resp = self.dns_gen.make_response()
+            self.sock.sendto( self.dns_gen.make_response(), self.client_address)
+            print("Request from {0} for {1}".format(self.client_address, self.dns_gen.domain))
+        except KeyboardInterrupt:
+            pass
+        except:
+            pass
+            
     

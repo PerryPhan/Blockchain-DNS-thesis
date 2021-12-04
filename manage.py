@@ -533,7 +533,8 @@ def dashboard_operation():
                 dns.blockchain.broadcastNewBlock()
             html_options['transactions_list'] = dns.blockchain.transactions.getListTransactionsByAccount(account_options['account_id'])          
         else:
-            transactions_list_by_account.extend(appending_transactions)
+            for tran in appending_transactions:  
+                transactions_list_by_account.insert(0 ,tran)
             html_options['transactions_list'] = transactions_list_by_account
         return render_template('_operation_dashboard_template.html', **html_options, **response)
     
@@ -944,7 +945,7 @@ if __name__ == "__main__":
     # - NOT FOUND NODE -------------------------------
     else:
         print(
-            f"Return code #{code}: WRONG INFORMATION OR THIS NODE IS RUNNING \n")
+            f"Return code #{code}: WRONG INFORMATION OR THIS NODE IS RUNNING AND NO NODES LEFT \n")
         print("Please try again with 2 options bellow :")
         print("1. Append '-p' option to access program \n")
         print(

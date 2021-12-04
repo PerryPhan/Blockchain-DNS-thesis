@@ -143,7 +143,10 @@ class Blockchain:
                     if cur_block.previous_hash != pre_block._hash(): return 500
                     
                     # Layer #3 : transaction in trasaction pool 
-                    if any([ tran in idhash_pool for tran in cur_block.transactions]) == False : return 500
+                    for tran in cur_block.transactions:
+                        if  tran in idhash_pool == False : 
+                            print( '!! CHANGE FOUND IN TRANSACTION #',tran.id )
+                            return 500
 
                     # Get transaction idhash pool
                     self.chain.append(cur_block)
