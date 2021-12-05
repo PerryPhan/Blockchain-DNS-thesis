@@ -114,6 +114,7 @@ def main(from_ip_address, from_port, debug_flag=False):
                 args=[from_ip_address, from_port, debug_flag, REST_TIME]
             )
             x.start()
+            x.join()
             print("\tLen : ", len(ZONES) or 0)
             print("\tArr : ", [ zone for zone in ZONES ])
             if debug_flag == True:
@@ -123,11 +124,6 @@ def main(from_ip_address, from_port, debug_flag=False):
             client = ClientHandler(address, data, sock, ZONES)
             client.run() # return
         except KeyboardInterrupt:
-            print("---------------- ENDING WITH CTRL + C --------------------" )
-            x.join()
-            sock.close()
-            break
-        except os.error:
             print("---------------- ENDING WITH CTRL + C --------------------" )
             x.join()
             sock.close()

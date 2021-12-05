@@ -678,58 +678,38 @@ class NodesBusiness:
         """
         network = self.getNetwork()  # Found all node ( not-working status )
         id = str(uuid4()).replace('-', '')
-        if not network:  # 1. Empty network, create new
+        if not network:  # Empty network, create new
             return self.registerNode(
-                id,
-                ip,
-                port,
-                nodename,
-                is_active
+                id, ip, port, nodename, is_active
             )
         else:
             if genport_flag == True :
                 port = random.randint(self.PORT_START, self.PORT_END)
                 return self.registerNode(
-                    id,
-                    ip,
-                    port,
-                    nodename,
-                    is_active
+                    id, ip, port, nodename, is_active
                 )
             nodeIP = self.getNodeWithIP(ip)
-            if not nodeIP:  # 2. Don't have this IP in DB, create new
+            if not nodeIP:  # Don't have this IP in DB, create new
                 return self.registerNode(
-                    id,
-                    ip,
-                    port,
-                    nodename,
-                    is_active
+                    id, ip, port, nodename, is_active
                 )
             nodeIPPort = self.getNodeWithIPAndPort(ip, port)
-            if not nodeIPPort:  # 3. Have this IP but don't have this port, create new
+            if not nodeIPPort:  # Have this IP but don't have this port, create new
                 return self.registerNode(
-                    id,
-                    ip,
-                    port,
-                    nodename,
-                    is_active
+                    id, ip, port, nodename, is_active
                 )
-            elif nodeIPPort.is_active == True:  # 4. This node already active    
+            elif nodeIPPort.is_active == True:  # This node already active    
                 anotherNode = [
                     node for node in nodeIP if node.is_active == False and node.ip == nodeIPPort.ip]  
                 if len(anotherNode) <= 0:  # No node same IP spared
                     return self.registerNode(
-                        id,
-                        ip,
-                        port,
-                        nodename,
-                        is_active
+                        id, ip, port, nodename, is_active
                     )
                 else:  # This node has same IP, different port and haven't used yet
                     self.activeNode(anotherNode[0])
                     return anotherNode[0], 201
 
-            else:  # 5. This node is not used by anyone
+            else:  # This node is not used by anyone
                 self.activeNode(nodeIPPort)
                 return nodeIPPort, 201
 

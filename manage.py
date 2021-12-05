@@ -45,6 +45,7 @@ def blocks_txs_manager():
     limit = 3
 
     # Default
+    id = 1
     page = 1
     pages = 1
     offset = 0
@@ -579,8 +580,9 @@ def login():
             session['account'] = account
 
         response = {'status': status, 'message': message}
+        
         return render_template('_login_template.html', **html_options, **response) if status != 200 else redirect('/dashboard/transactions')
-
+        
     regis_email = ''
     if session and session.get('regis_email'):
         regis_email = session.get('regis_email')
