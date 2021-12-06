@@ -65,7 +65,7 @@ def load_zones_from_path():
     return json_zone # {'daidns1.com': content of file 'daidns1.com' } 
 
 def main(from_ip_address, from_port, debug_flag=False):
-    REST_TIME = 5 #sec
+    REST_TIME = 2 #sec
     def loading(from_ip_address, from_port, debug_flag, sec):
         global ZONES
         print("THREADING ON ")
@@ -73,14 +73,14 @@ def main(from_ip_address, from_port, debug_flag=False):
         if not ZONES: return 
         time.sleep(sec)
         
-    try: # Version Listening IP, Port
+    try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.bind((IP, PORT))
         print("\nDNS Listening on {0}:{1} !!\n".format(IP, PORT))
-    except: # Version Loading from Zones folder
-        print('\nEXCEPTION FROM DNS')
-        pass
-    
+    except:
+        sock.close()
+        print("\nDNS error when init ")
+        
     x = threading.Thread(
         target=loading,
         args=[from_ip_address, from_port, debug_flag, REST_TIME]
@@ -99,14 +99,14 @@ def main(from_ip_address, from_port, debug_flag=False):
     print("---------------- LISTENING ON PORT 53 --------------------")
     print("< Press select 'Kill active process' or CTRL + C to end process, this may take time, please wait >" )
     
-    while ZONES:
+    while True:
         try: 
             data, address = sock.recvfrom(650)
             # data: Raw Data , address : Tuple
             # b'I_\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00\x07daidns1\x03com\x00\x00\x01\x00\x01' ('192.168.1.7', 57426)
             # NEW_ZONES = load_zones(from_ip_address, from_port, debug_flag) or load_zones_from_path()
             # if NEW_ZONES != ZONES : ZONES = NEW_ZONES
-            if not ZONES :
+            if not ZONES:
                 x.join()
                 raise KeyboardInterrupt
             x = threading.Thread(
@@ -114,7 +114,7 @@ def main(from_ip_address, from_port, debug_flag=False):
                 args=[from_ip_address, from_port, debug_flag, REST_TIME]
             )
             x.start()
-            x.join()
+            # x.join()
             print("\tLen : ", len(ZONES) or 0)
             print("\tArr : ", [ zone for zone in ZONES ])
             if debug_flag == True:
@@ -123,14 +123,32 @@ def main(from_ip_address, from_port, debug_flag=False):
 
             client = ClientHandler(address, data, sock, ZONES)
             client.run() # return
+            
         except KeyboardInterrupt:
             print("---------------- ENDING WITH CTRL + C --------------------" )
-            x.join()
             sock.close()
+            x.join()
             break
-    print("---------------- CLEANING DNS CACHE --------------------")
-    os.system('restartNIC.bat')
+        except os.error:
+            print("---------------- ENDING WITH ERROR --------------------" )
+            print(os.error())
+            sock.close()
+            x.join()
+            break
+        except :
+            print("---------------- ENDING WITH EXCEPT --------------------" )
+            print(Exception())
+            sock.close()
+            x.join()
+            break
 
+    sock.close()
+    x.join()        
+    os.system('restartNIC.bat')
+    print("< Please wait 5 seconds for adapter fully restarted >")
+    time.sleep(5)
+    print("---------------- CLEANING DNS CACHE --------------------")
+    exit(0)
 
 if __name__ == "__main__":
     parser = ArgumentParser()
