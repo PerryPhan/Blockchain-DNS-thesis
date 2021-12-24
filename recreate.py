@@ -1,8 +1,18 @@
-from database import recreate, db, clear_data
+from database import db
 from business import NodesBusiness, AccountBusiness
 import socket, random, re
-from werkzeug.security import generate_password_hash
 
+def recreate():
+    db.drop_all()
+    db.create_all()
+    
+def clear_data(session):
+    meta = db.metadata
+    for table in reversed(meta.sorted_tables):
+        print('Clear table %s' % table)
+        session.execute(table.delete())
+    session.commit()
+    
 recreate()
 # CREATE NODES 
 
@@ -47,7 +57,7 @@ def create_nodes( number ):
         print()
     print("DONE !!")
     
-# CRAETE ADMIN
+# CREATE ADMIN
 accounts = AccountBusiness()
 def create_admin(node, name):
     # Get random fullname

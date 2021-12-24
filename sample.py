@@ -1,26 +1,11 @@
-# from models import db, generate_password_hash, random
 import random
 import json
 import time
-import re
 import os
-# from models import Accounts, Transactions
-# Accounts -------------------------------------------------------
-# db.session.add(
-#     Accounts(
-#         fullname='Phan Dai',
-#         email='phandai@admin.com',
-#         password=generate_password_hash('Phandai2@'),
-#         type_cd=1, # ADMIN
-#         is_deleted=False
-#     )
-# )
-# Nodes ----------------------------------------------------------
-# Transactions ---------------------------------------------------
+
 HEADER = "#[domain] [type] [ip] [port] [ttl-Timetolive]\n"
 CONTENTS = []
 FILENAME = 'names.txt'
-
 
 def autoInsertTransaction(number):
     def generateRecordTransaction(domain, ip, type='A', port=80, ttl=14400):
@@ -34,10 +19,13 @@ def autoInsertTransaction(number):
 
     domains = generateDomains(number)
     ips = generateIPs(number)
-    trans = [generateRecordTransaction(domains[i], ips[i])
-             for i in range(number)]
+    trans = [
+        generateRecordTransaction(domains[i], ips[i]) for i in range(number)
+    ]
     CONTENTS = [
-        f"{tran['domain']} {tran['type']}  {tran['ip']} {tran['port']} {tran['ttl']}\n" for tran in trans]
+        f"{tran['domain']} {tran['type']}  {tran['ip']} {tran['port']} {tran['ttl']}\n"
+        for tran in trans
+    ]
 
     f = open("sample.txt", "w")
     f.write(HEADER)
@@ -45,16 +33,7 @@ def autoInsertTransaction(number):
         f.write(content)
     f.close()
 
-    return json.dumps({
-        'len': len(trans),
-        'transactions': trans
-    })
-    # for i in range( number ):
-    #     db.session.add(Transactions(
-    #         hostname= domains[i],
-    #         ip= ips[i],
-    #         reward= reward,
-    #         port= port))
+    return json.dumps({'len': len(trans), 'transactions': trans})
 
 
 def generateDomains(number):
@@ -84,6 +63,7 @@ def generateIPs(number):
 
 number = 5
 
+
 def generateZoneFiles(number):
     zones_list = []
 
@@ -92,24 +72,25 @@ def generateZoneFiles(number):
 
     for i in range(number):
         ZONE_FILE_FORMAT = {
-            '$origin':  "{domain}".format(domain=domains[i]),
-            '$ttl': 3600,
+            '$origin':
+            "{domain}".format(domain=domains[i]),
+            '$ttl':
+            3600,
             'soa': {
                 "mname": "ns1.{domain}".format(domain=domains[i]),
                 "rname": "admin.{domain}".format(domain=domains[i]),
-                        "serial": "{time}".format(time=str(time.time())),
+                "serial": "{time}".format(time=str(time.time())),
                 "refresh": 3600,
                 "retry": 600,
                 "expire": 604800,
                 "minimum": 86400
             },
-
-            'ns':  [
-                {"host": "ns1.{domain}".format(domain=domains[i])},
-                {"host": "ns2.{domain}".format(domain=domains[i])}
-            ],
-
-            'a':  [
+            'ns': [{
+                "host": "ns1.{domain}".format(domain=domains[i])
+            }, {
+                "host": "ns2.{domain}".format(domain=domains[i])
+            }],
+            'a': [
                 {
                     "name": "@",
                     "ttl": 400,
@@ -129,7 +110,7 @@ def generateZoneFiles(number):
         }
         sample_path = 'sample/'
         filename = "{domain}.zone".format(domain=domains[i])
-        print('Append ',i,') ',filename,' to folder ',sample_path)
+        print('Append ', i, ') ', filename, ' to folder ', sample_path)
         with open(sample_path + filename, 'w+') as f:
             try:
                 json.dump(ZONE_FILE_FORMAT, f)
@@ -163,6 +144,3 @@ def testOpenJSON():
 
 
 generateZoneFiles(number)
-# Blocks ---------------------------------------------------------
-# PUSH ALL >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-# db.session.commit()

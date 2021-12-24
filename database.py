@@ -1,25 +1,9 @@
-from constant import MINE_REWARD, ZONE_FORMAT
+from constant import MINE_REWARD
 from include import db, json, hashlib, datetime, copy
 import time
 ''' 
     This file stores what is necessary in Database PgSQL 
 '''
-
-def recreate():
-    db.drop_all()
-    db.create_all()
-    
-def clear_data(session):
-    meta = db.metadata
-    for table in reversed(meta.sorted_tables):
-        print('Clear table %s' % table)
-        session.execute(table.delete())
-    session.commit()
-    
-def merge_obj(obj, merge_obj):
-    for property in merge_obj:
-        obj[property] = merge_obj[property]
-    return obj
 
 class Accounts(db.Model):
     __tablename__ = 'accounts'
@@ -61,7 +45,6 @@ class Nodes(db.Model):
 
     def datetime_format(self):
         return datetime.fromtimestamp(self.timestamp).strftime("%b %d, %Y") if self.timestamp else None
-
 
 class Blocks(db.Model):
     __tablename__ = 'blocks'
