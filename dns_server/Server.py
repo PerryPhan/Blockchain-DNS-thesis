@@ -1,18 +1,39 @@
 #!/usr/bin/env python3
 
 import socket
-import requests, json, os
+import requests, json, os, re
 from argparse import ArgumentParser
 from dns_generator import ClientHandler
 from datetime import datetime
-import signal
-import sys
 
 # Global variables
-IP = '192.168.1.7'
+IP = '192.168.43.7'
 PORT = 53
 
 import threading, time
+
+def create_file_restartNIC_bat(on = False):
+    if on == False : return 
+    
+    BROADCAST = '.'.join( re.split('\.', IP)[:-1] ) + '.1'
+    SUBNET = '255.255.255.0'
+    
+    commands = f'''
+    netsh winsock reset
+    netsh int ip reset
+    netsh advfirewall reset 
+    ipconfig /flushdns
+    ipconfig /release
+    ipconfig /renew
+    netsh interface ipv4 set address name="Wi-Fi" static {IP} {SUBNET} {BROADCAST}
+    netsh advfirewall set publicprofile state off
+    '''
+    
+    with open('restartNIC.bat', 'w+') as f:
+        f.write(commands)
+        
+    print(' REWRITING FILE restartNIC.bat .. Done')
+
 
 def load_zones(from_ip, from_port, create_zone_file_flag ):
     if not from_ip:
@@ -161,10 +182,17 @@ if __name__ == "__main__":
 
     parser.add_argument('-p', '--port',  nargs="?", const=5000,
                         type=int, help='Option application\'s port')
+    
+    parser.add_argument('-rw', '--rewrite',  action="store_true"
+                        , help='Flag to on(1)/off(0) rewriting restartNIC.bat file , default: off(0) ')
+    
     args = parser.parse_args()
 
     debug_flag = args.debug
     from_ip_address = args.ip or socket.gethostbyname(socket.gethostname())
     from_port = args.port
-
+    on = args.rewrite
+    
+    create_file_restartNIC_bat(on)
+    
     main(from_ip_address, from_port, debug_flag)

@@ -114,9 +114,9 @@
           <div class="value"><span>{{ dblock.previous_hash }}</span></div>
         </div>
         <div class="flex add-by">
-          <label for="add-by">Add by {% if dblock.node_id == dblock.add_by_node_id %} this node {% else %} other node {% endif %}</label>
+          <label for="add-by">Add by {% if node.id == dblock.add_by_node_id %} this node {% else %} other node {% endif %}</label>
           <div class="value">
-            <span>{% if dblock.node_id == dblock.add_by_node_id %} +{{dblock.earning()}} {% else %} 0 {% endif %}</span>
+            <span> {% if node.id == dblock.add_by_node_id %} +{{dblock.earning()}} {% else %} 0 {% endif %}</span>
           </div>
         </div>
         <div class="flex created-by" id ="{{ dblock.node.id }}" >

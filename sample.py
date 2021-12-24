@@ -129,6 +129,7 @@ def generateZoneFiles(number):
         }
         sample_path = 'sample/'
         filename = "{domain}.zone".format(domain=domains[i])
+        print('Append ',i,') ',filename,' to folder ',sample_path)
         with open(sample_path + filename, 'w+') as f:
             try:
                 json.dump(ZONE_FILE_FORMAT, f)
