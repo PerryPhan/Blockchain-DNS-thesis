@@ -1,7 +1,11 @@
 from database import db
 from business import NodesBusiness, AccountBusiness
 import socket, random, re
-
+'''
+    Run this file to drop and create all configured tables 
+    Auto generate default number ( 10 ) node + number admin for that node
+    End
+'''
 def recreate():
     db.drop_all()
     db.create_all()
@@ -12,10 +16,14 @@ def clear_data(session):
         print('Clear table %s' % table)
         session.execute(table.delete())
     session.commit()
+    print()
     
 recreate()
-# CREATE NODES 
 
+# CREATE NODES 
+'''
+    This progress genereate node
+'''
 nodes = NodesBusiness()
 host = socket.gethostbyname(socket.gethostname())
 port = 5000
@@ -58,6 +66,9 @@ def create_nodes( number ):
     print("DONE !!")
     
 # CREATE ADMIN
+'''
+    This progress genereate account type 'Admin'
+'''
 accounts = AccountBusiness()
 def create_admin(node, name):
     # Get random fullname
@@ -74,7 +85,6 @@ def create_admin(node, name):
     ]," with code ", status )
     return admin, status
 
-clear_data(db.session)
-print()
-create_nodes(number)
+clear_data(db.session) # Truncate Data
+create_nodes(number) # Main
 
