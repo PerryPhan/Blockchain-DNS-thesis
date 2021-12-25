@@ -1,6 +1,6 @@
 <p align="center">
   <a href="" rel="noopener">
- <img width=100% height=400px src="https://supraoracles.com/wp-content/uploads/2021/11/blockchain-domains.jpg" alt="Project logo"></a>
+ <img width=600px height=400px src="https://supraoracles.com/wp-content/uploads/2021/11/blockchain-domains.jpg" alt="Project logo"></a>
 </p>
 
 <h1 align="center"><b>DNS BLOCKCHAIN</b></h1>
@@ -16,10 +16,10 @@
 
 ---
 
-<p align="center">This is my exams to end my university journey. Takes 2.5 months. The day report is 24/12/2021 ( Chrismas in COVID and Ormicron 😥 ). Lots of memorible moment 😁. 
+<p align="center">This is my exams to end my university journey. Takes 2.5 months. The day report is 24/12/2021 ( Chrismas in COVID and Ormicron 😥 ). Lots of memorible moment 😁. <br> I'm the last one on the left 
 <br>
 <a href="" rel="noopener">
-<img width=450px height=250px src="https://scontent.fsgn5-6.fna.fbcdn.net/v/t1.15752-9/264329563_623215088925900_5231524545818107820_n.jpg?_nc_cat=106&ccb=1-5&_nc_sid=ae9488&_nc_ohc=P6I4aaQ25T4AX9Yu8W0&_nc_ht=scontent.fsgn5-6.fna&oh=03_AVIWddUf-4NBS0t94Zuyh1WDnaKUZlJi6Sw_1iI1ZC4rJA&oe=61EAA151" alt="Memorible Moment">
+<img width=550px height=300px src="https://scontent.fsgn5-6.fna.fbcdn.net/v/t1.15752-9/264329563_623215088925900_5231524545818107820_n.jpg?_nc_cat=106&ccb=1-5&_nc_sid=ae9488&_nc_ohc=P6I4aaQ25T4AX9Yu8W0&_nc_ht=scontent.fsgn5-6.fna&oh=03_AVIWddUf-4NBS0t94Zuyh1WDnaKUZlJi6Sw_1iI1ZC4rJA&oe=61EAA151" alt="Memorible Moment">
 </a>
 
 </p>
@@ -54,6 +54,12 @@ Python 3.9.5
 ```
 Try with upper or equal version only. Because I had bug when hashing SHA 256 from database in hashlib in version 3.6.5
 
+Also your apdater setting for DNS very important. 
+
+#1: The Ipv4 setting and Ipv6 off
+
+![Adapter setting](/screenshot/20211225_adapter_setting.png?raw=true "Adapter setting")
+
 ### <b> Installing </b>
 All the setup process is in the setup.sh, you can just easily run batch and the database included a number of table data. 
 ```
@@ -63,7 +69,7 @@ Another need in this program is DNS Server config, go to dns/Server.py and rewri
 
 ```
 # Global variables
-IP = '192.168.43.7' # wifi Ipv4 address
+IP = '192.168.1.7' # wifi Ipv4 address
 PORT = 53
 ```
 
@@ -77,19 +83,86 @@ The result with like restartNIC.sample.bat with Ipv4 is 192.168.43.7
 
 ## 🎈 Usage <a name="usage"></a>
 
-Add notes about how to use the system.
-Take screen shot 
+<b> ABOUT BLOCKCHAIN </b>
+
+To run every nodes in the network, just run command 
+```
+python manage.py -p 
+```
+![Run node](/screenshot/20211225_run_node_1.png?raw=true "Run node" )
+'-p \<port>' : which port you open with ( defualt 5000 ), used again will access random one in your node list. <br>
+The other option can be found out more by command help ' -h ' 
+
+# 
+When you have 2 nodes open in the Command line, then go to website and login with administrator or registry with hoster right.
+
+#1 : Registry with hoster or login with admin.
+
+<br> 📍 Login
+
+![Login with admin](/screenshot/20211225_login_with_admin.png?raw=true "Login with admin")
+
+<br> 📍 Registry
+
+![Registry hoster](/screenshot/20211225_registry_with_hoster.png?raw=true "Registry hoster")
+
+#2 : Go to operation page and insert data with two ways ( by file, only .zone and .txt file, you can find it in /sample ).
+
+<br>
+
+![Do operation insert](/screenshot/20211225_do_operation.png?raw=true "Do operation insert")
+
+#3 : Show transactions and domains, may be blocks.
+
+<br> 📍 Transactions
+
+![Show transactions](/screenshot/20211225_show_transactions.png?raw=true "show transactions")
+
+<br> 📍 Domains
+
+![Show domains](/screenshot/20211225_show_domains.png?raw=true "show domains")
+
+<b> ABOUT SERVER </b>
+
+To run dns 
+```
+cd dns
+python Server.py -p
+```
+![Show dns](/screenshot/20211225_run_dns.png?raw=true "show dns")
+
+'-p \<port>' : which port you get data by ( defualt 5000 )<br>
+Especially, you need one '-ip' option but default it will be local ip
+
+The other option can be found out more by command help ' -h ' 
+
+#
+That it, now you can resolve your own default by your browser or 'ping' or 'nslookup' <br>
+Make sure web cache and dns cache is clear
+
+<br> 📍 Ping and Nslookup
+
+![Ping and Nslookup](/screenshot/20211225_ping_with_nslookup.png?raw=true "ping nslookup")
+
+<br> 📍 Browser
+
+![Browser](/screenshot/20211225_browser.png?raw=true "browser")
+
+
+
 
 ## ✍️ Authors <a name = "authors"></a>
-
-- [@PerryPhan aka Phan Dai](https://github.com/PerryPhan) - All operations director. 
+- [Mr. Huynh Thanh Tam]() - Guided Teacher  
+- [@PerryPhan aka Phan Dai](https://github.com/PerryPhan) - Creator. 
 
 Thank to :<br> 
-⭐[@almighty-ken](https://github.com/almighty-ken) with his [DNS Blockchain repository](https://github.com/almighty-ken/DNS_BlockChain) .<br>
+⭐[@almighty-ken](https://github.com/almighty-ken) with his basic skeleton [DNS Blockchain repository](https://github.com/almighty-ken/DNS_BlockChain) .<br>
 ⭐[@akapila011](https://github.com/akapila011) with his [DNS Server](https://github.com/akapila011/DNS-Server)
 
 ## 🎉 Acknowledgements <a name = "acknowledgement"></a>
 
 - Knowledge of Blockchain and DNS 
 - Ways to resolve DNS request
-- Progress of making block 
+- Progress of mining block based on Proof of Work  
+
+<h2 align="center"> <b> Have fun 😉 </b> </h2>
