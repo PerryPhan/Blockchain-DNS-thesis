@@ -19,7 +19,7 @@
 <p align="center">This is my exams to end my university journey. Takes 2.5 months. The day report is 24/12/2021 ( Chrismas in COVID and Ormicron 😥 ). Lots of memorible moment 😁. <br> I'm the last one on the left 
 <br>
 <a href="" rel="noopener">
-<img width=550px height=300px src="https://scontent.fsgn5-6.fna.fbcdn.net/v/t1.15752-9/264329563_623215088925900_5231524545818107820_n.jpg?_nc_cat=106&ccb=1-5&_nc_sid=ae9488&_nc_ohc=P6I4aaQ25T4AX9Yu8W0&_nc_ht=scontent.fsgn5-6.fna&oh=03_AVIWddUf-4NBS0t94Zuyh1WDnaKUZlJi6Sw_1iI1ZC4rJA&oe=61EAA151" alt="Memorible Moment">
+<img width=550px height=300px src="./screenshot/our_class_final_photo.jpg" alt="Memorible Moment">
 </a>
 
 </p>
